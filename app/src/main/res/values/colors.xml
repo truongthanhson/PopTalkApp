@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="textColorPrimary">#757575</color>
+    <color name="navigationBarColor">#000000</color>
+    <color name="colorAccent">#448AFF</color>
+    <color name="half_black">#808080</color>
+    <color name="black">#ff000000</color>
+    <color name="white">#ffffffff</color>
+    <color name="gray">#ffa5a5a5</color>
+
+    <color name="login_background">#f1f5f7</color>
+    <color name="login_base_background">#f8f9f9</color>
+    <color name="login_footer_background">#ffda1b</color>
+    <color name="login_footer_text">#c62828</color>
+    <color name="login_button">#c62828</color>
+    <color name="login_button_pressed">#931f1f</color>
+    <color name="login_device_id_background">#8090a4ae</color>
+</resources>
