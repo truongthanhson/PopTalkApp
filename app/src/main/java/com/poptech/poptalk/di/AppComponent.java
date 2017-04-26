@@ -2,6 +2,8 @@ package com.poptech.poptalk.di;
 
 import android.content.Context;
 
+import com.poptech.poptalk.provider.PopTalkDatabase;
+
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -14,4 +16,5 @@ import dagger.Component;
 @Singleton
 public interface AppComponent {
     Context getApplicationContext();
+    PopTalkDatabase getDatabase();
 }

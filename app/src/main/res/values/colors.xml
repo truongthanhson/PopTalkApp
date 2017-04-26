@@ -10,6 +10,14 @@
     <color name="white">#ffffffff</color>
     <color name="gray">#ffa5a5a5</color>
 
+    <color name="level_0">#1abc9c</color>
+    <color name="level_1">#3498db</color>
+    <color name="level_2">#e67e22</color>
+    <color name="level_3">#8e44ad</color>
+    <color name="level_4">#f1c40f</color>
+    <color name="level_5">#2ecc71</color>
+    <color name="level_default">#000000</color>
+
     <color name="login_background">#f1f5f7</color>
     <color name="login_base_background">#f8f9f9</color>
     <color name="login_footer_background">#ffda1b</color>

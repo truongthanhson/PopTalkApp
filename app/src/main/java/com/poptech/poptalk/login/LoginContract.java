@@ -11,8 +11,9 @@ public class LoginContract {
 
     interface View extends BaseView<Presenter>{
         void showErrorPassword(String error);
-        void showErrorUsernam(String error);
+        void showErrorUsername(String error);
         void onLoginSuccessful();
+        void onLoginFailed();
     }
 
     interface Presenter extends BasePresenter{

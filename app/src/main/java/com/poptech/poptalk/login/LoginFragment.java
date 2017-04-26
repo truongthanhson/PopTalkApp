@@ -10,9 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.andexert.library.RippleView;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.utils.AnimationUtils;
 
 import java.io.File;
@@ -87,18 +89,21 @@ public class LoginFragment extends Fragment implements LoginContract.View, Rippl
     }
 
     @Override
-    public void showErrorUsernam(String error) {
+    public void showErrorUsername(String error) {
         mUserName.setError(getString(R.string.login_error_username));
         AnimationUtils.shake(getActivity().getApplicationContext(), mUserName);
     }
 
     @Override
     public void onLoginSuccessful() {
-//        SaveData.getInstance(getActivity()).setLoggedIn(true);
-//        Intent intent = new Intent(getActivity(), PhotoActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(intent);
-//        getActivity().finish();
+        Intent intent = new Intent(getActivity(), CollectionsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onLoginFailed() {
     }
 
     @Override

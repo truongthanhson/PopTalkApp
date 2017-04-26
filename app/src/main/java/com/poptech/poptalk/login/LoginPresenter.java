@@ -12,11 +12,15 @@ import javax.inject.Inject;
 
 public class LoginPresenter implements LoginContract.Presenter {
     private LoginContract.View mView;
+
     @Inject
     Context mContext;
 
+    private LoginModel mModel;
+
     @Inject
-    public LoginPresenter(LoginContract.View view) {
+    public LoginPresenter(LoginModel model, LoginContract.View view) {
+        this.mModel = model;
         this.mView = view;
     }
 
@@ -32,11 +36,15 @@ public class LoginPresenter implements LoginContract.Presenter {
     @Override
     public void login(String userName, String password) {
         if (userName.isEmpty()) {
-            mView.showErrorUsernam(mContext.getString(R.string.login_error_username));
+            mView.showErrorUsername(mContext.getString(R.string.login_error_username));
         } else if (password.isEmpty()) {
             mView.showErrorPassword(mContext.getString(R.string.login_error_password));
         } else {
-            mView.onLoginSuccessful();
+            if(mModel.getUser().getName().equalsIgnoreCase(userName) && mModel.getUser().getPassword().equalsIgnoreCase(password)){
+                mView.onLoginSuccessful();
+            }else{
+                mView.onLoginFailed();
+            }
         }
     }
 
