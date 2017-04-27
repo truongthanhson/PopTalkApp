@@ -27,6 +27,8 @@
     <dimen name="level_beam_line_width">6dp</dimen>
     <dimen name="level_beam_line_offset">2dp</dimen>
 
+    <dimen name="grid_divider">5dp</dimen>
+
     <dimen name="list_item_padding">8dp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>

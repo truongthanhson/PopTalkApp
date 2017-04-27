@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -54,6 +55,11 @@ public class CollectionsActivity extends AppCompatActivity {
         // Set up the navigation drawer.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupNavigationBar();
@@ -68,20 +74,9 @@ public class CollectionsActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-//        DaggerTasksComponent.builder()
-//                .tasksRepositoryComponent(((ToDoApplication) getApplication()).getTasksRepositoryComponent())
-//                .tasksPresenterModule(new TasksPresenterModule(tasksFragment)).build()
-//                .inject(this);
-//
         DaggerCollectionsComponent.builder()
                 .appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent())
                 .collectionsPresenterModule(new CollectionsPresenterModule(collectionsFragment)).build().inject(this);
-//        // Load previously saved state, if available.
-//        if (savedInstanceState != null) {
-//            TasksFilterType currentFiltering =
-//                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-//            mTasksPresenter.setFiltering(currentFiltering);
-//        }
     }
 
     private void setupNavigationBar() {

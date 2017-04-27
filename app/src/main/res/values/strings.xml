@@ -3,4 +3,6 @@
     <string name="login_error_username">Please enter username</string>
     <string name="login_error_password">Please enter password</string>
     <string name="login_error_language">Please choose language</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

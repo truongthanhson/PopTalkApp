@@ -1,5 +1,9 @@
 package com.poptech.poptalk.collections;
 
+import com.poptech.poptalk.bean.Collection;
+
+import java.util.List;
+
 import javax.inject.Inject;
 
 /**
@@ -18,6 +22,12 @@ public class CollectionsPresenter implements CollectionsContract.Presenter {
 
     @Override
     public void start() {
+        mView.setPresenter(this);
+    }
 
+    @Override
+    public void loadCollections() {
+        List<Collection> collections = mModel.getCollections();
+        mView.onCollectionsLoaded(collections);
     }
 }
