@@ -71,28 +71,17 @@
                     android:textSize="16sp" />
             </RelativeLayout>
 
-            <com.andexert.library.RippleView
-                android:id="@+id/login_ripple_id"
-                rv_centered="true"
+
+            <TextView
+                android:id="@+id/login_title_tv_id"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="20dp"
-                android:background="#c62828"
-                app:rv_rippleDuration="150">
-
-                <TextView
-                    android:id="@+id/login_title_tv_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:text="Log In"
-                    android:textColor="@color/white"
-                    android:textSize="15sp" />
-            </com.andexert.library.RippleView>
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="Log In"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
         </LinearLayout>
 
     </android.support.v7.widget.CardView>

@@ -23,13 +23,13 @@ import java.io.File;
  * Created by sontt on 04/03/2017.
  */
 
-public class LoginFragment extends Fragment implements LoginContract.View, RippleView.OnRippleCompleteListener {
+public class LoginFragment extends Fragment implements LoginContract.View, View.OnClickListener {
 
     private TextView mUserName;
 
     private EditText mPassword;
 
-    private RippleView mLoginButton;
+    private TextView mLoginButton;
 
     private View mView;
 
@@ -39,22 +39,6 @@ public class LoginFragment extends Fragment implements LoginContract.View, Rippl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        try {
-//            String pathPhoto = Environment.getExternalStorageDirectory() + Constants.PATH_APP + Constants.PATH_PHOTO;
-//            String pathSound = Environment.getExternalStorageDirectory() + Constants.PATH_APP + Constants.PATH_SOUND;
-//            File filePhoto = new File(pathPhoto);
-//            File fileSound = new File(pathSound);
-//            if (!filePhoto.exists()) {
-//                Utils.forceMkdir(filePhoto);
-//            }
-//            if (!fileSound.exists()) {
-//                Utils.forceMkdir(fileSound);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        SaveData.getInstance(getActivity()).setLoggedIn(false);
     }
 
     @Nullable
@@ -63,8 +47,8 @@ public class LoginFragment extends Fragment implements LoginContract.View, Rippl
         mView = inflater.inflate(R.layout.fragment_login_layout,container,false);
         mUserName = (TextView) mView.findViewById(R.id.user_name_id);
         mPassword = (EditText) mView.findViewById(R.id.password_id);
-        mLoginButton = (RippleView) mView.findViewById(R.id.login_ripple_id);
-        mLoginButton.setOnRippleCompleteListener(this);
+        mLoginButton = (TextView) mView.findViewById(R.id.login_title_tv_id);
+        mLoginButton.setOnClickListener(this);
         return mView;
     }
 
@@ -78,10 +62,6 @@ public class LoginFragment extends Fragment implements LoginContract.View, Rippl
         super.onDestroy();
     }
 
-    @Override
-    public void onComplete(RippleView rippleView) {
-        mPresenter.login(mUserName.getText().toString(), mPassword.getText().toString());
-    }
     @Override
     public void showErrorPassword(String error) {
         mPassword.setError(getString(R.string.login_error_password));
@@ -109,5 +89,16 @@ public class LoginFragment extends Fragment implements LoginContract.View, Rippl
     @Override
     public void setPresenter(LoginContract.Presenter presenter) {
         mPresenter = presenter;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.login_title_tv_id:
+                mPresenter.login(mUserName.getText().toString(), mPassword.getText().toString());
+                break;
+            default:
+                break;
+        }
     }
 }
