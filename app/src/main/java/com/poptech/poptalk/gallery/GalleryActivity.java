@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -20,10 +19,9 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.BasePermissionListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.collections.CollectionsFragment;
+import com.poptech.poptalk.speakitem.SpeakItemsDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -139,11 +137,13 @@ public class GalleryActivity extends AppCompatActivity {
         }else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("croppedPath", resultUri.getPath());
-                setResult(Activity.RESULT_OK,resultIntent);
-                Toast.makeText(this,resultUri.getPath()+ "", Toast.LENGTH_LONG).show();
+//                Uri resultUri = result.getUri();
+//                Intent resultIntent = new Intent();
+//                resultIntent.putExtra("croppedPath", resultUri.getPath());
+//                setResult(Activity.RESULT_OK,resultIntent);
+//                Toast.makeText(this,resultUri.getPath()+ "", Toast.LENGTH_LONG).show();
+                openSpeakItemDetailScreen();
+                finish();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Intent errorIntent = new Intent();
@@ -158,6 +158,12 @@ public class GalleryActivity extends AppCompatActivity {
         CropImage.activity(Uri.fromFile(new File(imagePath)))
                 .start(this);
     }
+
+    public void openSpeakItemDetailScreen(){
+        Intent intent = new Intent(this, SpeakItemsDetailActivity.class);
+        startActivity(intent);
+    }
+
 
     private void runCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

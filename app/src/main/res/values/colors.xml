@@ -25,4 +25,6 @@
     <color name="login_button">#c62828</color>
     <color name="login_button_pressed">#931f1f</color>
     <color name="login_device_id_background">#8090a4ae</color>
+
+    <color name="waveform_unselected">@color/colorAccent</color>
 </resources>
