@@ -150,4 +150,15 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mDrawerMenuAdapter.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mDrawerMenuAdapter.onRestoreInstanceState(savedInstanceState);
+    }
 }
