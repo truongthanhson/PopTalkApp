@@ -11,33 +11,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
-import com.karumi.dexter.listener.single.BasePermissionListener;
-import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.drawer.data.BaseItem;
-import com.poptech.poptalk.drawer.data.CustomDataProvider;
-import com.poptech.poptalk.drawer.multilevellistview.ItemInfo;
-import com.poptech.poptalk.drawer.multilevellistview.MultiLevelListAdapter;
-import com.poptech.poptalk.drawer.multilevellistview.MultiLevelListView;
-import com.poptech.poptalk.drawer.multilevellistview.OnItemClickListener;
-import com.poptech.poptalk.drawer.views.LevelBeamView;
+import com.poptech.poptalk.drawer.DrawerMenuAdapter;
+import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
-import com.poptech.poptalk.gallery.PhotoLGalleryFragment;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.List;
@@ -51,9 +40,11 @@ import javax.inject.Inject;
 public class CollectionsActivity extends AppCompatActivity implements View.OnClickListener {
     private DrawerLayout mDrawerLayout;
 
-    private MultiLevelListView multiLevelListView;
+    private RecyclerView mDrawerMenu;
 
     private FloatingActionButton mFloatingButton;
+
+    private DrawerMenuAdapter mDrawerMenuAdapter;
 
     @Inject
     CollectionsPresenter mPresenter;
@@ -82,7 +73,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             setupNavigationBar();
         }
 
-        //setup floafing button
+        //setup floating button
         mFloatingButton = (FloatingActionButton)findViewById(R.id.fab_add_speak_item);
         mFloatingButton.setOnClickListener(this);
 
@@ -102,32 +93,20 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void setupNavigationBar() {
-        multiLevelListView = (MultiLevelListView) findViewById(R.id.multiLevelMenu);
+        mDrawerMenu = (RecyclerView) findViewById(R.id.drawer_menu);
 
-        // custom ListAdapter
-        ListAdapter listAdapter = new ListAdapter();
+        // RecyclerView has some built in animations to it, using the DefaultItemAnimator.
+        // Specifically when you call notifyItemChanged() it does a fade animation for the changing
+        // of the data in the ViewHolder. If you would like to disable this you can use the following:
+        RecyclerView.ItemAnimator animator = mDrawerMenu.getItemAnimator();
+        if (animator instanceof DefaultItemAnimator) {
+            ((DefaultItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
 
-        multiLevelListView.setAdapter(listAdapter);
-        multiLevelListView.setOnItemClickListener(mOnItemClickListener);
-
-        listAdapter.setDataItems(CustomDataProvider.getInitialItems());
+        mDrawerMenu.setLayoutManager(new LinearLayoutManager(this));
+        mDrawerMenuAdapter = new DrawerMenuAdapter(DrawerMenuDataFactory.makeDrawerMenu());
+        mDrawerMenu.setAdapter(mDrawerMenuAdapter);
     }
-
-    private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
-
-        private void showItemDescription(Object object, ItemInfo itemInfo) {
-        }
-
-        @Override
-        public void onItemClicked(MultiLevelListView parent, View view, Object item, ItemInfo itemInfo) {
-            showItemDescription(item, itemInfo);
-        }
-
-        @Override
-        public void onGroupItemClicked(MultiLevelListView parent, View view, Object item, ItemInfo itemInfo) {
-            showItemDescription(item, itemInfo);
-        }
-    };
 
     @Override
     public void onClick(View v) {
@@ -168,57 +147,6 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 Snackbar.make(mDrawerLayout,path,Snackbar.LENGTH_LONG)
                         .show();
             }
-        }
-    }
-
-    private class ListAdapter extends MultiLevelListAdapter {
-
-        private class ViewHolder {
-            TextView nameView;
-            TextView infoView;
-            ImageView arrowView;
-            LevelBeamView levelBeamView;
-        }
-
-        @Override
-        public List<?> getSubObjects(Object object) {
-            return CustomDataProvider.getSubItems((BaseItem) object);
-        }
-
-        @Override
-        public boolean isExpandable(Object object) {
-            return CustomDataProvider.isExpandable((BaseItem) object);
-        }
-
-        @Override
-        public View getViewForObject(Object object, View convertView, ItemInfo itemInfo) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                viewHolder = new ViewHolder();
-                convertView = LayoutInflater.from(CollectionsActivity.this).inflate(R.layout.data_item, null);
-                //viewHolder.infoView = (TextView) convertView.findViewById(R.id.dataItemInfo);
-                viewHolder.nameView = (TextView) convertView.findViewById(R.id.dataItemName);
-                viewHolder.arrowView = (ImageView) convertView.findViewById(R.id.dataItemArrow);
-                viewHolder.levelBeamView = (LevelBeamView) convertView.findViewById(R.id.dataItemLevelBeam);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-
-            viewHolder.nameView.setText(((BaseItem) object).getName());
-            //viewHolder.infoView.setText(getItemInfoDsc(itemInfo));
-
-            if (itemInfo.isExpandable()) {
-                viewHolder.arrowView.setVisibility(View.VISIBLE);
-                viewHolder.arrowView.setImageResource(itemInfo.isExpanded() ?
-                        R.drawable.ic_expand_less : R.drawable.ic_expand_more);
-            } else {
-                viewHolder.arrowView.setVisibility(View.GONE);
-            }
-
-            viewHolder.levelBeamView.setLevel(itemInfo.getLevel());
-
-            return convertView;
         }
     }
 

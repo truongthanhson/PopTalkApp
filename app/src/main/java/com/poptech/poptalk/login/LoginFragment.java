@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.andexert.library.RippleView;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.utils.AnimationUtils;
