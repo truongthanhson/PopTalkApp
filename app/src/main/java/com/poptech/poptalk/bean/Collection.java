@@ -5,10 +5,13 @@ package com.poptech.poptalk.bean;
  */
 
 public class Collection {
-    private int id;
+    private long id;
     private String description;
     private String language;
     private String thumbPath;
+
+    public Collection() {
+    }
 
     public Collection(int id, String description, String language, String thumbPath) {
         this.id = id;
@@ -17,11 +20,11 @@ public class Collection {
         this.thumbPath = thumbPath;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

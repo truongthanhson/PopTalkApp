@@ -1,7 +1,12 @@
-package com.poptech.poptalk.collections;
+package com.poptech.poptalk.provider;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.poptech.poptalk.BaseModel;
 import com.poptech.poptalk.bean.Collection;
+import com.poptech.poptalk.provider.PopTalkContract;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 
 import java.util.ArrayList;
@@ -23,6 +28,65 @@ public class CollectionsModel implements BaseModel {
     }
 
     public List<Collection> getCollections() {
+        return queryCollections();
+    }
+
+    private interface CollectionQuery{
+        String[] projections = new String[]{
+                PopTalkContract.Collections._ID,
+                PopTalkContract.Collections.COLLECTION_DESCRIPTION,
+                PopTalkContract.Collections.COLLECTION_LANGUAGE
+        };
+
+        int COLLETION_ID = 0;
+        int COLLECTION_DESCRIPTION = 1;
+        int COLLECTION_LANGUAGE = 2;
+    }
+
+    public void addNewCollection(Collection collection){
+        SQLiteDatabase database = mDatabase.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PopTalkContract.Collections.COLLECTION_DESCRIPTION, collection.getDescription());
+        contentValues.put(PopTalkContract.Collections.COLLECTION_LANGUAGE, collection.getLanguage());
+
+        database.insert(PopTalkContract.Tables.COLLECTIONS, null, contentValues);
+    }
+
+    public List<Collection> queryCollections(){
+        List<Collection> collections = new ArrayList<>();
+        Cursor cursor = null;
+
+        try {
+            SQLiteDatabase database = mDatabase.getWritableDatabase();
+
+            cursor = database.query(PopTalkContract.Tables.COLLECTIONS,
+                                                            CollectionQuery.projections,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null);
+
+            if(cursor.moveToFirst()){
+                do{
+                    Collection collection = new Collection();
+                    collection.setId(cursor.getLong(CollectionQuery.COLLETION_ID));
+                    collection.setDescription(cursor.getString(CollectionQuery.COLLECTION_DESCRIPTION));
+                    collection.setLanguage(cursor.getString(CollectionQuery.COLLECTION_LANGUAGE));
+                    collections.add(collection);
+                }while (cursor.moveToNext());
+            }
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+        }
+        return collections;
+    }
+
+    //Testing purpose only
+    public void generateTestData(){
         ArrayList<Collection> collections = new ArrayList<>();
         Collection collection1 = new Collection(1, "collection1","Vietnam","http://kids.nationalgeographic.com/content/dam/kids/photos/Countries/Q-Z/vietnam-ha-long-bay.ngsversion.1412614607489.jpg");
         Collection collection2 = new Collection(2, "collection2","England","https://images.goaheadtours.com/tour-tile/5176_80_2500_0/a-view-of-big-ben-london-eye-and-the-parliament-in-london-england.jpg");
@@ -44,6 +108,10 @@ public class CollectionsModel implements BaseModel {
         collections.add(collection8);
         collections.add(collection9);
         collections.add(collection10);
-        return collections;
+
+        for(Collection collection:collections){
+            addNewCollection(collection);
+        }
     }
+
 }

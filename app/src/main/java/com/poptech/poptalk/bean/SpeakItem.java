@@ -5,20 +5,45 @@ package com.poptech.poptalk.bean;
  */
 
 public class SpeakItem {
-    private String id;
+    private long id;
+    private String description;
+    private String mark;
     private String photoPath;
+    private long collectionId;
 
-    public SpeakItem(String id, String photoPath) {
-        this.id = id;
-        this.photoPath = photoPath;
+    public SpeakItem() {
     }
 
-    public String getId() {
+    public SpeakItem(long id, String description, String mark, String photoPath, long collectionId) {
+        this.id = id;
+        this.description = description;
+        this.mark = mark;
+        this.photoPath = photoPath;
+        this.collectionId = collectionId;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getMark() {
+        return mark;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
     }
 
     public String getPhotoPath() {
@@ -29,30 +54,11 @@ public class SpeakItem {
         this.photoPath = photoPath;
     }
 
-    @Override
-    public String toString() {
-        return "SpeakItem{" +
-                "id='" + id + '\'' +
-                ", photoPath='" + photoPath + '\'' +
-                '}';
+    public long getCollectionId() {
+        return collectionId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SpeakItem speakItem = (SpeakItem) o;
-
-        if (id != null ? !id.equals(speakItem.id) : speakItem.id != null) return false;
-        return photoPath != null ? photoPath.equals(speakItem.photoPath) : speakItem.photoPath == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (photoPath != null ? photoPath.hashCode() : 0);
-        return result;
+    public void setCollectionId(long collectionId) {
+        this.collectionId = collectionId;
     }
 }

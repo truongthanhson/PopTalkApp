@@ -45,6 +45,8 @@ public class PopTalkApplication extends Application {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+
+
     }
 
     public AppComponent getAppComponent() {

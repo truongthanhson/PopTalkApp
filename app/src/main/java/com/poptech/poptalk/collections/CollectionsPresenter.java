@@ -1,8 +1,8 @@
 package com.poptech.poptalk.collections;
 
 import com.poptech.poptalk.bean.Collection;
+import com.poptech.poptalk.provider.CollectionsModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;

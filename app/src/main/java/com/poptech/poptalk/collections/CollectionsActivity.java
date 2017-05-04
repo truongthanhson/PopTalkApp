@@ -24,9 +24,12 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
+import com.poptech.poptalk.provider.CollectionsModel;
+import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.List;
@@ -48,6 +51,12 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Inject
     CollectionsPresenter mPresenter;
+
+    @Inject
+    CollectionsModel mCollectionModel;
+
+    @Inject
+    SpeakItemModel mSpeakItemModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +99,10 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         DaggerCollectionsComponent.builder()
                 .appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent())
                 .collectionsPresenterModule(new CollectionsPresenterModule(collectionsFragment)).build().inject(this);
+
+        //addTestData
+//        mCollectionModel.generateTestData();
+//        mSpeakItemModel.generateTestData();
     }
 
     private void setupNavigationBar() {
