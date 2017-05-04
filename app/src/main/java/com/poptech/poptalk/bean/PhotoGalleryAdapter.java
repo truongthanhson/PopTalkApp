@@ -38,19 +38,9 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
 
     @Override
     public void onBindViewHolder(PhotoGalleryAdapter.ViewHolder viewHolder, int position) {
-        GridLayoutManager.LayoutParams params = (GridLayoutManager.LayoutParams) viewHolder.view.getLayoutParams();
-        if(params != null){
-            viewHolder.view.setLayoutParams(new GridLayoutManager.LayoutParams(Utils.getDisplayWidth((Activity) mContext) / 3,Utils.getDisplayWidth((Activity) mContext) / 3));
-        }else{
-            params = new GridLayoutManager.LayoutParams(Utils.getDisplayWidth((Activity) mContext) / 3,Utils.getDisplayWidth((Activity) mContext) / 3);
-            viewHolder.view.setLayoutParams(params);
-        }
-
         if (!StringUtils.isNullOrEmpty(mPhotoList.get(position))) {
             Glide.with(mContext)
                     .load(mPhotoList.get(position))
-                    .centerCrop()
-                    .override(Utils.getDisplayWidth((Activity) mContext) / 3, Utils.getDisplayWidth((Activity) mContext) / 3)
                     .centerCrop()
                     .thumbnail(0.5f)
                     .placeholder(R.color.white)
@@ -72,7 +62,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
             super(view);
             this.view = view;
             mPhotoView = (ImageView) view.findViewById(R.id.photo_img_id);
-            view.setOnClickListener(this);
+            mPhotoView.setOnClickListener(this);
         }
 
         @Override
