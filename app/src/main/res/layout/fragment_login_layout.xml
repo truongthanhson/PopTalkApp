@@ -82,7 +82,15 @@
                 android:text="Log In"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
-        </LinearLayout>
 
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/facebook_login_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="40dp"/>
+        </LinearLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

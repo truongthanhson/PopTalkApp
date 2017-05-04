@@ -12,6 +12,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.utils.AnimationUtils;
@@ -22,7 +27,7 @@ import java.io.File;
  * Created by sontt on 04/03/2017.
  */
 
-public class LoginFragment extends Fragment implements LoginContract.View, View.OnClickListener {
+public class LoginFragment extends Fragment implements LoginContract.View, View.OnClickListener, FacebookCallback<LoginResult> {
 
     private TextView mUserName;
 
@@ -31,6 +36,10 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     private TextView mLoginButton;
 
     private View mView;
+
+    private LoginButton mFacebookLogin;
+
+    private CallbackManager mCallbackManager;
 
     private static final String TAG = "LoginActivity";
     private LoginContract.Presenter mPresenter;
@@ -43,11 +52,15 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_login_layout,container,false);
+        mView = inflater.inflate(R.layout.fragment_login_layout, container, false);
         mUserName = (TextView) mView.findViewById(R.id.user_name_id);
         mPassword = (EditText) mView.findViewById(R.id.password_id);
         mLoginButton = (TextView) mView.findViewById(R.id.login_title_tv_id);
         mLoginButton.setOnClickListener(this);
+        mCallbackManager = CallbackManager.Factory.create();
+        mFacebookLogin = (LoginButton) mView.findViewById(R.id.facebook_login_id);
+        mFacebookLogin.registerCallback(mCallbackManager, this);
+        mFacebookLogin.setFragment(this);
         return mView;
     }
 
@@ -92,12 +105,32 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.login_title_tv_id:
                 mPresenter.login(mUserName.getText().toString(), mPassword.getText().toString());
                 break;
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onSuccess(LoginResult loginResult) {
+        onLoginSuccessful();
+    }
+
+    @Override
+    public void onCancel() {
+        Toast.makeText(getActivity(), "Facebook permission is not granted", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onError(FacebookException error) {
+        Toast.makeText(getActivity(), "Facebook login error " + error.toString(), Toast.LENGTH_LONG).show();
     }
 }
