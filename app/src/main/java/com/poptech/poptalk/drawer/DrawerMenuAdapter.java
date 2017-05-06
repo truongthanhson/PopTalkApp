@@ -3,18 +3,20 @@ package com.poptech.poptalk.drawer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.collections.AppMenuOpen;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.List;
 
 public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMenuViewHolder, SubMenuDrawerViewHolder> {
+  AppMenuOpen delegate;
 
-  public DrawerMenuAdapter(List<? extends ExpandableGroup> groups) {
+  public DrawerMenuAdapter(List<? extends ExpandableGroup> groups, AppMenuOpen delegate) {
     super(groups);
+    this.delegate = delegate;
   }
 
   @Override
@@ -33,14 +35,30 @@ public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMen
 
   @Override
   public void onBindChildViewHolder(SubMenuDrawerViewHolder holder, int flatPosition,
-                                    ExpandableGroup group, int childIndex) {
+                                    final ExpandableGroup group, int childIndex) {
 
     final SubMenuDrawer subMenu = ((TopLevelMenuDrawer) group).getItems().get(childIndex);
     holder.setSubMenuName(subMenu.getName());
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Toast.makeText(view.getContext(), subMenu.getName(), Toast.LENGTH_SHORT).show();
+        if(group.getTitle().equalsIgnoreCase("view")){
+          if(subMenu.getName().equalsIgnoreCase("collection")){
+            delegate.onNavigateToViewCollection();
+          }else if(subMenu.getName().equalsIgnoreCase("view")){
+            delegate.onNavigateToViewView();
+          }else if(subMenu.getName().equalsIgnoreCase("location")){
+            delegate.onNavigateToViewLocation();
+          }
+        }else if(group.getTitle().equalsIgnoreCase("sort by")){
+            if(subMenu.getName().equalsIgnoreCase("description")){
+                delegate.onNavigateToSortByDescription();
+            }else if(subMenu.getName().equalsIgnoreCase("language")){
+                delegate.onNavigateToSortByLanguage();
+            }else if(subMenu.getName().equalsIgnoreCase("recent")){
+                delegate.onNavigateToSortByRecent();
+            }
+        }
       }
     });
   }

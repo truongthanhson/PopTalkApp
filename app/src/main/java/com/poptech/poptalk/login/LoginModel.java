@@ -1,7 +1,5 @@
 package com.poptech.poptalk.login;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import com.poptech.poptalk.BaseModel;
 import com.poptech.poptalk.bean.Credentials;
 import com.poptech.poptalk.provider.PopTalkDatabase;

@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -24,7 +25,6 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
@@ -40,7 +40,7 @@ import javax.inject.Inject;
  * Created by sontt on 26/04/2017.
  */
 
-public class CollectionsActivity extends AppCompatActivity implements View.OnClickListener {
+public class CollectionsActivity extends AppCompatActivity implements View.OnClickListener, AppMenuOpen {
     private DrawerLayout mDrawerLayout;
 
     private RecyclerView mDrawerMenu;
@@ -57,6 +57,10 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Inject
     SpeakItemModel mSpeakItemModel;
+
+//    @Inject
+//    SpeakItemPresenter speakItemPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +121,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         }
 
         mDrawerMenu.setLayoutManager(new LinearLayoutManager(this));
-        mDrawerMenuAdapter = new DrawerMenuAdapter(DrawerMenuDataFactory.makeDrawerMenu());
+        mDrawerMenuAdapter = new DrawerMenuAdapter(DrawerMenuDataFactory.makeDrawerMenu(), this);
         mDrawerMenu.setAdapter(mDrawerMenuAdapter);
     }
 
@@ -173,5 +177,65 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mDrawerMenuAdapter.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onNavigateToViewCollection() {
+        Toast.makeText(this, "onNavigateToViewCollection", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNavigateToViewView() {
+        mDrawerLayout.closeDrawers();
+
+        // Create the fragment
+        SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+        ActivityUtils.replaceFragmentToActivity(
+                getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
+    }
+
+    @Override
+    public void onNavigateToViewLocation() {
+        Toast.makeText(this, "onNavigateToViewLocation", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNavigateToSortByDescription() {
+        mDrawerLayout.closeDrawers();
+
+        // Create the fragment
+        SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+        ActivityUtils.replaceFragmentToActivity(
+                getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
+    }
+
+    @Override
+    public void onNavigateToSortByLanguage() {
+        mDrawerLayout.closeDrawers();
+
+        // Create the fragment
+        SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+        ActivityUtils.replaceFragmentToActivity(
+                getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
+    }
+
+    @Override
+    public void onNavigateToSortByRecent() {
+        mDrawerLayout.closeDrawers();
+
+        // Create the fragment
+        SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+        ActivityUtils.replaceFragmentToActivity(
+                getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
+    }
+
+    @Override
+    public void onNavigateStoryboardMap() {
+
+    }
+
+    @Override
+    public void onNavigateStoryboardFrequency() {
+
     }
 }

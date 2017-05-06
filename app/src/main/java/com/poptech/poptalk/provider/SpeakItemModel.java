@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.poptech.poptalk.BaseModel;
-import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class SpeakItemModel implements BaseModel {
         this.mDatabase = database;
     }
 
-    public List<SpeakItem> getCollections() {
+    public List<SpeakItem> getSpeakItems() {
         return querySpeakItems();
     }
 
