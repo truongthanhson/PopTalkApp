@@ -45,8 +45,8 @@ public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMen
         if(group.getTitle().equalsIgnoreCase("view")){
           if(subMenu.getName().equalsIgnoreCase("collection")){
             delegate.onNavigateToViewCollection();
-          }else if(subMenu.getName().equalsIgnoreCase("view")){
-            delegate.onNavigateToViewView();
+          }else if(subMenu.getName().equalsIgnoreCase("list")){
+            delegate.onNavigateToViewList();
           }else if(subMenu.getName().equalsIgnoreCase("location")){
             delegate.onNavigateToViewLocation();
           }

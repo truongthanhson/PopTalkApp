@@ -185,7 +185,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    public void onNavigateToViewView() {
+    public void onNavigateToViewList() {
         mDrawerLayout.closeDrawers();
 
         // Create the fragment

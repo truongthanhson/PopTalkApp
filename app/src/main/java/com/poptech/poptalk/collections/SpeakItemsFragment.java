@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,9 +27,13 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
+import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 /**
  * Created by sontt on 26/04/2017.
@@ -122,8 +127,58 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onSpeakItemsLoaded(List<SpeakItem> speakItems) {
-        SpeakItemsAdapter speakItemsAdapter = new SpeakItemsAdapter(speakItems,getActivity());
-        mSpeakItemsView.setAdapter(speakItemsAdapter);
+//        SpeakItemsAdapter speakItemsAdapter = new SpeakItemsAdapter(speakItems,getActivity());
+//        mSpeakItemsView.setAdapter(speakItemsAdapter);
+        final SectionedRecyclerViewAdapter sectionedRecyclerViewAdapter = new SectionedRecyclerViewAdapter();
+        List<SpeakItem> speakItemSection1 = new ArrayList<>();
+        speakItemSection1.add(speakItems.get(0));
+        speakItemSection1.add(speakItems.get(1));
+        speakItemSection1.add(speakItems.get(2));
+        speakItemSection1.add(speakItems.get(3));
+        speakItemSection1.add(speakItems.get(4));
+        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "Vietnam"));
+
+        speakItemSection1 = new ArrayList<>();
+        speakItemSection1.add(speakItems.get(5));
+        speakItemSection1.add(speakItems.get(6));
+        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "England"));
+
+        speakItemSection1 = new ArrayList<>();
+        speakItemSection1.add(speakItems.get(7));
+        speakItemSection1.add(speakItems.get(8));
+        speakItemSection1.add(speakItems.get(9));
+        speakItemSection1.add(speakItems.get(10));
+        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "Japan"));
+
+        speakItemSection1 = new ArrayList<>();
+        speakItemSection1.add(speakItems.get(11));
+        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "Germany"));
+
+        speakItemSection1 = new ArrayList<>();
+        speakItemSection1.add(speakItems.get(12));
+        speakItemSection1.add(speakItems.get(13));
+        speakItemSection1.add(speakItems.get(14));
+        speakItemSection1.add(speakItems.get(15));
+        speakItemSection1.add(speakItems.get(16));
+        speakItemSection1.add(speakItems.get(17));
+        speakItemSection1.add(speakItems.get(18));
+        speakItemSection1.add(speakItems.get(19));
+        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "USA"));
+
+        GridLayoutManager glm = new GridLayoutManager(getContext(), 4);
+        glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch(sectionedRecyclerViewAdapter.getSectionItemViewType(position)) {
+                    case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
+                        return 4;
+                    default:
+                        return 1;
+                }
+            }
+        });
+        mSpeakItemsView.setLayoutManager(glm);
+        mSpeakItemsView.setAdapter(sectionedRecyclerViewAdapter);
     }
 
     @Override
@@ -142,7 +197,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
         @Override
         public SpeakItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_collection_layout, parent, false);
+            View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_speak_item_layout, parent, false);
             return new SpeakItemViewHolder(rootView);
         }
 
@@ -176,6 +231,65 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             mDescriptionTv = (TextView)mRootView.findViewById(R.id.tv_description_id);
             mLanguageTv = (TextView)mRootView.findViewById(R.id.tv_lang_id);
             mThumbnailIv = (ImageView)mRootView.findViewById(R.id.iv_thumb_id);
+        }
+    }
+
+    //section adapter for speak items
+    class SpeakItemSection extends StatelessSection{
+
+        private List<SpeakItem> speakItems;
+        private String header;
+
+        public SpeakItemSection(List<SpeakItem> speakItems, String header) {
+            super(R.layout.header_section_list_layout, R.layout.item_speak_item_layout);
+            this.speakItems = speakItems;
+            this.header = header;
+        }
+
+        @Override
+        public int getContentItemsTotal() {
+            return speakItems.size();
+        }
+
+        @Override
+        public RecyclerView.ViewHolder getItemViewHolder(View view) {
+            return new SpeakItemViewHolder(view);
+        }
+
+        @Override
+        public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
+            SpeakItemViewHolder holder = (SpeakItemViewHolder) viewHolder;
+            holder.mDescriptionTv.setText(speakItems.get(i).getDescription());
+            Glide.with(getActivity())
+                    .load(speakItems.get(i).getPhotoPath())
+                    .centerCrop()
+                    .thumbnail(0.5f)
+                    .placeholder(R.color.colorAccent)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.mThumbnailIv);
+        }
+
+        @Override
+        public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
+            return new HeaderViewHolder(view);
+        }
+
+        @Override
+        public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
+            HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
+
+            headerHolder.tvTitle.setText(header);
+        }
+    }
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView tvTitle;
+
+        public HeaderViewHolder(View view) {
+            super(view);
+
+            tvTitle = (TextView) view.findViewById(R.id.tvTitle);
         }
     }
 }

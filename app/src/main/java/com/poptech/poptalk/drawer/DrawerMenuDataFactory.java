@@ -36,7 +36,7 @@ public class DrawerMenuDataFactory {
     }
 
     private static List<SubMenuDrawer> makeViewSubmenu() {
-        return Arrays.asList(new SubMenuDrawer("Collection"), new SubMenuDrawer("View"), new SubMenuDrawer("Location"));
+        return Arrays.asList(new SubMenuDrawer("Collection"), new SubMenuDrawer("List"), new SubMenuDrawer("Location"));
     }
 
 }

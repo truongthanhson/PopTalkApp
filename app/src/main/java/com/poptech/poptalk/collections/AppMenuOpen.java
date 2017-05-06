@@ -6,7 +6,7 @@ package com.poptech.poptalk.collections;
 
 public interface AppMenuOpen {
     void onNavigateToViewCollection();
-    void onNavigateToViewView();
+    void onNavigateToViewList();
     void onNavigateToViewLocation();
 
     void onNavigateToSortByDescription();
