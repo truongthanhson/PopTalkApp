@@ -190,13 +190,30 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
         // Create the fragment
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        speakItemsFragment.setArguments(bundle);
+
         ActivityUtils.replaceFragmentToActivity(
                 getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
     }
 
     @Override
     public void onNavigateToViewLocation() {
-        Toast.makeText(this, "onNavigateToViewLocation", Toast.LENGTH_SHORT).show();
+        mDrawerLayout.closeDrawers();
+
+        // Create the fragment
+        SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.GRID);
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        speakItemsFragment.setArguments(bundle);
+
+        ActivityUtils.replaceFragmentToActivity(
+                getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
     }
 
     @Override
@@ -205,6 +222,12 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
         // Create the fragment
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.DESCRIPTION);
+        speakItemsFragment.setArguments(bundle);
+
         ActivityUtils.replaceFragmentToActivity(
                 getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
     }
@@ -215,6 +238,12 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
         // Create the fragment
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.LANGUAGE);
+        speakItemsFragment.setArguments(bundle);
+
         ActivityUtils.replaceFragmentToActivity(
                 getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
     }
@@ -225,6 +254,12 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
         // Create the fragment
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        speakItemsFragment.setArguments(bundle);
+
         ActivityUtils.replaceFragmentToActivity(
                 getSupportFragmentManager(), speakItemsFragment, R.id.contentFrame);
     }

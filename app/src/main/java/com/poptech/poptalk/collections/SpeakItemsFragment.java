@@ -35,16 +35,37 @@ import javax.inject.Inject;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
+import static com.poptech.poptalk.collections.SpeakItemsFragment.GroupSpeakItemViewType.GRID;
+import static com.poptech.poptalk.collections.SpeakItemsFragment.GroupSpeakItemViewType.LIST;
+
 /**
  * Created by sontt on 26/04/2017.
  */
 
 public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.View{
 
+    public enum GroupSpeakItemSortType {
+        NONE,
+        DESCRIPTION,
+        LANGUAGE,
+        RECENT
+    }
+
+    public enum GroupSpeakItemViewType{
+        GRID,
+        LIST
+    }
+
+    public static final String KEY_SPEAK_ITEM_VIEW_TYPE = "key_speak_item_view_type";
+    public static final String KEY_SPEAK_ITEM_SORT_TYPE = "key_speak_item_sort_type";
+
     private View mView;
     private RecyclerView mSpeakItemsView;
     @Inject
     SpeakItemPresenter mPresenter;
+    GroupSpeakItemSortType mSortType;
+    GroupSpeakItemViewType mViewType;
+    private SectionedRecyclerViewAdapter mSectionedSpeakItemAdapter;
 
     public SpeakItemsFragment() {
         // Requires empty public constructor
@@ -55,9 +76,14 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         super.onCreate(savedInstanceState);
 
         // Create the presenter
-
         DaggerSpeakItemComponent.builder().appComponent(((PopTalkApplication)PopTalkApplication.applicationContext).getAppComponent()).
                 speakItemsPresenterModule(new SpeakItemsPresenterModule(this)).build().inject(this);
+
+        Bundle args = getArguments();
+        if(args != null){
+            mSortType = (GroupSpeakItemSortType) args.getSerializable(KEY_SPEAK_ITEM_SORT_TYPE);
+            mViewType = (GroupSpeakItemViewType) args.getSerializable(KEY_SPEAK_ITEM_VIEW_TYPE);
+        }
     }
 
     @Nullable
@@ -70,7 +96,6 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     private void initView() {
         mSpeakItemsView = (RecyclerView) mView.findViewById(R.id.speak_item_list);
-        mSpeakItemsView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL,false));
     }
 
     @Override
@@ -127,32 +152,30 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onSpeakItemsLoaded(List<SpeakItem> speakItems) {
-//        SpeakItemsAdapter speakItemsAdapter = new SpeakItemsAdapter(speakItems,getActivity());
-//        mSpeakItemsView.setAdapter(speakItemsAdapter);
-        final SectionedRecyclerViewAdapter sectionedRecyclerViewAdapter = new SectionedRecyclerViewAdapter();
+        mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
         List<SpeakItem> speakItemSection1 = new ArrayList<>();
         speakItemSection1.add(speakItems.get(0));
         speakItemSection1.add(speakItems.get(1));
         speakItemSection1.add(speakItems.get(2));
         speakItemSection1.add(speakItems.get(3));
         speakItemSection1.add(speakItems.get(4));
-        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "Vietnam"));
+        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Vietnam"));
 
         speakItemSection1 = new ArrayList<>();
         speakItemSection1.add(speakItems.get(5));
         speakItemSection1.add(speakItems.get(6));
-        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "England"));
+        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "England"));
 
         speakItemSection1 = new ArrayList<>();
         speakItemSection1.add(speakItems.get(7));
         speakItemSection1.add(speakItems.get(8));
         speakItemSection1.add(speakItems.get(9));
         speakItemSection1.add(speakItems.get(10));
-        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "Japan"));
+        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Japan"));
 
         speakItemSection1 = new ArrayList<>();
         speakItemSection1.add(speakItems.get(11));
-        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "Germany"));
+        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Germany"));
 
         speakItemSection1 = new ArrayList<>();
         speakItemSection1.add(speakItems.get(12));
@@ -163,22 +186,34 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         speakItemSection1.add(speakItems.get(17));
         speakItemSection1.add(speakItems.get(18));
         speakItemSection1.add(speakItems.get(19));
-        sectionedRecyclerViewAdapter.addSection(new SpeakItemSection(speakItemSection1, "USA"));
+        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "USA"));
 
-        GridLayoutManager glm = new GridLayoutManager(getContext(), 4);
-        glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                switch(sectionedRecyclerViewAdapter.getSectionItemViewType(position)) {
-                    case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
-                        return 4;
-                    default:
-                        return 1;
+        RecyclerView.LayoutManager layoutManager = getLayoutManager();
+        mSpeakItemsView.setLayoutManager(layoutManager);
+        mSpeakItemsView.setAdapter(mSectionedSpeakItemAdapter);
+    }
+
+
+    public RecyclerView.LayoutManager getLayoutManager() {
+        RecyclerView.LayoutManager layoutManager = null;
+
+        if(mViewType == GRID){
+            layoutManager = new GridLayoutManager(getContext(), 4);
+            ((GridLayoutManager)layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    switch(mSectionedSpeakItemAdapter.getSectionItemViewType(position)) {
+                        case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
+                            return 4;
+                        default:
+                            return 1;
+                    }
                 }
-            }
-        });
-        mSpeakItemsView.setLayoutManager(glm);
-        mSpeakItemsView.setAdapter(sectionedRecyclerViewAdapter);
+            });
+        }else if(mViewType == LIST){
+            layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+        }
+        return layoutManager;
     }
 
     @Override
