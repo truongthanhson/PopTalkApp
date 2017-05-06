@@ -12,5 +12,5 @@ import dagger.Component;
 @FragmentScoped
 @Component(dependencies = AppComponent.class, modules = CollectionsPresenterModule.class)
 public interface CollectionsComponent {
-    void inject(CollectionsActivity collectionsActivity);
+    void inject(CollectionsFragment collectionsFragment);
 }

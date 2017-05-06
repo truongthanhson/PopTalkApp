@@ -25,6 +25,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
+import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.utils.Utils;
@@ -33,15 +34,18 @@ import com.poptech.poptalk.view.ItemDecorationColumns;
 import java.util.List;
 import java.util.zip.Inflater;
 
+import javax.inject.Inject;
+
 /**
  * Created by sontt on 26/04/2017.
  */
 
 public class CollectionsFragment extends Fragment implements CollectionsContract.View {
 
-    private CollectionsContract.Presenter mPresenter;
     private View mView;
     private RecyclerView mCollectionsView;
+    @Inject
+    CollectionsPresenter mPresenter;
 
     public CollectionsFragment() {
         // Requires empty public constructor
@@ -50,6 +54,11 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Create the presenter
+        DaggerCollectionsComponent.builder()
+                .appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent())
+                .collectionsPresenterModule(new CollectionsPresenterModule(this)).build().inject(this);
     }
 
     @Nullable
@@ -123,14 +132,13 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
 
     @Override
     public void setPresenter(CollectionsContract.Presenter presenter) {
-        mPresenter = presenter;
+        mPresenter = (CollectionsPresenter) presenter;
     }
 
     @Override
     public void onCollectionsLoaded(List<Collection> collections) {
         CollectionsAdapter adapter = new CollectionsAdapter(collections,getActivity());
         mCollectionsView.setAdapter(adapter);
-
     }
 
     public class CollectionsAdapter extends RecyclerView.Adapter<CollectionViewHolder>{

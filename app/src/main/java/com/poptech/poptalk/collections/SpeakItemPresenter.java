@@ -29,6 +29,7 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
 
     @Override
     public void loadSpeakItems() {
+//        mModel.generateTestData();
         List<SpeakItem> speakItems = mModel.getSpeakItems();
         mView.onSpeakItemsLoaded(speakItems);
     }

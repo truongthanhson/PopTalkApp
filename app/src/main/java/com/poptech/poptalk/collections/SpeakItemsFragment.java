@@ -66,6 +66,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     GroupSpeakItemSortType mSortType;
     GroupSpeakItemViewType mViewType;
     private SectionedRecyclerViewAdapter mSectionedSpeakItemAdapter;
+    private SpeakItemsAdapter mSpeakItemAdapter;
 
     public SpeakItemsFragment() {
         // Requires empty public constructor
@@ -152,45 +153,52 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onSpeakItemsLoaded(List<SpeakItem> speakItems) {
-        mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
-        List<SpeakItem> speakItemSection1 = new ArrayList<>();
-        speakItemSection1.add(speakItems.get(0));
-        speakItemSection1.add(speakItems.get(1));
-        speakItemSection1.add(speakItems.get(2));
-        speakItemSection1.add(speakItems.get(3));
-        speakItemSection1.add(speakItems.get(4));
-        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Vietnam"));
+        if(mSortType == GroupSpeakItemSortType.NONE){
+            mSpeakItemAdapter = new SpeakItemsAdapter(speakItems,getActivity());
+            RecyclerView.LayoutManager layoutManager = getLayoutManager();
+            mSpeakItemsView.setLayoutManager(layoutManager);
+            mSpeakItemsView.setAdapter(mSpeakItemAdapter);
+        }else{
+            mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
+            List<SpeakItem> speakItemSection1 = new ArrayList<>();
+            speakItemSection1.add(speakItems.get(0));
+            speakItemSection1.add(speakItems.get(1));
+            speakItemSection1.add(speakItems.get(2));
+            speakItemSection1.add(speakItems.get(3));
+            speakItemSection1.add(speakItems.get(4));
+            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Vietnam"));
 
-        speakItemSection1 = new ArrayList<>();
-        speakItemSection1.add(speakItems.get(5));
-        speakItemSection1.add(speakItems.get(6));
-        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "England"));
+            speakItemSection1 = new ArrayList<>();
+            speakItemSection1.add(speakItems.get(5));
+            speakItemSection1.add(speakItems.get(6));
+            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "England"));
 
-        speakItemSection1 = new ArrayList<>();
-        speakItemSection1.add(speakItems.get(7));
-        speakItemSection1.add(speakItems.get(8));
-        speakItemSection1.add(speakItems.get(9));
-        speakItemSection1.add(speakItems.get(10));
-        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Japan"));
+            speakItemSection1 = new ArrayList<>();
+            speakItemSection1.add(speakItems.get(7));
+            speakItemSection1.add(speakItems.get(8));
+            speakItemSection1.add(speakItems.get(9));
+            speakItemSection1.add(speakItems.get(10));
+            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Japan"));
 
-        speakItemSection1 = new ArrayList<>();
-        speakItemSection1.add(speakItems.get(11));
-        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Germany"));
+            speakItemSection1 = new ArrayList<>();
+            speakItemSection1.add(speakItems.get(11));
+            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Germany"));
 
-        speakItemSection1 = new ArrayList<>();
-        speakItemSection1.add(speakItems.get(12));
-        speakItemSection1.add(speakItems.get(13));
-        speakItemSection1.add(speakItems.get(14));
-        speakItemSection1.add(speakItems.get(15));
-        speakItemSection1.add(speakItems.get(16));
-        speakItemSection1.add(speakItems.get(17));
-        speakItemSection1.add(speakItems.get(18));
-        speakItemSection1.add(speakItems.get(19));
-        mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "USA"));
+            speakItemSection1 = new ArrayList<>();
+            speakItemSection1.add(speakItems.get(12));
+            speakItemSection1.add(speakItems.get(13));
+            speakItemSection1.add(speakItems.get(14));
+            speakItemSection1.add(speakItems.get(15));
+            speakItemSection1.add(speakItems.get(16));
+            speakItemSection1.add(speakItems.get(17));
+            speakItemSection1.add(speakItems.get(18));
+            speakItemSection1.add(speakItems.get(19));
+            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "USA"));
 
-        RecyclerView.LayoutManager layoutManager = getLayoutManager();
-        mSpeakItemsView.setLayoutManager(layoutManager);
-        mSpeakItemsView.setAdapter(mSectionedSpeakItemAdapter);
+            RecyclerView.LayoutManager layoutManager = getLayoutManager();
+            mSpeakItemsView.setLayoutManager(layoutManager);
+            mSpeakItemsView.setAdapter(mSectionedSpeakItemAdapter);
+        }
     }
 
 

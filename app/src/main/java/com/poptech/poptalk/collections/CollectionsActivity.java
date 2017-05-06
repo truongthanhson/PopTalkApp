@@ -49,18 +49,6 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     private DrawerMenuAdapter mDrawerMenuAdapter;
 
-    @Inject
-    CollectionsPresenter mPresenter;
-
-    @Inject
-    CollectionsModel mCollectionModel;
-
-    @Inject
-    SpeakItemModel mSpeakItemModel;
-
-//    @Inject
-//    SpeakItemPresenter speakItemPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,23 +78,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         mFloatingButton = (FloatingActionButton)findViewById(R.id.fab_add_speak_item);
         mFloatingButton.setOnClickListener(this);
 
-        CollectionsFragment collectionsFragment =
-                (CollectionsFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
-        if (collectionsFragment == null) {
-            // Create the fragment
-            collectionsFragment = CollectionsFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), collectionsFragment, R.id.contentFrame);
-        }
-
-        // Create the presenter
-        DaggerCollectionsComponent.builder()
-                .appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent())
-                .collectionsPresenterModule(new CollectionsPresenterModule(collectionsFragment)).build().inject(this);
-
-        //addTestData
-//        mCollectionModel.generateTestData();
-//        mSpeakItemModel.generateTestData();
+        onNavigateToViewCollection();
     }
 
     private void setupNavigationBar() {
@@ -181,7 +153,11 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onNavigateToViewCollection() {
-        Toast.makeText(this, "onNavigateToViewCollection", Toast.LENGTH_SHORT).show();
+        mDrawerLayout.closeDrawers();
+
+        CollectionsFragment collectionsFragment = CollectionsFragment.newInstance();
+        ActivityUtils.replaceFragmentToActivity(
+                getSupportFragmentManager(), collectionsFragment, R.id.contentFrame);
     }
 
     @Override
