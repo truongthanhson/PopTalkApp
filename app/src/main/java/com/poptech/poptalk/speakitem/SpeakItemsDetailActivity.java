@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.poptech.poptalk.R;
 
@@ -36,6 +37,14 @@ public class SpeakItemsDetailActivity extends AppCompatActivity {
         mSpeakItemPager = (ViewPager)findViewById(R.id.speak_item_pager_id);
         mSpeakItemPager.setAdapter(new SpeakItemsPagerAdapter(getSupportFragmentManager()));
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public static class SpeakItemsPagerAdapter extends FragmentStatePagerAdapter {

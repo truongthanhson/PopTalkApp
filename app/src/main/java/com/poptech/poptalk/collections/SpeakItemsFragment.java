@@ -44,6 +44,10 @@ import static com.poptech.poptalk.collections.SpeakItemsFragment.GroupSpeakItemV
 
 public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.View{
 
+    public interface SpeakItemsFragmentCallback{
+        void onClickSpeakItem(long speakItemId, long collectionId);
+    }
+
     public enum GroupSpeakItemSortType {
         NONE,
         DESCRIPTION,
@@ -59,17 +63,27 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     public static final String KEY_SPEAK_ITEM_VIEW_TYPE = "key_speak_item_view_type";
     public static final String KEY_SPEAK_ITEM_SORT_TYPE = "key_speak_item_sort_type";
 
-    private View mView;
-    private RecyclerView mSpeakItemsView;
     @Inject
     SpeakItemPresenter mPresenter;
+
+    private View mView;
+    private RecyclerView mSpeakItemsView;
     GroupSpeakItemSortType mSortType;
     GroupSpeakItemViewType mViewType;
     private SectionedRecyclerViewAdapter mSectionedSpeakItemAdapter;
     private SpeakItemsAdapter mSpeakItemAdapter;
+    private SpeakItemsFragmentCallback mCallback;
 
     public SpeakItemsFragment() {
         // Requires empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof SpeakItemsFragmentCallback){
+            mCallback = (SpeakItemsFragmentCallback) context;
+        }
     }
 
     @Override
@@ -230,11 +244,11 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     }
 
     public class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder>{
-        private List<SpeakItem> mCollections;
+        private List<SpeakItem> mSpeakItems;
         private Context mContext;
 
         public SpeakItemsAdapter(List<SpeakItem> collections, Context context) {
-            this.mCollections = collections;
+            this.mSpeakItems = collections;
             this.mContext = context;
         }
 
@@ -245,20 +259,29 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         }
 
         @Override
-        public void onBindViewHolder(SpeakItemViewHolder holder, int position) {
-            holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
+        public void onBindViewHolder(SpeakItemViewHolder holder, final int position) {
+            holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription());
             Glide.with(mContext)
-                    .load(mCollections.get(position).getPhotoPath())
+                    .load(mSpeakItems.get(position).getPhotoPath())
                     .centerCrop()
                     .thumbnail(0.5f)
                     .placeholder(R.color.colorAccent)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.mThumbnailIv);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mCallback != null){
+                        mCallback.onClickSpeakItem(mSpeakItems.get(position).getId(), mSpeakItems.get(position).getCollectionId());
+                    }
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
-            return mCollections.size();
+            return mSpeakItems.size();
         }
     }
 
@@ -300,7 +323,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         }
 
         @Override
-        public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
+        public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
             SpeakItemViewHolder holder = (SpeakItemViewHolder) viewHolder;
             holder.mDescriptionTv.setText(speakItems.get(i).getDescription());
             Glide.with(getActivity())
@@ -310,6 +333,15 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                     .placeholder(R.color.colorAccent)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.mThumbnailIv);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mCallback != null){
+                        mCallback.onClickSpeakItem(speakItems.get(i).getId(), speakItems.get(i).getCollectionId());
+                    }
+                }
+            });
         }
 
         @Override

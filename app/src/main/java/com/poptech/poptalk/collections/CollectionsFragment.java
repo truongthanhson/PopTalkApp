@@ -42,13 +42,26 @@ import javax.inject.Inject;
 
 public class CollectionsFragment extends Fragment implements CollectionsContract.View {
 
+    public interface CollectionsFragmentCallback{
+        void onClickCollections(long collectionId);
+    }
+
     private View mView;
     private RecyclerView mCollectionsView;
+    private CollectionsFragmentCallback callback;
     @Inject
     CollectionsPresenter mPresenter;
 
     public CollectionsFragment() {
         // Requires empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof CollectionsFragmentCallback){
+            callback = (CollectionsFragmentCallback)context;
+        }
     }
 
     @Override
@@ -157,7 +170,7 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
         }
 
         @Override
-        public void onBindViewHolder(CollectionViewHolder holder, int position) {
+        public void onBindViewHolder(CollectionViewHolder holder, final int position) {
             holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
             holder.mLanguageTv.setText(mCollections.get(position).getLanguage());
             Glide.with(mContext)
@@ -167,6 +180,15 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
                     .placeholder(R.color.colorAccent)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.mThumbnailIv);
+
+            holder.mRootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(callback != null){
+                        callback.onClickCollections(mCollections.get(position).getId());
+                    }
+                }
+            });
         }
 
         @Override

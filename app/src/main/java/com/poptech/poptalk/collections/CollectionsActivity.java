@@ -30,6 +30,7 @@ import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.SpeakItemModel;
+import com.poptech.poptalk.speakitem.SpeakItemsDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.List;
@@ -40,7 +41,7 @@ import javax.inject.Inject;
  * Created by sontt on 26/04/2017.
  */
 
-public class CollectionsActivity extends AppCompatActivity implements View.OnClickListener, AppMenuOpen {
+public class CollectionsActivity extends AppCompatActivity implements View.OnClickListener, AppMenuOpen, CollectionsFragment.CollectionsFragmentCallback, SpeakItemsFragment.SpeakItemsFragmentCallback {
     private DrawerLayout mDrawerLayout;
 
     private RecyclerView mDrawerMenu;
@@ -248,5 +249,27 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onNavigateStoryboardFrequency() {
 
+    }
+
+    @Override
+    public void onClickCollections(long collectionId) {
+        navigateToCollectionDetailScreen(collectionId);
+    }
+
+    private void navigateToCollectionDetailScreen(long collectionId) {
+        Intent intent = new Intent(this, CollectionDetailActivity.class);
+        intent.putExtra("collection_id", collectionId);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClickSpeakItem(long speakItemId, long collectionId) {
+        openSpeakItemDetailScreen(speakItemId, collectionId);
+    }
+
+    public void openSpeakItemDetailScreen(long speakItemId, long collectionId){
+        Toast.makeText(this,"speakItemId = " + speakItemId + " --- collectionId = " + collectionId,Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, SpeakItemsDetailActivity.class);
+        startActivity(intent);
     }
 }
