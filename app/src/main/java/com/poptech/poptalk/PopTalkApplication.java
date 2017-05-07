@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
@@ -13,7 +14,9 @@ import com.facebook.FacebookSdk;
 import com.poptech.poptalk.di.AppComponent;
 import com.poptech.poptalk.di.AppModule;
 import com.poptech.poptalk.di.DaggerAppComponent;
+import com.poptech.poptalk.utils.Utils;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -33,6 +36,8 @@ public class PopTalkApplication extends Application {
         applicationHandler = new Handler(applicationContext.getMainLooper());
         mAppComponent = DaggerAppComponent.builder().appModule(new AppModule(applicationContext)).build();
         FacebookSdk.sdkInitialize(getApplicationContext());
+        NativeLoader.initNativeLibs(applicationContext);
+
         try {
             PackageInfo info = getPackageManager().getPackageInfo("com.poptech.poptalk", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {

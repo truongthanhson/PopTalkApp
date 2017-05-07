@@ -21,24 +21,26 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
     private final Context mContext;
 
     public static final String SQL_CREATE_COLLECTIONS = "CREATE TABLE " + Tables.COLLECTIONS + " ("
-                                                        + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                                        + CollectionsColumns.COLLECTION_DESCRIPTION + " TEXT,"
-                                                        + CollectionsColumns.COLLECTION_LANGUAGE + " TEXT)";
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + CollectionsColumns.COLLECTION_DESCRIPTION + " TEXT,"
+            + CollectionsColumns.COLLECTION_LANGUAGE + " TEXT)";
 
     public static final String SQL_CREATE_PHOTOS = "CREATE TABLE " + Tables.PHOTOS + " ("
-                                                        + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                                        + PhotoColumns.PHOTO_PATH + " TEXT)";
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + PhotoColumns.PHOTO_PATH + " TEXT)";
 
     public static final String SQL_CREATE_SPEAK_ITEMS = "CREATE TABLE " + Tables.SPEAK_ITEMS + " ("
-                                                        + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                                        + SpeakItemColumns.SPEAK_ITEM_MARK + " TEXT,"
-                                                        + SpeakItemColumns.SPEAK_ITEM_PATH + " TEXT,"
-                                                        + SpeakItemColumns.SPEAK_ITEM_DESCRIPTION + " TEXT, "
-                                                        + SpeakItemColumns.COLLECTION_ID + " INTEGER)";
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + SpeakItemColumns.SPEAK_ITEM_SOUND_MARK + " TEXT,"
+            + SpeakItemColumns.SPEAK_ITEM_PHOTO_PATH + " TEXT,"
+            + SpeakItemColumns.SPEAK_ITEM_PHOTO_DESCRIPTION + " TEXT, "
+            + SpeakItemColumns.SPEAK_ITEM_PHOTO_LOCATION + " TEXT, "
+            + SpeakItemColumns.SPEAK_ITEM_PHOTO_DATETIME + " TEXT, "
+            + SpeakItemColumns.COLLECTION_ID + " INTEGER)";
 
     public static final String SQL_CREATE_LANGUAGES = "CREATE TABLE " + Tables.LANGUAGES + " ("
-                                                        + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                                        + LanguagesColumns.LANGUAGE_ACTIVE + " TEXT)";
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + LanguagesColumns.LANGUAGE_ACTIVE + " TEXT)";
 
     public static final String SQL_CREATE_LANGUAGE_ITEMS = "CREATE TABLE " + Tables.LANGUAGE_ITEMS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -46,8 +48,8 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
             + LanguageItemsColumns.LANGUAGE_ITEM_COMMENT + " TEXT)";
 
 
-    public PopTalkDatabase(Context context){
-        super(context,DATABASE_NAME,null,CURRENT_DATABASE_VERSION);
+    public PopTalkDatabase(Context context) {
+        super(context, DATABASE_NAME, null, CURRENT_DATABASE_VERSION);
         mContext = context;
     }
 

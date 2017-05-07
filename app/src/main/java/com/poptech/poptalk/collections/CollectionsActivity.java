@@ -23,19 +23,14 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
-import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
-import com.poptech.poptalk.provider.CollectionsModel;
-import com.poptech.poptalk.provider.SpeakItemModel;
-import com.poptech.poptalk.speakitem.SpeakItemsDetailActivity;
+import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 /**
  * Created by sontt on 26/04/2017.
@@ -269,7 +264,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     public void openSpeakItemDetailScreen(long speakItemId, long collectionId){
         Toast.makeText(this,"speakItemId = " + speakItemId + " --- collectionId = " + collectionId,Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, SpeakItemsDetailActivity.class);
+        Intent intent = new Intent(this, SpeakItemDetailActivity.class);
         startActivity(intent);
     }
 }

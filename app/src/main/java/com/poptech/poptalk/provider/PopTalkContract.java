@@ -9,8 +9,10 @@ import android.provider.BaseColumns;
 
 public class PopTalkContract {
 
-    public interface SyncColumn{
-        /** Last time this entry was updated or synchronized. */
+    public interface SyncColumn {
+        /**
+         * Last time this entry was updated or synchronized.
+         */
         String UPDATED = "updated";
     }
 
@@ -26,15 +28,18 @@ public class PopTalkContract {
         String PHOTO_PATH = "photo_path";
     }
 
-    public interface CollectionsColumns{
+    public interface CollectionsColumns {
         String COLLECTION_DESCRIPTION = "description";
         String COLLECTION_LANGUAGE = "language_1";
     }
 
     public interface SpeakItemColumns {
-        String SPEAK_ITEM_PATH = "sound_path";
-        String SPEAK_ITEM_MARK = "sound_mark";
-        String SPEAK_ITEM_DESCRIPTION = "description";
+        String SPEAK_ITEM_SOUND_PATH = "sound_path";
+        String SPEAK_ITEM_SOUND_MARK = "sound_mark";
+        String SPEAK_ITEM_PHOTO_PATH = "photo_path";
+        String SPEAK_ITEM_PHOTO_DESCRIPTION = "photo_description";
+        String SPEAK_ITEM_PHOTO_LOCATION = "photo_location";
+        String SPEAK_ITEM_PHOTO_DATETIME = "photo_datetime";
         String COLLECTION_ID = "collection_id";
     }
 
@@ -69,7 +74,7 @@ public class PopTalkContract {
             PATH_LANGUAGE_ITEMS
     };
 
-    public static class Photos implements PhotoColumns, BaseColumns{
+    public static class Photos implements PhotoColumns, BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_PHOTOS).build();
 
@@ -83,7 +88,7 @@ public class PopTalkContract {
         }
     }
 
-    public static class Collections implements CollectionsColumns, BaseColumns{
+    public static class Collections implements CollectionsColumns, BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_COLLECTIONS).build();
 
@@ -97,7 +102,7 @@ public class PopTalkContract {
         }
     }
 
-    public static class SpeakItems implements SpeakItemColumns, BaseColumns{
+    public static class SpeakItems implements SpeakItemColumns, BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_SPEAK_ITEMS).build();
 
@@ -111,7 +116,7 @@ public class PopTalkContract {
         }
     }
 
-    public static class Languages implements LanguagesColumns, BaseColumns{
+    public static class Languages implements LanguagesColumns, BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_LANGUAGES).build();
 
@@ -125,7 +130,7 @@ public class PopTalkContract {
         }
     }
 
-    public static class LanguageItems implements LanguagesColumns, BaseColumns{
+    public static class LanguageItems implements LanguagesColumns, BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_LANGUAGE_ITEMS).build();
 
@@ -139,7 +144,7 @@ public class PopTalkContract {
         }
     }
 
-    private PopTalkContract(){
+    private PopTalkContract() {
 
     }
 }

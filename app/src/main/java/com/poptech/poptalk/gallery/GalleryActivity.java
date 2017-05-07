@@ -21,7 +21,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.speakitem.SpeakItemsDetailActivity;
+import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -160,7 +160,7 @@ public class GalleryActivity extends AppCompatActivity {
     }
 
     public void openSpeakItemDetailScreen(){
-        Intent intent = new Intent(this, SpeakItemsDetailActivity.class);
+        Intent intent = new Intent(this, SpeakItemDetailActivity.class);
         startActivity(intent);
     }
 

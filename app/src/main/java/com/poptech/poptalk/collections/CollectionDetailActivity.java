@@ -9,8 +9,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.gallery.PhotoLGalleryFragment;
-import com.poptech.poptalk.speakitem.SpeakItemsDetailActivity;
+import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 /**
@@ -62,7 +61,7 @@ public class CollectionDetailActivity extends AppCompatActivity implements Speak
 
     public void openSpeakItemDetailScreen(long speakItemId, long collectionId){
         Toast.makeText(this,"speakItemId = " + speakItemId + " --- collectionId = " + collectionId,Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, SpeakItemsDetailActivity.class);
+        Intent intent = new Intent(this, SpeakItemDetailActivity.class);
         startActivity(intent);
     }
 }

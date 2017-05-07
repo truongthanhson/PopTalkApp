@@ -12,11 +12,8 @@ import android.view.MenuItem;
 
 import com.poptech.poptalk.R;
 
-/**
- * Created by sontt on 30/04/2017.
- */
 
-public class SpeakItemsDetailActivity extends AppCompatActivity {
+public class SpeakItemDetailActivity extends AppCompatActivity {
 
     private Toolbar mToolBar;
     private ViewPager mSpeakItemPager;
@@ -27,14 +24,14 @@ public class SpeakItemsDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_speak_items);
 
         //setup Toolbar
-        mToolBar = (Toolbar)findViewById(R.id.toolbar);
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Speak Items");
 
         //setup viewpager
-        mSpeakItemPager = (ViewPager)findViewById(R.id.speak_item_pager_id);
+        mSpeakItemPager = (ViewPager) findViewById(R.id.speak_item_pager_id);
         mSpeakItemPager.setAdapter(new SpeakItemsPagerAdapter(getSupportFragmentManager()));
 
     }
@@ -48,7 +45,7 @@ public class SpeakItemsDetailActivity extends AppCompatActivity {
     }
 
     public static class SpeakItemsPagerAdapter extends FragmentStatePagerAdapter {
-        private static int NUM_ITEMS = 3;
+        private static int NUM_ITEMS = 1;
 
         public SpeakItemsPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -63,16 +60,7 @@ public class SpeakItemsDetailActivity extends AppCompatActivity {
         // Returns the fragment to display for that page
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return SpeakItemDetailFragment.newInstance(0);
-                case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return SpeakItemDetailFragment.newInstance(1);
-                case 2: // Fragment # 1 - This will show SecondFragment
-                    return SpeakItemDetailFragment.newInstance(2);
-                default:
-                    return null;
-            }
+            return SpeakItemDetailFragment.newInstance(position);
         }
 
         // Returns the page title for the top indicator

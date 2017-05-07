@@ -24,6 +24,7 @@ import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.PhotoGalleryAdapter;
 import com.poptech.poptalk.utils.MetricUtils;
+import com.poptech.poptalk.view.ItemDecorationColumns;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +73,7 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), Constants.GRID_COLUMN_COUNT);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new SpacesBetweenGridPhotoDecoration(MetricUtils.dpToPx(10),3,true));
+        recyclerView.addItemDecoration(new ItemDecorationColumns(3, MetricUtils.dpToPx(5), false));
     }
 
     @Override
@@ -94,7 +95,7 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
-        if (disposable!=null && !disposable.isDisposed()) {
+        if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
         }
     }
@@ -138,7 +139,7 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
         return imageUrls;
     }
 
-    public Observable<List<String>> queryPhotos(){
+    public Observable<List<String>> queryPhotos() {
         return Observable.create(new ObservableOnSubscribe<List<String>>() {
             @Override
             public void subscribe(ObservableEmitter<List<String>> e) throws Exception {
@@ -146,39 +147,5 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
                 e.onComplete();
             }
         });
-    }
-
-    public class SpacesBetweenGridPhotoDecoration extends RecyclerView.ItemDecoration{
-        private int spacing;
-        private int spanCount;
-        private boolean includeEdge;
-
-        public SpacesBetweenGridPhotoDecoration(int spacing, int spanCount, boolean includeEdge) {
-            this.spacing = spacing;
-            this.spanCount = spanCount;
-            this.includeEdge = includeEdge;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
-                }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
-                }
-            }
-        }
     }
 }
