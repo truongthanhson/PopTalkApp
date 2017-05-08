@@ -3,6 +3,7 @@ package com.poptech.poptalk.bean;
 import android.os.Environment;
 
 import com.poptech.poptalk.Constants;
+import com.poptech.poptalk.utils.StringUtils;
 
 /**
  * Created by sontt on 30/04/2017.
@@ -11,19 +12,22 @@ import com.poptech.poptalk.Constants;
 public class SpeakItem {
     private long id;
     private String description;
-    private String mark;
     private String photoPath;
+    private String datetime;
+    private String location;
     private long collectionId;
     private String audioPath;
     private int audioDuration;
     private float audioProgress;
     private int audioProgressSec;
     private byte[] audioWaveform;
-    private String datetime;
-    private String location;
+    private float audioLeftMark;
+    private float audioRightMark;
+    private float audioMiddleMark;
 
 
     public SpeakItem() {
+        setDefaultMark();
     }
 
     public SpeakItem(long id, String location, String datetime, String description, String mark, String photoPath, long collectionId) {
@@ -31,9 +35,9 @@ public class SpeakItem {
         this.location = location;
         this.datetime = datetime;
         this.description = description;
-        this.mark = mark;
         this.photoPath = photoPath;
         this.collectionId = collectionId;
+        setDefaultMark();
     }
 
     public long getId() {
@@ -52,20 +56,28 @@ public class SpeakItem {
         this.description = description;
     }
 
-    public String getMark() {
-        return mark;
-    }
-
-    public void setMark(String mark) {
-        this.mark = mark;
-    }
-
     public String getPhotoPath() {
         return photoPath;
     }
 
     public void setPhotoPath(String photoPath) {
         this.photoPath = photoPath;
+    }
+
+    public void setDateTime(String datetime) {
+        this.datetime = datetime;
+    }
+
+    public String getDateTime() {
+        return datetime;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public long getCollectionId() {
@@ -120,19 +132,52 @@ public class SpeakItem {
         return audioWaveform;
     }
 
-    public void setDateTime(String datetime) {
-        this.datetime = datetime;
+    private void setDefaultMark() {
+        this.audioLeftMark = 0.0f;
+        this.audioMiddleMark = 0.5f;
+        this.audioRightMark = 1.0f;
     }
 
-    public String getDateTime() {
-        return datetime;
+    public void setAudioMark(String audioMark) {
+        if (!StringUtils.isNullOrEmpty(audioMark)) {
+            String[] marks = audioMark.split(";");
+            try {
+                this.audioLeftMark = Float.valueOf(marks[0]);
+                this.audioMiddleMark = Float.valueOf(marks[1]);
+                this.audioRightMark = Float.valueOf(marks[2]);
+            } catch (Exception e) {
+                setDefaultMark();
+            }
+        } else {
+            setDefaultMark();
+        }
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public String getAudioMark() {
+        return audioLeftMark + ";" + audioMiddleMark + ";" + audioRightMark;
     }
 
-    public String getLocation() {
-        return location;
+    public void setAudioLeftMark(float audioLeftMark) {
+        this.audioLeftMark = audioLeftMark;
+    }
+
+    public float getAudioLeftMark() {
+        return audioLeftMark;
+    }
+
+    public void setAudioMiddleMark(float audioMiddleMark) {
+        this.audioMiddleMark = audioMiddleMark;
+    }
+
+    public float getAudioMiddleMark() {
+        return audioMiddleMark;
+    }
+
+    public void setAudioRightMark(float audioRightMark) {
+        this.audioRightMark = audioRightMark;
+    }
+
+    public float getAudioRightMark() {
+        return audioRightMark;
     }
 }

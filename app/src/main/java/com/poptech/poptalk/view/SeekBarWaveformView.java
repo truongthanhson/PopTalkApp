@@ -26,9 +26,7 @@ public class SeekBarWaveformView extends View {
 
     private void init(Context context) {
         seekBarWaveform = new SeekBarWaveform(context);
-        //seekBarWaveform.setColors(0xFFBBE3AC, 0xFF78C272, 0xFFA9DD96);
         seekBarWaveform.setColors(0xFF78C272, 0xFFF4B400 , 0xFFA9DD96);
-
     }
 
     public void setWaveform(byte[] waveform) {
@@ -36,8 +34,13 @@ public class SeekBarWaveformView extends View {
         invalidate();
     }
 
-    public void setProgress(float progress) {
-        seekBarWaveform.setProgress(progress);
+    public void setLeftProgress(float progress) {
+        seekBarWaveform.setLeftProgress(progress);
+        invalidate();
+    }
+
+    public void setRightProgress(float progress) {
+        seekBarWaveform.setRightProgress(progress);
         invalidate();
     }
 

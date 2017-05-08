@@ -20,7 +20,7 @@ public class AudioTimelineView extends View {
     private Paint paint;
     private Paint paint2;
     private float progressLeft = 0;
-    private float progressMidle = 0.5f;
+    private float progressMiddle = 0.5f;
     private float progressRight = 1;
     private boolean pressedLeft = false;
     private boolean pressedRight = false;
@@ -39,7 +39,7 @@ public class AudioTimelineView extends View {
     public interface AudioWaveFormTimelineViewDelegate {
         void onLeftProgressChanged(float progress);
 
-        void onMidleProgressChanged(float progress);
+        void onMiddleProgressChanged(float progress);
 
         void onRightProgressChanged(float progress);
     }
@@ -80,7 +80,7 @@ public class AudioTimelineView extends View {
 
         int width = getMeasuredWidth();
         int startX = (int) (width * progressLeft);
-        int midX = (int) (width * progressMidle);
+        int midX = (int) (width * progressMiddle);
         int endX = (int) (width * progressRight);
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -150,9 +150,9 @@ public class AudioTimelineView extends View {
                 } else if (chooseMiddle) {
                     chooseMiddle = false;
                     midX = (int) x;
-                    progressMidle = (float) (midX) / (float) width;
+                    progressMiddle = (float) (midX) / (float) width;
                     if (delegate != null) {
-                        delegate.onMidleProgressChanged(progressMidle);
+                        delegate.onMiddleProgressChanged(progressMiddle);
                     }
                     invalidate();
                     return true;
@@ -192,9 +192,9 @@ public class AudioTimelineView extends View {
                 } else if (midX > endX) {
                     midX = endX;
                 }
-                progressMidle = (float) (midX) / (float) width;
+                progressMiddle = (float) (midX) / (float) width;
                 if (delegate != null) {
-                    delegate.onMidleProgressChanged(progressMidle);
+                    delegate.onMiddleProgressChanged(progressMiddle);
                 }
                 invalidate();
                 return true;
@@ -212,7 +212,7 @@ public class AudioTimelineView extends View {
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
         int startX = (int) (width * progressLeft);
-        int midX = (int) (width * progressMidle);
+        int midX = (int) (width * progressMiddle);
         int endX = (int) (width * progressRight);
 
         canvas.save();
@@ -232,8 +232,8 @@ public class AudioTimelineView extends View {
         this.progressLeft = progressLeft;
     }
 
-    public void setProgressMidle(float progressMidle) {
-        this.progressMidle = progressMidle;
+    public void setProgressMiddle(float progressMiddle) {
+        this.progressMiddle = progressMiddle;
     }
 
     public void setProgressRight(float progressRight) {
