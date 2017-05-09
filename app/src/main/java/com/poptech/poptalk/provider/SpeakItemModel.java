@@ -118,7 +118,7 @@ public class SpeakItemModel implements BaseModel {
                 do {
                     SpeakItem speakItem = new SpeakItem();
                     speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
-                    speakItem.setMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_SOUND_MARK));
+                    speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
                     speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
                     speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
                     speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));

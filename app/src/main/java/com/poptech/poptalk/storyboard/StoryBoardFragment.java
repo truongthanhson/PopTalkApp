@@ -180,7 +180,17 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
 
                 View child = parent.getChildAt(i);
 
-                c.drawRect(new Rect(child.getLeft(), child.getTop() + 100, child.getRight(),child.getTop() + 200), pathPaint);
+                c.drawRect(new Rect(child.getLeft(), (int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2), child.getRight(),(int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2) + 200), pathPaint);
+
+                int pos = parent.getChildAdapterPosition(child);
+
+                if(pos == 1){
+                    c.drawRect(new Rect(child.getRight() - MetricUtils.dpToPx(20), (int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2), child.getRight(),child.getBottom()), pathPaint);
+                }
+
+                if(pos == 3){
+                    c.drawRect(new Rect(child.getRight() - MetricUtils.dpToPx(20), child.getTop(), child.getRight(),(int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2)), pathPaint);
+                }
             }
         }
 
