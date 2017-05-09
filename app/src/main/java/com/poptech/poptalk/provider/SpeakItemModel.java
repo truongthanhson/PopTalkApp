@@ -100,6 +100,43 @@ public class SpeakItemModel implements BaseModel {
         return speakItems;
     }
 
+    public List<SpeakItem> getSpeakItems(long withCollectionId){
+        List<SpeakItem> speakItems = new ArrayList<>();
+        Cursor cursor = null;
+
+        try {
+            SQLiteDatabase database = mDatabase.getWritableDatabase();
+
+            cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
+                    SpeakItemQuery.projections,
+                    PopTalkContract.SpeakItems.COLLECTION_ID + "=?",
+                    new String[]{"" + withCollectionId},
+                    null,
+                    null,
+                    null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    SpeakItem speakItem = new SpeakItem();
+                    speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
+                    speakItem.setMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_SOUND_MARK));
+                    speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
+                    speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
+                    speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                    speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                    speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
+
+                    speakItems.add(speakItem);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return speakItems;
+    }
+
     //Testing purpose only
     public void generateTestData() {
         SpeakItem speakItem = new SpeakItem(1, "Ha Noi, Vietnam", "May 08, 2017", "Ha Noi", "", "https://www.vietnamgrouptour.com/images/detailed/7/hanoi-full-day-city-tour.jpg", 1);

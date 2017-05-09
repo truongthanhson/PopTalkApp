@@ -58,6 +58,12 @@ public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMen
             }else if(subMenu.getName().equalsIgnoreCase("recent")){
                 delegate.onNavigateToSortByRecent();
             }
+        }else if(group.getTitle().equalsIgnoreCase("story board")){
+          if(subMenu.getName().equalsIgnoreCase("map & datetime")){
+            delegate.onNavigateStoryboardMap();
+          }else if(subMenu.getName().equalsIgnoreCase("frequency")){
+            delegate.onNavigateStoryboardFrequency();
+          }
         }
       }
     });

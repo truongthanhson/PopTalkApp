@@ -28,6 +28,7 @@ import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
+import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.List;
@@ -238,7 +239,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onNavigateStoryboardMap() {
-
+        Intent intent = new Intent(this, StoryboardActivity.class);
+        startActivity(intent);
     }
 
     @Override
