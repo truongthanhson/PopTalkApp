@@ -41,20 +41,6 @@ public class GalleryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            String pathPhoto = Environment.getExternalStorageDirectory() + Constants.PATH_APP + Constants.PATH_PHOTO;
-            String pathSound = Environment.getExternalStorageDirectory() + Constants.PATH_APP + Constants.PATH_SOUND;
-            File filePhoto = new File(pathPhoto);
-            File fileSound = new File(pathSound);
-            if (!filePhoto.exists()) {
-                Utils.forceMkdir(filePhoto);
-            }
-            if (!fileSound.exists()) {
-                Utils.forceMkdir(fileSound);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         setContentView(R.layout.activity_photo);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,7 +73,7 @@ public class GalleryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
-        }else if (item.getItemId() == R.id.action_camera) {
+        } else if (item.getItemId() == R.id.action_camera) {
             Dexter.withActivity(this)
                     .withPermission(Manifest.permission.CAMERA).withListener(new BasePermissionListener() {
                 @Override
@@ -114,7 +100,7 @@ public class GalleryActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem cameraItem = menu.findItem(R.id.action_camera);
-        if(cameraItem != null) {
+        if (cameraItem != null) {
             cameraItem.setVisible(true);
         }
         MenuItem plusItem = menu.findItem(R.id.action_plus);
@@ -134,7 +120,7 @@ public class GalleryActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.REQUEST_AVATAR_CAPTURE && resultCode == Activity.RESULT_OK) {
             startActivityCrop(mFilePathString);
-        }else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 //                Uri resultUri = result.getUri();
@@ -148,7 +134,7 @@ public class GalleryActivity extends AppCompatActivity {
                 Exception error = result.getError();
                 Intent errorIntent = new Intent();
                 errorIntent.putExtra("error", error.getMessage());
-                setResult(Activity.RESULT_CANCELED,errorIntent);
+                setResult(Activity.RESULT_CANCELED, errorIntent);
             }
             finish();
         }
@@ -159,7 +145,7 @@ public class GalleryActivity extends AppCompatActivity {
                 .start(this);
     }
 
-    public void openSpeakItemDetailScreen(){
+    public void openSpeakItemDetailScreen() {
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);
         startActivity(intent);
     }
@@ -171,6 +157,13 @@ public class GalleryActivity extends AppCompatActivity {
             Uri mImageCaptureUri;
             mFilePathString = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_PHOTO + "/" + System.currentTimeMillis() + ".jpg";
             File iFilePath = new File(mFilePathString);
+            try {
+                if (!iFilePath.getParentFile().exists()) {
+                    Utils.forceMkdir(iFilePath.getParentFile());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             mImageCaptureUri = Uri.fromFile(iFilePath);
             takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
             takePictureIntent.putExtra("return-data", true);

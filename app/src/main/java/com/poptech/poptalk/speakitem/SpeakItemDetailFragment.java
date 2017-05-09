@@ -68,9 +68,11 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private int mSpeakItemId;
     private float mStartedDraggingX;
     private float mDistCanMove;
-    private boolean mIsNextPlaying;
-    private boolean mIsCurrentPlaying;
-    private boolean mIsRecording;
+    private boolean mNextPlaying;
+    private boolean mNextPausing;
+    private boolean mCurrentPlaying;
+    private boolean mCurrentPausing;
+    private boolean mRecording;
 
     public SpeakItemDetailFragment() {
     }
@@ -118,9 +120,12 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private void initData() {
         mStartedDraggingX = -1;
         mDistCanMove = AndroidUtilities.dp(100);
-        mIsNextPlaying = false;
-        mIsCurrentPlaying = false;
-        mIsRecording = false;
+        mNextPlaying = false;
+        mNextPausing = false;
+        mCurrentPlaying = false;
+        mCurrentPausing = false;
+        mRecording = false;
+
         setNotification();
     }
 
@@ -169,6 +174,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onDestroy() {
+        AudioController.getInstance().cleanupPlayer();
         clearNotification();
         super.onDestroy();
     }
@@ -206,7 +212,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStartError);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStopped);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordProgressChanged);
-        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStartCompleted);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioStartCompleted);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidReset);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioProgressDidChanged);
@@ -217,7 +223,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStartError);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStopped);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordProgressChanged);
-        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStartCompleted);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioStartCompleted);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidReset);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioProgressDidChanged);
@@ -228,35 +234,42 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.play_first_fl_id:
-                if (!mIsCurrentPlaying) {
-                    mIsCurrentPlaying = true;
-                    mIsNextPlaying = false;
+                if (!mCurrentPlaying) {
+                    mCurrentPlaying = true;
+                    mNextPlaying = false;
                     setPlayView();
-                    mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
-                    AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+                    if (!mCurrentPausing) {
+                        mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
+                        AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+                    }
                     AudioController.getInstance().playAudio(mSpeakItem);
+                    mCurrentPausing = false;
                 } else {
-                    mIsCurrentPlaying = false;
-                    mIsNextPlaying = false;
+                    mCurrentPlaying = false;
+                    mNextPlaying = false;
                     setPlayView();
                     AudioController.getInstance().pauseAudio(mSpeakItem);
+                    mCurrentPausing = true;
                 }
 
                 break;
             case R.id.play_second_fl_id:
-                if (!mIsNextPlaying) {
-                    mIsCurrentPlaying = false;
-                    mIsNextPlaying = true;
+                if (!mNextPlaying) {
+                    mCurrentPlaying = false;
+                    mNextPlaying = true;
                     setPlayView();
-                    mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
-                    AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
-                    AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+                    if (!mNextPausing) {
+                        mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
+                        AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+                    }
                     AudioController.getInstance().playAudio(mSpeakItem);
+                    mNextPausing = false;
                 } else {
-                    mIsCurrentPlaying = false;
-                    mIsNextPlaying = false;
+                    mCurrentPlaying = false;
+                    mNextPlaying = false;
                     setPlayView();
                     AudioController.getInstance().pauseAudio(mSpeakItem);
+                    mNextPausing = true;
                 }
 
                 break;
@@ -271,7 +284,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             case MotionEvent.ACTION_DOWN:
                 if (v.getId() == R.id.record_fl_id) {
                     mStartedDraggingX = -1;
-                    mIsRecording = true;
+                    mRecording = true;
                     setRecordView();
                     mSpeakItem.generateAudioPath();
                     AudioController.getInstance().startRecording(mSpeakItem.getAudioPath());
@@ -280,7 +293,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             case MotionEvent.ACTION_UP:
                 if (v.getId() == R.id.record_fl_id) {
                     mStartedDraggingX = -1;
-                    mIsRecording = false;
+                    mRecording = false;
                     setRecordView();
                     AudioController.getInstance().stopRecording(1);
                 }
@@ -290,7 +303,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                     float x = event.getX();
                     x = x + mRecordButton.getX();
                     if ((x - mStartedDraggingX) < -mDistCanMove) {
-                        mIsRecording = false;
+                        mRecording = false;
                         setRecordView();
                         AudioController.getInstance().stopRecording(0);
                         return true;
@@ -336,7 +349,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void setRecordView() {
-        if (mIsRecording) {
+        if (mRecording) {
             mView.findViewById(R.id.play_ll_id).setVisibility(View.GONE);
             mView.findViewById(R.id.record_normal_fl_id).setVisibility(View.GONE);
             mView.findViewById(R.id.record_press_fl_id).setVisibility(View.VISIBLE);
@@ -361,14 +374,14 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void setPlayView() {
-        if (mIsCurrentPlaying) {
+        if (mCurrentPlaying) {
             mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.GONE);
         } else {
             mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.GONE);
             mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.VISIBLE);
         }
-        if (mIsNextPlaying) {
+        if (mNextPlaying) {
             mView.findViewById(R.id.play_second_press_fl_id).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.play_second_normal_fl_id).setVisibility(View.GONE);
         } else {
@@ -393,30 +406,30 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             onAudioDidReset();
         } else if (id == NotificationCenter.audioProgressDidChanged) {
             onAudioProgressDidChanged((float) args[0], (int) args[1]);
-        } else if (id == NotificationCenter.recordStartCompleted) {
-            onRecordStartCompleted();
+        } else if (id == NotificationCenter.audioStartCompleted) {
+            onAudioStartCompleted();
         }
     }
 
-    private void onRecordStartCompleted() {
+    private void onAudioStartCompleted() {
         if (mSpeakItem != null && !AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
-            if (mIsCurrentPlaying) {
+            if (mCurrentPlaying) {
                 mRecordWave.setLeftProgress(mSpeakItem.getAudioMiddleMark());
-            } else if (mIsNextPlaying) {
+            } else if (mNextPlaying) {
                 mRecordWave.setLeftProgress(mSpeakItem.getAudioRightMark());
             }
-            mIsNextPlaying = false;
-            mIsCurrentPlaying = false;
+            mNextPlaying = false;
+            mCurrentPlaying = false;
             setPlayView();
         }
     }
 
     private void onAudioProgressDidChanged(float progress, int progressSec) {
         if (mSpeakItem != null && AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
-            if (mIsCurrentPlaying && (progress >= mSpeakItem.getAudioMiddleMark())) {
+            if (mCurrentPlaying && (progress >= mSpeakItem.getAudioMiddleMark())) {
                 AudioController.getInstance().stopAudio();
                 return;
-            } else if (mIsNextPlaying && (progress >= mSpeakItem.getAudioRightMark())) {
+            } else if (mNextPlaying && (progress >= mSpeakItem.getAudioRightMark())) {
                 AudioController.getInstance().stopAudio();
                 return;
             }
@@ -430,8 +443,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private void onAudioDidReset() {
         if (mSpeakItem != null && !AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
-            mIsCurrentPlaying = false;
-            mIsNextPlaying = false;
+            mCurrentPlaying = false;
+            mNextPlaying = false;
             setPlayView();
             mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
             mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
@@ -450,7 +463,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void onRecordStarted() {
-        mIsRecording = true;
+        mRecording = true;
         setRecordView();
     }
 
@@ -466,7 +479,13 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onLeftProgressChanged(float progress) {
+        mNextPausing = false;
+        mCurrentPausing = false;
         mSpeakItem.setAudioLeftMark(progress);
+        if (mCurrentPlaying || mNextPlaying) {
+            mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
+            AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+        }
         mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
         mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
     }
@@ -474,13 +493,19 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Override
     public void onMiddleProgressChanged(float progress) {
         mSpeakItem.setAudioMiddleMark(progress);
+        if (!mCurrentPlaying && !mNextPlaying) {
+            mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+            mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+        }
 
     }
 
     @Override
     public void onRightProgressChanged(float progress) {
         mSpeakItem.setAudioRightMark(progress);
-        mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+        if (!mCurrentPlaying && !mNextPlaying) {
+            mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+        }
         mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
     }
 

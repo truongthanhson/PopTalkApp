@@ -13,6 +13,7 @@ import android.util.Log;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.AndroidUtilities;
+import com.poptech.poptalk.utils.Utils;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -267,6 +268,13 @@ public class AudioController {
                 }
                 mRecordingAudio = new SpeakItem();
                 mRecordingAudioFile = new File(path);
+                if (!mRecordingAudioFile.getParentFile().exists()) {
+                    try {
+                        Utils.forceMkdir(mRecordingAudioFile.getParentFile());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 try {
                     if (startRecord(mRecordingAudioFile.getAbsolutePath()) == 0) {
@@ -657,7 +665,6 @@ public class AudioController {
         if (mPlayingAudioItem != null) {
             mPlayingAudioItem.setAudioProgress(0.0f);
             mPlayingAudioItem.setAudioProgressSec(0);
-            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, 0.0f, 0);
             mPlayingAudioItem = null;
         }
     }
@@ -755,8 +762,8 @@ public class AudioController {
                     mAudioTrackPlayer.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener() {
                         @Override
                         public void onMarkerReached(AudioTrack audioTrack) {
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
                             cleanupPlayer();
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartCompleted);
                         }
 
                         @Override
@@ -783,8 +790,8 @@ public class AudioController {
                 mAudioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
                         cleanupPlayer();
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartCompleted);
                     }
                 });
                 mAudioPlayer.prepare();
@@ -885,6 +892,6 @@ public class AudioController {
         stopProgressTimer();
         mPlayingAudioItem = null;
         mIsPaused = false;
-        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartCompleted);
+        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
     }
 }

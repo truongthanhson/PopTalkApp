@@ -15,16 +15,16 @@ import java.util.ArrayList;
 public class NotificationCenter {
 
     private static int totalEvents = 1;
-    public static final int audioProgressDidChanged = totalEvents++;
-    public static final int audioDidReset = totalEvents++;
-    public static final int audioPlayStateChanged = totalEvents++;
     public static final int recordProgressChanged = totalEvents++;
     public static final int recordStarted = totalEvents++;
     public static final int recordStartError = totalEvents++;
-    public static final int recordStartCompleted = totalEvents++;
     public static final int recordStopped = totalEvents++;
+    public static final int audioProgressDidChanged = totalEvents++;
+    public static final int audioDidReset = totalEvents++;
+    public static final int audioPlayStateChanged = totalEvents++;
     public static final int audioDidSent = totalEvents++;
     public static final int audioDidStarted = totalEvents++;
+    public static final int audioStartCompleted = totalEvents++;
 
     private SparseArray<ArrayList<Object>> observers = new SparseArray<>();
     private SparseArray<ArrayList<Object>> removeAfterBroadcast = new SparseArray<>();

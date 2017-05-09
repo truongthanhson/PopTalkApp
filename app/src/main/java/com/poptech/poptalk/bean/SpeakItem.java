@@ -93,7 +93,7 @@ public class SpeakItem {
     }
 
     public void generateAudioPath() {
-        this.audioPath = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_SOUND + "/" + id + "_record.ogg";
+        this.audioPath = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_AUDIO + "/" + id + "_record.ogg";
     }
 
     public String getAudioPath() {
