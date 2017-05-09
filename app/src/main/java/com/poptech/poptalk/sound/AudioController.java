@@ -48,7 +48,7 @@ public class AudioController {
 
     public native byte[] getWaveform2(short[] array, int length);
 
-    public static int[] readArgs = new int[3];
+    public static int[] mReadArgs = new int[3];
 
     private class AudioBuffer {
         public AudioBuffer(int capacity) {
@@ -63,48 +63,48 @@ public class AudioController {
         long pcmOffset;
     }
 
-    private Runnable recordStartRunnable;
-    private DispatchQueue recordQueue;
-    private AudioRecord audioRecorder = null;
-    private File recordingAudioFile = null;
-    private SpeakItem recordingAudio;
-    private long recordStartTime;
-    private long recordTimeCount;
-    private int sendAfterDone;
-    private int playerBufferSize = 0;
-    private ArrayList<ByteBuffer> recordBuffers = new ArrayList<>();
-    private DispatchQueue fileEncodingQueue;
-    private DispatchQueue fileDecodingQueue;
-    private DispatchQueue playerQueue;
-    private ArrayList<AudioBuffer> usedPlayerBuffers = new ArrayList<>();
-    private ArrayList<AudioBuffer> freePlayerBuffers = new ArrayList<>();
-    private Runnable recordRunnable = new Runnable() {
+    private Runnable mRecordStartRunnable;
+    private DispatchQueue mRecordQueue;
+    private AudioRecord mAudioRecorder = null;
+    private File mRecordingAudioFile = null;
+    private SpeakItem mRecordingAudio;
+    private long mRecordStartTime;
+    private long mRecordTimeCount;
+    private int mSendAfterDone;
+    private int mPlayerBufferSize = 0;
+    private ArrayList<ByteBuffer> mRecordBuffers = new ArrayList<>();
+    private DispatchQueue mFileEncodingQueue;
+    private DispatchQueue mFileDecodingQueue;
+    private DispatchQueue mPlayerQueue;
+    private ArrayList<AudioBuffer> mUsedPlayerBuffers = new ArrayList<>();
+    private ArrayList<AudioBuffer> mFreePlayerBuffers = new ArrayList<>();
+    private Runnable mRecordRunnable = new Runnable() {
         @Override
         public void run() {
-            if (audioRecorder != null) {
+            if (mAudioRecorder != null) {
                 ByteBuffer buffer;
-                if (!recordBuffers.isEmpty()) {
-                    buffer = recordBuffers.get(0);
-                    recordBuffers.remove(0);
+                if (!mRecordBuffers.isEmpty()) {
+                    buffer = mRecordBuffers.get(0);
+                    mRecordBuffers.remove(0);
                 } else {
-                    buffer = ByteBuffer.allocateDirect(recordBufferSize);
+                    buffer = ByteBuffer.allocateDirect(mRecordBufferSize);
                     buffer.order(ByteOrder.nativeOrder());
                 }
                 buffer.rewind();
-                int len = audioRecorder.read(buffer, buffer.capacity());
+                int len = mAudioRecorder.read(buffer, buffer.capacity());
                 if (len > 0) {
                     buffer.limit(len);
                     double sum = 0;
                     try {
-                        long newSamplesCount = samplesCount + len / 2;
-                        int currentPart = (int) (((double) samplesCount / (double) newSamplesCount) * recordSamples.length);
-                        int newPart = recordSamples.length - currentPart;
+                        long newSamplesCount = mSamplesCount + len / 2;
+                        int currentPart = (int) (((double) mSamplesCount / (double) newSamplesCount) * mRecordSamples.length);
+                        int newPart = mRecordSamples.length - currentPart;
                         float sampleStep;
                         if (currentPart != 0) {
-                            sampleStep = (float) recordSamples.length / (float) currentPart;
+                            sampleStep = (float) mRecordSamples.length / (float) currentPart;
                             float currentNum = 0;
                             for (int a = 0; a < currentPart; a++) {
-                                recordSamples[a] = recordSamples[(int) currentNum];
+                                mRecordSamples[a] = mRecordSamples[(int) currentNum];
                                 currentNum += sampleStep;
                             }
                         }
@@ -116,13 +116,13 @@ public class AudioController {
                             if (peak > 2500) {
                                 sum += peak * peak;
                             }
-                            if (i == (int) nextNum && currentNum < recordSamples.length) {
-                                recordSamples[currentNum] = peak;
+                            if (i == (int) nextNum && currentNum < mRecordSamples.length) {
+                                mRecordSamples[currentNum] = peak;
                                 nextNum += sampleStep;
                                 currentNum++;
                             }
                         }
-                        samplesCount = newSamplesCount;
+                        mSamplesCount = newSamplesCount;
                     } catch (Exception e) {
                     }
                     buffer.position(0);
@@ -130,78 +130,78 @@ public class AudioController {
                     final ByteBuffer finalBuffer = buffer;
                     final boolean flush = len != buffer.capacity();
                     if (len != 0) {
-                        fileEncodingQueue.postRunnable(new Runnable() {
+                        mFileEncodingQueue.postRunnable(new Runnable() {
                             @Override
                             public void run() {
                                 while (finalBuffer.hasRemaining()) {
                                     int oldLimit = -1;
-                                    if (finalBuffer.remaining() > fileBuffer.remaining()) {
+                                    if (finalBuffer.remaining() > mFileBuffer.remaining()) {
                                         oldLimit = finalBuffer.limit();
-                                        finalBuffer.limit(fileBuffer.remaining() + finalBuffer.position());
+                                        finalBuffer.limit(mFileBuffer.remaining() + finalBuffer.position());
                                     }
-                                    fileBuffer.put(finalBuffer);
-                                    if (fileBuffer.position() == fileBuffer.limit() || flush) {
-                                        if (writeFrame(fileBuffer, !flush ? fileBuffer.limit() : finalBuffer.position()) != 0) {
-                                            fileBuffer.rewind();
-                                            recordTimeCount += fileBuffer.limit() / 2 / 16;
+                                    mFileBuffer.put(finalBuffer);
+                                    if (mFileBuffer.position() == mFileBuffer.limit() || flush) {
+                                        if (writeFrame(mFileBuffer, !flush ? mFileBuffer.limit() : finalBuffer.position()) != 0) {
+                                            mFileBuffer.rewind();
+                                            mRecordTimeCount += mFileBuffer.limit() / 2 / 16;
                                         }
                                     }
                                     if (oldLimit != -1) {
                                         finalBuffer.limit(oldLimit);
                                     }
                                 }
-                                recordQueue.postRunnable(new Runnable() {
+                                mRecordQueue.postRunnable(new Runnable() {
                                     @Override
                                     public void run() {
-                                        recordBuffers.add(finalBuffer);
+                                        mRecordBuffers.add(finalBuffer);
                                     }
                                 });
                             }
                         });
                     }
-                    recordQueue.postRunnable(recordRunnable);
+                    mRecordQueue.postRunnable(mRecordRunnable);
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         @Override
                         public void run() {
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordProgressChanged, System.currentTimeMillis() - recordStartTime, amplitude);
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordProgressChanged, System.currentTimeMillis() - mRecordStartTime, amplitude);
                         }
                     });
                 } else {
-                    recordBuffers.add(buffer);
-                    stopRecordingInternal(sendAfterDone);
+                    mRecordBuffers.add(buffer);
+                    stopRecordingInternal(mSendAfterDone);
                 }
             }
         }
     };
-    private short[] recordSamples = new short[1024];
-    private long samplesCount;
-    private ByteBuffer fileBuffer;
-    private int recordBufferSize;
-    private boolean isPaused = false;
-    private MediaPlayer audioPlayer = null;
-    private AudioTrack audioTrackPlayer = null;
-    private int lastProgress = 0;
-    private int ignoreFirstProgress = 0;
-    private SpeakItem playingAudioItem;
-    private final Object sync = new Object();
-    private final Object playerSync = new Object();
-    private final Object playerObjectSync = new Object();
-    private final Object progressTimerSync = new Object();
-    private Timer progressTimer = null;
-    private long lastPlayPcm;
-    private long currentTotalPcmDuration;
-    private boolean decodingFinished = false;
-    private int buffersWrited;
+    private short[] mRecordSamples = new short[1024];
+    private long mSamplesCount;
+    private ByteBuffer mFileBuffer;
+    private int mRecordBufferSize;
+    private boolean mIsPaused = false;
+    private MediaPlayer mAudioPlayer = null;
+    private AudioTrack mAudioTrackPlayer = null;
+    private int mLastProgress = 0;
+    private int mIgnoreFirstProgress = 0;
+    private SpeakItem mPlayingAudioItem;
+    private final Object mSync = new Object();
+    private final Object mPlayerSync = new Object();
+    private final Object mPlayerObjectSync = new Object();
+    private final Object mProgressTimerSync = new Object();
+    private Timer mProgressTimer = null;
+    private long mLastPlayPcm;
+    private long mCurrentTotalPcmDuration;
+    private boolean mDecodingFinished = false;
+    private int mBuffersWrited;
 
-    private static volatile AudioController Instance = null;
+    private static volatile AudioController mInstance = null;
 
     public static AudioController getInstance() {
-        AudioController localInstance = Instance;
+        AudioController localInstance = mInstance;
         if (localInstance == null) {
             synchronized (AudioController.class) {
-                localInstance = Instance;
+                localInstance = mInstance;
                 if (localInstance == null) {
-                    Instance = localInstance = new AudioController();
+                    mInstance = localInstance = new AudioController();
                 }
             }
         }
@@ -210,40 +210,40 @@ public class AudioController {
 
     public AudioController() {
         try {
-            recordBufferSize = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            if (recordBufferSize <= 0) {
-                recordBufferSize = 1280;
+            mRecordBufferSize = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            if (mRecordBufferSize <= 0) {
+                mRecordBufferSize = 1280;
             }
-            playerBufferSize = AudioTrack.getMinBufferSize(48000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            if (playerBufferSize <= 0) {
-                playerBufferSize = 3840;
+            mPlayerBufferSize = AudioTrack.getMinBufferSize(48000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            if (mPlayerBufferSize <= 0) {
+                mPlayerBufferSize = 3840;
             }
             for (int a = 0; a < 5; a++) {
                 ByteBuffer buffer = ByteBuffer.allocateDirect(4096);
                 buffer.order(ByteOrder.nativeOrder());
-                recordBuffers.add(buffer);
+                mRecordBuffers.add(buffer);
             }
             for (int a = 0; a < 3; a++) {
-                freePlayerBuffers.add(new AudioBuffer(playerBufferSize));
+                mFreePlayerBuffers.add(new AudioBuffer(mPlayerBufferSize));
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
 
-        fileBuffer = ByteBuffer.allocateDirect(1920);
-        recordQueue = new DispatchQueue("recordQueue");
-        recordQueue.setPriority(Thread.MAX_PRIORITY);
-        fileEncodingQueue = new DispatchQueue("fileEncodingQueue");
-        fileEncodingQueue.setPriority(Thread.MAX_PRIORITY);
-        playerQueue = new DispatchQueue("playerQueue");
-        fileDecodingQueue = new DispatchQueue("fileDecodingQueue");
+        mFileBuffer = ByteBuffer.allocateDirect(1920);
+        mRecordQueue = new DispatchQueue("mRecordQueue");
+        mRecordQueue.setPriority(Thread.MAX_PRIORITY);
+        mFileEncodingQueue = new DispatchQueue("mFileEncodingQueue");
+        mFileEncodingQueue.setPriority(Thread.MAX_PRIORITY);
+        mPlayerQueue = new DispatchQueue("mPlayerQueue");
+        mFileDecodingQueue = new DispatchQueue("mFileDecodingQueue");
     }
 
     public void startRecording(final String path) {
         boolean paused = false;
-        if (playingAudioItem != null && isPlayingAudio(playingAudioItem) && !isAudioPaused()) {
+        if (mPlayingAudioItem != null && isPlayingAudio(mPlayingAudioItem) && !isAudioPaused()) {
             paused = true;
-            pauseAudio(playingAudioItem);
+            pauseAudio(mPlayingAudioItem);
         }
 
         try {
@@ -253,51 +253,58 @@ public class AudioController {
             Log.e(TAG, e.toString());
         }
 
-        recordQueue.postRunnable(recordStartRunnable = new Runnable() {
+        mRecordQueue.postRunnable(mRecordStartRunnable = new Runnable() {
             @Override
             public void run() {
-                if (audioRecorder != null) {
+                if (mAudioRecorder != null) {
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         @Override
                         public void run() {
-                            recordStartRunnable = null;
+                            mRecordStartRunnable = null;
                             NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartError);
                         }
                     });
                     return;
                 }
-                recordingAudio = new SpeakItem();
-                recordingAudioFile = new File(path);
+                mRecordingAudio = new SpeakItem();
+                mRecordingAudioFile = new File(path);
+                if (!mRecordingAudioFile.getParentFile().exists()) {
+                    try {
+                        Utils.forceMkdir(mRecordingAudioFile.getParentFile());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 try {
-                    if (startRecord(recordingAudioFile.getAbsolutePath()) == 0) {
+                    if (startRecord(mRecordingAudioFile.getAbsolutePath()) == 0) {
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             @Override
                             public void run() {
-                                recordStartRunnable = null;
+                                mRecordStartRunnable = null;
                                 NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartError);
                             }
                         });
                         return;
                     }
 
-                    audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, recordBufferSize * 10);
-                    recordStartTime = System.currentTimeMillis();
-                    recordTimeCount = 0;
-                    samplesCount = 0;
-                    fileBuffer.rewind();
+                    mAudioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, mRecordBufferSize * 10);
+                    mRecordStartTime = System.currentTimeMillis();
+                    mRecordTimeCount = 0;
+                    mSamplesCount = 0;
+                    mFileBuffer.rewind();
 
-                    audioRecorder.startRecording();
+                    mAudioRecorder.startRecording();
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
                     return;
                 }
 
-                recordQueue.postRunnable(recordRunnable);
+                mRecordQueue.postRunnable(mRecordRunnable);
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        recordStartRunnable = null;
+                        mRecordStartRunnable = null;
                         NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStarted);
                     }
                 });
@@ -307,20 +314,20 @@ public class AudioController {
 
     private void stopRecordingInternal(final int send) {
         if (send != 0) {
-            final File recordingAudioFileToSend = recordingAudioFile;
-            final SpeakItem audioToSend = recordingAudio;
-            fileEncodingQueue.postRunnable(new Runnable() {
+            final File recordingAudioFileToSend = mRecordingAudioFile;
+            final SpeakItem audioToSend = mRecordingAudio;
+            mFileEncodingQueue.postRunnable(new Runnable() {
                 @Override
                 public void run() {
                     stopRecord();
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         @Override
                         public void run() {
-                            /*getWaveform2(recordSamples, recordSamples.length); */
+                            /*getWaveform2(mRecordSamples, mRecordSamples.length); */
                             audioToSend.setAudioWaveform(getWaveform(recordingAudioFileToSend.getAbsolutePath()));
                             audioToSend.setAudioPath(recordingAudioFileToSend.getAbsolutePath());
-                            long duration = recordTimeCount;
-                            audioToSend.setAudioDuration((int) (recordTimeCount / 1000));
+                            long duration = mRecordTimeCount;
+                            audioToSend.setAudioDuration((int) (mRecordTimeCount / 1000));
                             if (duration > 700) {
                                 NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidSent, audioToSend);
                             } else {
@@ -332,35 +339,35 @@ public class AudioController {
             });
         }
         try {
-            if (audioRecorder != null) {
-                audioRecorder.release();
-                audioRecorder = null;
+            if (mAudioRecorder != null) {
+                mAudioRecorder.release();
+                mAudioRecorder = null;
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-        recordingAudio = null;
-        recordingAudioFile = null;
+        mRecordingAudio = null;
+        mRecordingAudioFile = null;
     }
 
     public void stopRecording(final int send) {
-        if (recordStartRunnable != null) {
-            recordQueue.cancelRunnable(recordStartRunnable);
-            recordStartRunnable = null;
+        if (mRecordStartRunnable != null) {
+            mRecordQueue.cancelRunnable(mRecordStartRunnable);
+            mRecordStartRunnable = null;
         }
-        recordQueue.postRunnable(new Runnable() {
+        mRecordQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
-                if (audioRecorder == null) {
+                if (mAudioRecorder == null) {
                     return;
                 }
                 try {
-                    sendAfterDone = send;
-                    audioRecorder.stop();
+                    mSendAfterDone = send;
+                    mAudioRecorder.stop();
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
-                    if (recordingAudioFile != null) {
-                        recordingAudioFile.delete();
+                    if (mRecordingAudioFile != null) {
+                        mRecordingAudioFile.delete();
                     }
                 }
                 if (send == 0) {
@@ -386,28 +393,28 @@ public class AudioController {
         if (progress == 1.0f) {
             return;
         }
-        if (!isPaused) {
-            audioTrackPlayer.pause();
+        if (!mIsPaused) {
+            mAudioTrackPlayer.pause();
         }
-        audioTrackPlayer.flush();
-        fileDecodingQueue.postRunnable(new Runnable() {
+        mAudioTrackPlayer.flush();
+        mFileDecodingQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
                 seekOpusFile(progress);
-                synchronized (playerSync) {
-                    freePlayerBuffers.addAll(usedPlayerBuffers);
-                    usedPlayerBuffers.clear();
+                synchronized (mPlayerSync) {
+                    mFreePlayerBuffers.addAll(mUsedPlayerBuffers);
+                    mUsedPlayerBuffers.clear();
                 }
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (!isPaused) {
-                            ignoreFirstProgress = 3;
-                            lastPlayPcm = (long) (currentTotalPcmDuration * progress);
-                            if (audioTrackPlayer != null) {
-                                audioTrackPlayer.play();
+                        if (!mIsPaused) {
+                            mIgnoreFirstProgress = 3;
+                            mLastPlayPcm = (long) (mCurrentTotalPcmDuration * progress);
+                            if (mAudioTrackPlayer != null) {
+                                mAudioTrackPlayer.play();
                             }
-                            lastProgress = (int) (currentTotalPcmDuration / 48.0f * progress);
+                            mLastProgress = (int) (mCurrentTotalPcmDuration / 48.0f * progress);
                             checkPlayerQueue();
                         }
                     }
@@ -417,15 +424,15 @@ public class AudioController {
     }
 
     public boolean seekToProgress(SpeakItem audioItem, float progress) {
-        if (audioTrackPlayer == null && audioPlayer == null || audioItem == null || playingAudioItem == null) {
+        if (mAudioTrackPlayer == null && mAudioPlayer == null || audioItem == null || mPlayingAudioItem == null) {
             return false;
         }
         try {
-            if (audioPlayer != null) {
-                int seekTo = (int) (audioPlayer.getDuration() * progress);
-                audioPlayer.seekTo(seekTo);
-                lastProgress = seekTo;
-            } else if (audioTrackPlayer != null) {
+            if (mAudioPlayer != null) {
+                int seekTo = (int) (mAudioPlayer.getDuration() * progress);
+                mAudioPlayer.seekTo(seekTo);
+                mLastProgress = seekTo;
+            } else if (mAudioTrackPlayer != null) {
                 seekOpusPlayer(progress);
             }
         } catch (Exception e) {
@@ -436,42 +443,42 @@ public class AudioController {
     }
 
     private void checkDecoderQueue() {
-        fileDecodingQueue.postRunnable(new Runnable() {
+        mFileDecodingQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
-                if (decodingFinished) {
+                if (mDecodingFinished) {
                     checkPlayerQueue();
                     return;
                 }
                 boolean was = false;
                 while (true) {
                     AudioBuffer buffer = null;
-                    synchronized (playerSync) {
-                        if (!freePlayerBuffers.isEmpty()) {
-                            buffer = freePlayerBuffers.get(0);
-                            freePlayerBuffers.remove(0);
+                    synchronized (mPlayerSync) {
+                        if (!mFreePlayerBuffers.isEmpty()) {
+                            buffer = mFreePlayerBuffers.get(0);
+                            mFreePlayerBuffers.remove(0);
                         }
-                        if (!usedPlayerBuffers.isEmpty()) {
+                        if (!mUsedPlayerBuffers.isEmpty()) {
                             was = true;
                         }
                     }
                     if (buffer != null) {
-                        readOpusFile(buffer.buffer, playerBufferSize, readArgs);
-                        buffer.size = readArgs[0];
-                        buffer.pcmOffset = readArgs[1];
-                        buffer.finished = readArgs[2];
+                        readOpusFile(buffer.buffer, mPlayerBufferSize, mReadArgs);
+                        buffer.size = mReadArgs[0];
+                        buffer.pcmOffset = mReadArgs[1];
+                        buffer.finished = mReadArgs[2];
                         if (buffer.finished == 1) {
-                            decodingFinished = true;
+                            mDecodingFinished = true;
                         }
                         if (buffer.size != 0) {
                             buffer.buffer.rewind();
                             buffer.buffer.get(buffer.bufferBytes);
-                            synchronized (playerSync) {
-                                usedPlayerBuffers.add(buffer);
+                            synchronized (mPlayerSync) {
+                                mUsedPlayerBuffers.add(buffer);
                             }
                         } else {
-                            synchronized (playerSync) {
-                                freePlayerBuffers.add(buffer);
+                            synchronized (mPlayerSync) {
+                                mFreePlayerBuffers.add(buffer);
                                 break;
                             }
                         }
@@ -488,42 +495,42 @@ public class AudioController {
     }
 
     private void checkPlayerQueue() {
-        playerQueue.postRunnable(new Runnable() {
+        mPlayerQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
-                synchronized (playerObjectSync) {
-                    if (audioTrackPlayer == null || audioTrackPlayer.getPlayState() != AudioTrack.PLAYSTATE_PLAYING) {
+                synchronized (mPlayerObjectSync) {
+                    if (mAudioTrackPlayer == null || mAudioTrackPlayer.getPlayState() != AudioTrack.PLAYSTATE_PLAYING) {
                         return;
                     }
                 }
                 AudioBuffer buffer = null;
-                synchronized (playerSync) {
-                    if (!usedPlayerBuffers.isEmpty()) {
-                        buffer = usedPlayerBuffers.get(0);
-                        usedPlayerBuffers.remove(0);
+                synchronized (mPlayerSync) {
+                    if (!mUsedPlayerBuffers.isEmpty()) {
+                        buffer = mUsedPlayerBuffers.get(0);
+                        mUsedPlayerBuffers.remove(0);
                     }
                 }
 
                 if (buffer != null) {
                     int count = 0;
                     try {
-                        count = audioTrackPlayer.write(buffer.bufferBytes, 0, buffer.size);
+                        count = mAudioTrackPlayer.write(buffer.bufferBytes, 0, buffer.size);
                     } catch (Exception e) {
                         Log.e(TAG, e.toString());
                     }
-                    buffersWrited++;
+                    mBuffersWrited++;
 
                     if (count > 0) {
                         final long pcm = buffer.pcmOffset;
                         final int marker = buffer.finished == 1 ? count : -1;
-                        final int finalBuffersWrited = buffersWrited;
+                        final int finalBuffersWrited = mBuffersWrited;
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             @Override
                             public void run() {
-                                lastPlayPcm = pcm;
+                                mLastPlayPcm = pcm;
                                 if (marker != -1) {
-                                    if (audioTrackPlayer != null) {
-                                        audioTrackPlayer.setNotificationMarkerPosition(1);
+                                    if (mAudioTrackPlayer != null) {
+                                        mAudioTrackPlayer.setNotificationMarkerPosition(1);
                                     }
                                     if (finalBuffersWrited == 1) {
                                         cleanupPlayer();
@@ -542,8 +549,8 @@ public class AudioController {
                 }
 
                 if (buffer != null) {
-                    synchronized (playerSync) {
-                        freePlayerBuffers.add(buffer);
+                    synchronized (mPlayerSync) {
+                        mFreePlayerBuffers.add(buffer);
                     }
                 }
             }
@@ -551,48 +558,48 @@ public class AudioController {
     }
 
     private void startProgressTimer(final SpeakItem currentPlayingSpeakItem) {
-        synchronized (progressTimerSync) {
-            if (progressTimer != null) {
+        synchronized (mProgressTimerSync) {
+            if (mProgressTimer != null) {
                 try {
-                    progressTimer.cancel();
-                    progressTimer = null;
+                    mProgressTimer.cancel();
+                    mProgressTimer = null;
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
                 }
             }
-            progressTimer = new Timer();
-            progressTimer.schedule(new TimerTask() {
+            mProgressTimer = new Timer();
+            mProgressTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    synchronized (sync) {
+                    synchronized (mSync) {
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (currentPlayingSpeakItem != null && (audioPlayer != null || audioTrackPlayer != null) && !isPaused) {
+                                if (currentPlayingSpeakItem != null && (mAudioPlayer != null || mAudioTrackPlayer != null) && !mIsPaused) {
                                     try {
-                                        if (ignoreFirstProgress != 0) {
-                                            ignoreFirstProgress--;
+                                        if (mIgnoreFirstProgress != 0) {
+                                            mIgnoreFirstProgress--;
                                             return;
                                         }
                                         int progress;
                                         float value;
-                                        if (audioPlayer != null) {
-                                            progress = audioPlayer.getCurrentPosition();
-                                            value = (float) lastProgress / (float) audioPlayer.getDuration();
-                                            if (progress <= lastProgress) {
+                                        if (mAudioPlayer != null) {
+                                            progress = mAudioPlayer.getCurrentPosition();
+                                            value = (float) mLastProgress / (float) mAudioPlayer.getDuration();
+                                            if (progress <= mLastProgress) {
                                                 return;
                                             }
                                         } else {
-                                            progress = (int) (lastPlayPcm / 48.0f);
-                                            value = (float) lastPlayPcm / (float) currentTotalPcmDuration;
-                                            if (progress == lastProgress) {
+                                            progress = (int) (mLastPlayPcm / 48.0f);
+                                            value = (float) mLastPlayPcm / (float) mCurrentTotalPcmDuration;
+                                            if (progress == mLastProgress) {
                                                 return;
                                             }
                                         }
-                                        lastProgress = progress;
+                                        mLastProgress = progress;
                                         currentPlayingSpeakItem.setAudioProgress(value);
-                                        currentPlayingSpeakItem.setAudioProgressSec(lastProgress / 1000);
-                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, value);
+                                        currentPlayingSpeakItem.setAudioProgressSec(mLastProgress / 1000);
+                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, value, mLastProgress / 1000);
                                     } catch (Exception e) {
                                         Log.e(TAG, e.toString());
                                     }
@@ -606,11 +613,11 @@ public class AudioController {
     }
 
     private void stopProgressTimer() {
-        synchronized (progressTimerSync) {
-            if (progressTimer != null) {
+        synchronized (mProgressTimerSync) {
+            if (mProgressTimer != null) {
                 try {
-                    progressTimer.cancel();
-                    progressTimer = null;
+                    mProgressTimer.cancel();
+                    mProgressTimer = null;
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
                 }
@@ -619,84 +626,84 @@ public class AudioController {
     }
 
     public void cleanupPlayer() {
-        if (audioPlayer != null) {
+        if (mAudioPlayer != null) {
             try {
-                audioPlayer.reset();
+                mAudioPlayer.reset();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
             try {
-                audioPlayer.stop();
+                mAudioPlayer.stop();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
             try {
-                audioPlayer.release();
-                audioPlayer = null;
+                mAudioPlayer.release();
+                mAudioPlayer = null;
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
-        } else if (audioTrackPlayer != null) {
-            synchronized (playerObjectSync) {
+        } else if (mAudioTrackPlayer != null) {
+            synchronized (mPlayerObjectSync) {
                 try {
-                    audioTrackPlayer.pause();
-                    audioTrackPlayer.flush();
+                    mAudioTrackPlayer.pause();
+                    mAudioTrackPlayer.flush();
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
                 }
                 try {
-                    audioTrackPlayer.release();
-                    audioTrackPlayer = null;
+                    mAudioTrackPlayer.release();
+                    mAudioTrackPlayer = null;
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
                 }
             }
         }
         stopProgressTimer();
-        lastProgress = 0;
-        isPaused = false;
-        if (playingAudioItem != null) {
-            playingAudioItem.setAudioProgress(0.0f);
-            playingAudioItem.setAudioProgressSec(0);
-            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, 0);
-            playingAudioItem = null;
+        mLastProgress = 0;
+        mIsPaused = false;
+        if (mPlayingAudioItem != null) {
+            mPlayingAudioItem.setAudioProgress(0.0f);
+            mPlayingAudioItem.setAudioProgressSec(0);
+            mPlayingAudioItem = null;
         }
     }
 
     public boolean pauseAudio(SpeakItem audioItem) {
-        if (audioTrackPlayer == null && audioPlayer == null || audioItem == null || playingAudioItem == null) {
+        if (mAudioTrackPlayer == null && mAudioPlayer == null || audioItem == null || mPlayingAudioItem == null) {
             return false;
         }
         stopProgressTimer();
         try {
-            if (audioPlayer != null) {
-                audioPlayer.pause();
-            } else if (audioTrackPlayer != null) {
-                audioTrackPlayer.pause();
+            if (mAudioPlayer != null) {
+                mAudioPlayer.pause();
+            } else if (mAudioTrackPlayer != null) {
+                mAudioTrackPlayer.pause();
             }
-            isPaused = true;
+            mIsPaused = true;
             NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
-            isPaused = false;
+            mIsPaused = false;
             return false;
         }
         return true;
     }
 
     public boolean resumeAudio(SpeakItem audioItem) {
-        if (audioTrackPlayer == null && audioPlayer == null || audioItem == null || playingAudioItem == null) {
+        if (mAudioTrackPlayer == null && mAudioPlayer == null || audioItem == null || mPlayingAudioItem == null) {
             return false;
         }
 
         try {
             startProgressTimer(audioItem);
-            if (audioPlayer != null) {
-                audioPlayer.start();
-            } else if (audioTrackPlayer != null) {
-                audioTrackPlayer.play();
+            if (mAudioPlayer != null) {
+                mAudioPlayer.start();
+            } else if (mAudioTrackPlayer != null) {
+                mAudioTrackPlayer.play();
+                checkPlayerQueue();
             }
-            isPaused = false;
+            mIsPaused = false;
             NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
@@ -706,11 +713,11 @@ public class AudioController {
     }
 
     public boolean isPlayingAudio(SpeakItem audioItem) {
-        return !(audioTrackPlayer == null && audioPlayer == null || audioItem == null || playingAudioItem == null);
+        return !(mAudioTrackPlayer == null && mAudioPlayer == null || audioItem == null || mPlayingAudioItem == null);
     }
 
     public boolean isAudioPaused() {
-        return isPaused;
+        return mIsPaused;
     }
 
 
@@ -718,8 +725,8 @@ public class AudioController {
         if (audioItem == null) {
             return false;
         }
-        if ((audioTrackPlayer != null || audioPlayer != null)) {
-            if (isPaused) {
+        if ((mAudioTrackPlayer != null || mAudioPlayer != null)) {
+            if (mIsPaused) {
                 resumeAudio(audioItem);
             }
             return true;
@@ -732,12 +739,12 @@ public class AudioController {
         }
 
         if (isOpusFile(audioFile.getAbsolutePath()) == 1) {
-            synchronized (playerObjectSync) {
+            synchronized (mPlayerObjectSync) {
                 try {
-                    ignoreFirstProgress = 3;
+                    mIgnoreFirstProgress = 3;
                     final Semaphore semaphore = new Semaphore(0);
                     final Boolean[] result = new Boolean[1];
-                    fileDecodingQueue.postRunnable(new Runnable() {
+                    mFileDecodingQueue.postRunnable(new Runnable() {
                         @Override
                         public void run() {
                             result[0] = openOpusFile(audioFile.getAbsolutePath()) != 0;
@@ -749,144 +756,142 @@ public class AudioController {
                     if (!result[0]) {
                         return false;
                     }
-                    currentTotalPcmDuration = getTotalPcmDuration();
-                    audioTrackPlayer = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize, AudioTrack.MODE_STREAM);
-                    audioTrackPlayer.setStereoVolume(1.0f, 1.0f);
-                    audioTrackPlayer.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener() {
+                    mCurrentTotalPcmDuration = getTotalPcmDuration();
+                    mAudioTrackPlayer = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, mPlayerBufferSize, AudioTrack.MODE_STREAM);
+                    mAudioTrackPlayer.setStereoVolume(1.0f, 1.0f);
+                    mAudioTrackPlayer.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener() {
                         @Override
                         public void onMarkerReached(AudioTrack audioTrack) {
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
                             cleanupPlayer();
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartCompleted);
                         }
 
                         @Override
                         public void onPeriodicNotification(AudioTrack audioTrack) {
                         }
                     });
-                    audioTrackPlayer.play();
+                    mAudioTrackPlayer.play();
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
-                    if (audioTrackPlayer != null) {
-                        audioTrackPlayer.release();
-                        audioTrackPlayer = null;
-                        isPaused = false;
-                        playingAudioItem = null;
+                    if (mAudioTrackPlayer != null) {
+                        mAudioTrackPlayer.release();
+                        mAudioTrackPlayer = null;
+                        mIsPaused = false;
+                        mPlayingAudioItem = null;
                     }
                     return false;
                 }
             }
         } else {
             try {
-                audioPlayer = new MediaPlayer();
-                audioPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                audioPlayer.setDataSource(audioFile.getAbsolutePath());
-                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                mAudioPlayer = new MediaPlayer();
+                mAudioPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mAudioPlayer.setDataSource(audioFile.getAbsolutePath());
+                mAudioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
                         cleanupPlayer();
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartCompleted);
                     }
                 });
-                audioPlayer.prepare();
-                audioPlayer.start();
+                mAudioPlayer.prepare();
+                mAudioPlayer.start();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
                 NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged);
-                if (audioPlayer != null) {
-                    audioPlayer.release();
-                    audioPlayer = null;
-                    isPaused = false;
-                    playingAudioItem = null;
+                if (mAudioPlayer != null) {
+                    mAudioPlayer.release();
+                    mAudioPlayer = null;
+                    mIsPaused = false;
+                    mPlayingAudioItem = null;
                 }
                 return false;
             }
         }
 
-        isPaused = false;
-        lastProgress = 0;
-        lastPlayPcm = 0;
-        playingAudioItem = audioItem;
-        startProgressTimer(playingAudioItem);
+        mIsPaused = false;
+        mLastProgress = 0;
+        mLastPlayPcm = 0;
+        mPlayingAudioItem = audioItem;
+        startProgressTimer(mPlayingAudioItem);
         NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidStarted, audioItem);
 
-        if (audioPlayer != null) {
+        if (mAudioPlayer != null) {
             try {
-                if (playingAudioItem.getAudioProgress() != 0) {
-                    int seekTo = (int) (audioPlayer.getDuration() * playingAudioItem.getAudioProgress());
-                    audioPlayer.seekTo(seekTo);
+                if (mPlayingAudioItem.getAudioProgress() != 0) {
+                    int seekTo = (int) (mAudioPlayer.getDuration() * mPlayingAudioItem.getAudioProgress());
+                    mAudioPlayer.seekTo(seekTo);
                 }
             } catch (Exception e2) {
-                playingAudioItem.setAudioProgress(0);
-                playingAudioItem.setAudioProgressSec(0);
-                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, 0);
+                mPlayingAudioItem.setAudioProgress(0);
+                mPlayingAudioItem.setAudioProgressSec(0);
+                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, 0.0f, 0);
                 Log.e(TAG, e2.toString());
             }
-        } else if (audioTrackPlayer != null) {
-            if (playingAudioItem.getAudioProgress() == 1) {
-                playingAudioItem.setAudioProgress(0);
+
+        } else if (mAudioTrackPlayer != null) {
+            if (mPlayingAudioItem.getAudioProgress() == 1) {
+                mPlayingAudioItem.setAudioProgress(0);
             }
-            fileDecodingQueue.postRunnable(new Runnable() {
+            mFileDecodingQueue.postRunnable(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        if (playingAudioItem != null && playingAudioItem.getAudioProgress() != 0) {
-                            lastPlayPcm = (long) (currentTotalPcmDuration * playingAudioItem.getAudioProgress());
-                            seekOpusFile(playingAudioItem.getAudioProgress());
+                        if (mPlayingAudioItem != null && mPlayingAudioItem.getAudioProgress() != 0) {
+                            mLastPlayPcm = (long) (mCurrentTotalPcmDuration * mPlayingAudioItem.getAudioProgress());
+                            seekOpusFile(mPlayingAudioItem.getAudioProgress());
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.toString());
                     }
-                    synchronized (playerSync) {
-                        freePlayerBuffers.addAll(usedPlayerBuffers);
-                        usedPlayerBuffers.clear();
+                    synchronized (mPlayerSync) {
+                        mFreePlayerBuffers.addAll(mUsedPlayerBuffers);
+                        mUsedPlayerBuffers.clear();
                     }
-                    decodingFinished = false;
+                    mDecodingFinished = false;
                     checkPlayerQueue();
                 }
             });
+            mAudioTrackPlayer.play();
         }
         return true;
     }
 
     public void stopAudio() {
-        if (audioTrackPlayer == null && audioPlayer == null || playingAudioItem == null) {
+        if (mAudioTrackPlayer == null && mAudioPlayer == null || mPlayingAudioItem == null) {
             return;
         }
         try {
-            if (audioPlayer != null) {
+            if (mAudioPlayer != null) {
                 try {
-                    audioPlayer.reset();
+                    mAudioPlayer.reset();
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
                 }
-                audioPlayer.stop();
-            } else if (audioTrackPlayer != null) {
-                audioTrackPlayer.pause();
-                audioTrackPlayer.flush();
+                mAudioPlayer.stop();
+            } else if (mAudioTrackPlayer != null) {
+                mAudioTrackPlayer.pause();
+                mAudioTrackPlayer.flush();
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
         try {
-            if (audioPlayer != null) {
-                audioPlayer.release();
-                audioPlayer = null;
-            } else if (audioTrackPlayer != null) {
-                synchronized (playerObjectSync) {
-                    audioTrackPlayer.release();
-                    audioTrackPlayer = null;
+            if (mAudioPlayer != null) {
+                mAudioPlayer.release();
+                mAudioPlayer = null;
+            } else if (mAudioTrackPlayer != null) {
+                synchronized (mPlayerObjectSync) {
+                    mAudioTrackPlayer.release();
+                    mAudioTrackPlayer = null;
                 }
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
         stopProgressTimer();
-        playingAudioItem = null;
-        isPaused = false;
-    }
-
-
-    public SpeakItem getPlayingAudioItem() {
-        return playingAudioItem;
+        mPlayingAudioItem = null;
+        mIsPaused = false;
+        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
     }
 }

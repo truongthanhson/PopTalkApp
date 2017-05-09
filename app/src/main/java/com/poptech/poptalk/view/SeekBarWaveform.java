@@ -22,7 +22,8 @@ public class SeekBarWaveform {
 
     private static Paint paintInner;
     private static Paint paintOuter;
-    private int thumbX = 0;
+    private int thumbLeftX = 0;
+    private int thumbRightX = 0;
     private int thumbDX = 0;
     private float startX;
     private boolean startDraging = false;
@@ -78,14 +79,14 @@ public class SeekBarWaveform {
             if (0 <= x && x <= width && y >= 0 && y <= height) {
                 startX = x;
                 pressed = true;
-                thumbDX = (int) (x - thumbX);
+                thumbDX = (int) (x - thumbLeftX);
                 startDraging = false;
                 return true;
             }
         } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             if (pressed) {
                 if (action == MotionEvent.ACTION_UP && delegate != null) {
-                    delegate.onSeekBarDrag((float) thumbX / (float) width);
+                    delegate.onSeekBarDrag((float) thumbLeftX / (float) width);
                 }
                 pressed = false;
                 return true;
@@ -93,11 +94,11 @@ public class SeekBarWaveform {
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (pressed) {
                 if (startDraging) {
-                    thumbX = (int) (x - thumbDX);
-                    if (thumbX < 0) {
-                        thumbX = 0;
-                    } else if (thumbX > width) {
-                        thumbX = width;
+                    thumbLeftX = (int) (x - thumbDX);
+                    if (thumbLeftX < 0) {
+                        thumbLeftX = 0;
+                    } else if (thumbLeftX > width) {
+                        thumbLeftX = width;
                     }
                 }
                 if (startX != -1 && Math.abs(x - startX) > AndroidUtilities.getPixelsInCM((Activity) mContext, 0.2f, true)) {
@@ -113,12 +114,21 @@ public class SeekBarWaveform {
         return false;
     }
 
-    public void setProgress(float progress) {
-        thumbX = (int) Math.ceil(width * progress);
-        if (thumbX < 0) {
-            thumbX = 0;
-        } else if (thumbX > width) {
-            thumbX = width;
+    public void setLeftProgress(float progress) {
+        thumbLeftX = (int) Math.ceil(width * progress);
+        if (thumbLeftX < 0) {
+            thumbLeftX = 0;
+        } else if (thumbLeftX > width) {
+            thumbLeftX = width;
+        }
+    }
+
+    public void setRightProgress(float progress) {
+        thumbRightX = (int) Math.ceil(width * progress);
+        if (thumbRightX < 0) {
+            thumbRightX = 0;
+        } else if (thumbRightX > width) {
+            thumbRightX = width;
         }
     }
 
@@ -129,6 +139,8 @@ public class SeekBarWaveform {
     public void setSize(int w, int h) {
         width = w;
         height = h;
+        thumbLeftX = 0;
+        thumbRightX = w;
     }
 
     public void draw(Canvas canvas) {
@@ -182,12 +194,17 @@ public class SeekBarWaveform {
 
             for (int b = 0; b < drawBarCount; b++) {
                 int x = barNum * AndroidUtilities.dp(colSpace);
-                if (x < thumbX && x + AndroidUtilities.dp(colWidth) < thumbX) {
+                if (x > thumbRightX) {
+                    canvas.drawRect(x, y + AndroidUtilities.dp(colHeight - Math.max(1, colHeight * 1.0f * value / 31.0f)), x + AndroidUtilities.dp(colWidth), y + AndroidUtilities.dp(colHeight), paintOuter);
+                } else if (x < thumbLeftX && x + AndroidUtilities.dp(colWidth) < thumbLeftX) {
                     canvas.drawRect(x, y + AndroidUtilities.dp(colHeight - Math.max(1, colHeight * 1.0f * value / 31.0f)), x + AndroidUtilities.dp(colWidth), y + AndroidUtilities.dp(colHeight), paintOuter);
                 } else {
                     canvas.drawRect(x, y + AndroidUtilities.dp(colHeight - Math.max(1, colHeight * 1.0f * value / 31.0f)), x + AndroidUtilities.dp(colWidth), y + AndroidUtilities.dp(colHeight), paintInner);
-                    if (x < thumbX) {
-                        canvas.drawRect(x, y + AndroidUtilities.dp(colHeight - Math.max(1, colHeight * 1.0f * value / 31.0f)), thumbX, y + AndroidUtilities.dp(colHeight), paintOuter);
+                    if (x + AndroidUtilities.dp(colWidth) > thumbRightX) {
+                        canvas.drawRect(thumbRightX, y + AndroidUtilities.dp(colHeight - Math.max(1, colHeight * 1.0f * value / 31.0f)), x + AndroidUtilities.dp(colWidth), y + AndroidUtilities.dp(colHeight), paintOuter);
+                    }
+                    if (x < thumbLeftX) {
+                        canvas.drawRect(x, y + AndroidUtilities.dp(colHeight - Math.max(1, colHeight * 1.0f * value / 31.0f)), thumbLeftX, y + AndroidUtilities.dp(colHeight), paintOuter);
                     }
                 }
                 barNum++;

@@ -73,7 +73,7 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), Constants.GRID_COLUMN_COUNT);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new ItemDecorationColumns(3, MetricUtils.dpToPx(5), false));
+        recyclerView.addItemDecoration(new ItemDecorationColumns(3, MetricUtils.dpToPx(5), true));
     }
 
     @Override

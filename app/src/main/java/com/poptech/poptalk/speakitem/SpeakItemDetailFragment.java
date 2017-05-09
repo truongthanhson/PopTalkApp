@@ -4,7 +4,6 @@ import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,18 +15,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
@@ -35,15 +30,14 @@ import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
 import com.poptech.poptalk.utils.AndroidUtilities;
 import com.poptech.poptalk.utils.Utils;
+import com.poptech.poptalk.view.AudioTimelineView;
 import com.poptech.poptalk.view.SeekBarWaveformView;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
-
-public class SpeakItemDetailFragment extends Fragment implements NotificationCenter.NotificationCenterDelegate, SpeakItemDetailContract.View, View.OnTouchListener {
+public class SpeakItemDetailFragment extends Fragment implements NotificationCenter.NotificationCenterDelegate, SpeakItemDetailContract.View, View.OnTouchListener, View.OnClickListener, AudioTimelineView.AudioWaveFormTimelineViewDelegate {
     public static SpeakItemDetailFragment newInstance(int speakItemId) {
         Bundle args = new Bundle();
         args.putInt("speak_item_id", speakItemId);
@@ -66,20 +60,26 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private LinearLayout mSlideCancel;
     private RelativeLayout mRecordMenu;
     private SeekBarWaveformView mRecordWave;
+    private AudioTimelineView mRecordTimeline;
+    private FrameLayout mPlayCurrentButton;
+    private FrameLayout mPlayNextButton;
 
     private SpeakItem mSpeakItem;
-    private int mSpeakItemId = -1;
-    private float mStartedDraggingX = -1;
-    private float mDistCanMove = AndroidUtilities.dp(100);
+    private int mSpeakItemId;
+    private float mStartedDraggingX;
+    private float mDistCanMove;
+    private boolean mNextPlaying;
+    private boolean mNextPausing;
+    private boolean mCurrentPlaying;
+    private boolean mCurrentPausing;
+    private boolean mRecording;
 
     public SpeakItemDetailFragment() {
-        // Requires empty public constructor
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Create the presenter
         DaggerSpeakItemDetailComponent.builder().appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent()).
                 speakItemDetailPresenterModule(new SpeakItemDetailPresenterModule(this)).build().inject(this);
 
@@ -104,13 +104,28 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mLanguageButton = (TextView) mView.findViewById(R.id.language_button_id);
         mRecordMenu = (RelativeLayout) mView.findViewById(R.id.record_menu_rl_id);
         mRecordButton = (FrameLayout) mView.findViewById(R.id.record_fl_id);
-        mRecordButton.setOnTouchListener(this);
         mTimerText = (TextView) mView.findViewById(R.id.timer_tv_id);
         mSlideCancel = (LinearLayout) mView.findViewById(R.id.slide_cancel_ll_id);
         mRecordWave = (SeekBarWaveformView) mView.findViewById(R.id.record_waveform_id);
+        mRecordTimeline = (AudioTimelineView) mView.findViewById(R.id.record_timeline_id);
+        mPlayCurrentButton = (FrameLayout) mView.findViewById(R.id.play_first_fl_id);
+        mPlayNextButton = (FrameLayout) mView.findViewById(R.id.play_second_fl_id);
+
+        mRecordButton.setOnTouchListener(this);
+        mPlayCurrentButton.setOnClickListener(this);
+        mPlayNextButton.setOnClickListener(this);
+        mRecordTimeline.setDelegate(this);
     }
 
     private void initData() {
+        mStartedDraggingX = -1;
+        mDistCanMove = AndroidUtilities.dp(100);
+        mNextPlaying = false;
+        mNextPausing = false;
+        mCurrentPlaying = false;
+        mCurrentPausing = false;
+        mRecording = false;
+
         setNotification();
     }
 
@@ -159,6 +174,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onDestroy() {
+        AudioController.getInstance().cleanupPlayer();
         clearNotification();
         super.onDestroy();
     }
@@ -180,6 +196,15 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
         mPhotoLocation.setText(speakItem.getLocation());
         mPhotoDateTime.setText(speakItem.getDateTime());
+
+        // Reload marks
+        mRecordTimeline.setProgressLeft(speakItem.getAudioLeftMark());
+        mRecordTimeline.setProgressMiddle(speakItem.getAudioMiddleMark());
+        mRecordTimeline.setProgressRight(speakItem.getAudioRightMark());
+
+        // Reload waveform
+        mRecordWave.setLeftProgress(speakItem.getAudioLeftMark());
+        mRecordWave.setRightProgress(speakItem.getAudioRightMark());
     }
 
     private void setNotification() {
@@ -187,7 +212,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStartError);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStopped);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordProgressChanged);
-        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStartCompleted);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioStartCompleted);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidReset);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioProgressDidChanged);
@@ -198,20 +223,69 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStartError);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStopped);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordProgressChanged);
-        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStartCompleted);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioStartCompleted);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidReset);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioProgressDidChanged);
     }
 
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.play_first_fl_id:
+                if (!mCurrentPlaying) {
+                    mCurrentPlaying = true;
+                    mNextPlaying = false;
+                    setPlayView();
+                    if (!mCurrentPausing) {
+                        mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
+                        AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+                    }
+                    AudioController.getInstance().playAudio(mSpeakItem);
+                    mCurrentPausing = false;
+                } else {
+                    mCurrentPlaying = false;
+                    mNextPlaying = false;
+                    setPlayView();
+                    AudioController.getInstance().pauseAudio(mSpeakItem);
+                    mCurrentPausing = true;
+                }
+
+                break;
+            case R.id.play_second_fl_id:
+                if (!mNextPlaying) {
+                    mCurrentPlaying = false;
+                    mNextPlaying = true;
+                    setPlayView();
+                    if (!mNextPausing) {
+                        mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
+                        AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+                    }
+                    AudioController.getInstance().playAudio(mSpeakItem);
+                    mNextPausing = false;
+                } else {
+                    mCurrentPlaying = false;
+                    mNextPlaying = false;
+                    setPlayView();
+                    AudioController.getInstance().pauseAudio(mSpeakItem);
+                    mNextPausing = true;
+                }
+
+                break;
+            default:
+                break;
+        }
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        Log.d(TAG, "ID: " + v.getId() + "Event: " + event.getAction());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (v.getId() == R.id.record_fl_id) {
                     mStartedDraggingX = -1;
-                    setRecordUIStatus(true);
+                    mRecording = true;
+                    setRecordView();
                     mSpeakItem.generateAudioPath();
                     AudioController.getInstance().startRecording(mSpeakItem.getAudioPath());
                 }
@@ -219,7 +293,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             case MotionEvent.ACTION_UP:
                 if (v.getId() == R.id.record_fl_id) {
                     mStartedDraggingX = -1;
-                    setRecordUIStatus(false);
+                    mRecording = false;
+                    setRecordView();
                     AudioController.getInstance().stopRecording(1);
                 }
                 break;
@@ -228,7 +303,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                     float x = event.getX();
                     x = x + mRecordButton.getX();
                     if ((x - mStartedDraggingX) < -mDistCanMove) {
-                        setRecordUIStatus(false);
+                        mRecording = false;
+                        setRecordView();
                         AudioController.getInstance().stopRecording(0);
                         return true;
                     }
@@ -272,14 +348,14 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         return true;
     }
 
-    private void setRecordUIStatus(boolean isRecording) {
-        if (isRecording) {
+    private void setRecordView() {
+        if (mRecording) {
             mView.findViewById(R.id.play_ll_id).setVisibility(View.GONE);
             mView.findViewById(R.id.record_normal_fl_id).setVisibility(View.GONE);
             mView.findViewById(R.id.record_press_fl_id).setVisibility(View.VISIBLE);
+            mTimerText.setText("00:00.00");
             mSlideCancel.setVisibility(View.VISIBLE);
             mTimerText.setVisibility(View.VISIBLE);
-            mTimerText.setText("00:00.00");
             mRecordButton.setTranslationX(0);
             Utils.scaleView(mRecordButton, 1.3f, 1.3f);
         } else {
@@ -297,66 +373,140 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         }
     }
 
-    private void setPlayFirstUIStatus(boolean isPlaying) {
-        if (isPlaying) {
+    private void setPlayView() {
+        if (mCurrentPlaying) {
             mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.GONE);
         } else {
             mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.GONE);
             mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.VISIBLE);
         }
-    }
-
-    private void setPlaySecondUIStatus(boolean isPlaying) {
-        if (isPlaying) {
+        if (mNextPlaying) {
             mView.findViewById(R.id.play_second_press_fl_id).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.play_second_normal_fl_id).setVisibility(View.GONE);
         } else {
             mView.findViewById(R.id.play_second_press_fl_id).setVisibility(View.GONE);
             mView.findViewById(R.id.play_second_normal_fl_id).setVisibility(View.VISIBLE);
         }
+        mTimerText.setText("00:00");
+        mTimerText.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void didReceivedNotification(int id, Object... args) {
         if (id == NotificationCenter.recordProgressChanged) {
-            long t = (Long) args[0];
-            Long time = t / 1000;
-            int ms = (int) (t % 1000L) / 10;
-            mTimerText.setText(String.format("%02d:%02d.%02d", time / 60, time % 60, ms));
+            onRecordProgressChanged((Long) args[0]);
         } else if (id == NotificationCenter.recordStartError || id == NotificationCenter.recordStopped) {
-            mTimerText.setText("00:00.00");
+            onRecordProgressStopped();
         } else if (id == NotificationCenter.recordStarted) {
-            setRecordUIStatus(true);
+            onRecordStarted();
         } else if (id == NotificationCenter.audioDidSent) {
-            mSpeakItem = (SpeakItem) args[0];
-            mRecordWave.setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.waveform_menu_id).setVisibility(View.VISIBLE);
-            mRecordWave.setWaveform(mSpeakItem.getAudioWaveform());
+            onAudioDidSent((SpeakItem) args[0]);
         } else if (id == NotificationCenter.audioDidReset) {
-            if (mSpeakItem != null && !AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
-                mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.GONE);
-                mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.VISIBLE);
-                mView.findViewById(R.id.play_second_press_fl_id).setVisibility(View.GONE);
-                mView.findViewById(R.id.play_second_normal_fl_id).setVisibility(View.VISIBLE);
-                mRecordWave.setProgress(0);
-            }
+            onAudioDidReset();
         } else if (id == NotificationCenter.audioProgressDidChanged) {
-            if (mSpeakItem != null && AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
-                SpeakItem audioPlaying = AudioController.getInstance().getPlayingAudioItem();
-                mSpeakItem.setAudioProgress(audioPlaying.getAudioProgress());
-                mSpeakItem.setAudioProgressSec(audioPlaying.getAudioProgressSec());
-                mRecordWave.setProgress(mSpeakItem.getAudioProgress());
-                String timeString = String.format("%d:%02d", mSpeakItem.getAudioProgressSec() / 60, mSpeakItem.getAudioProgressSec() % 60);
-                mTimerText.setText(timeString);
-            }
-        } else if (id == NotificationCenter.recordStartCompleted) {
-            if (mSpeakItem != null && !AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
-                mRecordWave.setProgress(1.0f);
-                setPlayFirstUIStatus(false);
-                setPlaySecondUIStatus(false);
-            }
-
+            onAudioProgressDidChanged((float) args[0], (int) args[1]);
+        } else if (id == NotificationCenter.audioStartCompleted) {
+            onAudioStartCompleted();
         }
     }
+
+    private void onAudioStartCompleted() {
+        if (mSpeakItem != null && !AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
+            if (mCurrentPlaying) {
+                mRecordWave.setLeftProgress(mSpeakItem.getAudioMiddleMark());
+            } else if (mNextPlaying) {
+                mRecordWave.setLeftProgress(mSpeakItem.getAudioRightMark());
+            }
+            mNextPlaying = false;
+            mCurrentPlaying = false;
+            setPlayView();
+        }
+    }
+
+    private void onAudioProgressDidChanged(float progress, int progressSec) {
+        if (mSpeakItem != null && AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
+            if (mCurrentPlaying && (progress >= mSpeakItem.getAudioMiddleMark())) {
+                AudioController.getInstance().stopAudio();
+                return;
+            } else if (mNextPlaying && (progress >= mSpeakItem.getAudioRightMark())) {
+                AudioController.getInstance().stopAudio();
+                return;
+            }
+            mSpeakItem.setAudioProgress(progress);
+            mSpeakItem.setAudioProgressSec(progressSec);
+            mRecordWave.setLeftProgress(mSpeakItem.getAudioProgress());
+            String timeString = String.format("%02d:%02d", mSpeakItem.getAudioProgressSec() / 60, mSpeakItem.getAudioProgressSec() % 60);
+            mTimerText.setText(timeString);
+        }
+    }
+
+    private void onAudioDidReset() {
+        if (mSpeakItem != null && !AudioController.getInstance().isPlayingAudio(mSpeakItem)) {
+            mCurrentPlaying = false;
+            mNextPlaying = false;
+            setPlayView();
+            mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+            mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+        }
+    }
+
+    private void onAudioDidSent(SpeakItem speakItem) {
+        mSpeakItem.setAudioPath(speakItem.getAudioPath());
+        mSpeakItem.setAudioDuration(speakItem.getAudioDuration());
+        mSpeakItem.setAudioWaveform(speakItem.getAudioWaveform());
+        mRecordWave.setVisibility(View.VISIBLE);
+        mView.findViewById(R.id.waveform_menu_id).setVisibility(View.VISIBLE);
+        mRecordWave.setWaveform(mSpeakItem.getAudioWaveform());
+        mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+        mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+    }
+
+    private void onRecordStarted() {
+        mRecording = true;
+        setRecordView();
+    }
+
+    private void onRecordProgressChanged(long t) {
+        Long time = t / 1000;
+        int ms = (int) (t % 1000L) / 10;
+        mTimerText.setText(String.format("%02d:%02d.%02d", time / 60, time % 60, ms));
+    }
+
+    private void onRecordProgressStopped() {
+        mTimerText.setText("00:00.00");
+    }
+
+    @Override
+    public void onLeftProgressChanged(float progress) {
+        mNextPausing = false;
+        mCurrentPausing = false;
+        mSpeakItem.setAudioLeftMark(progress);
+        if (mCurrentPlaying || mNextPlaying) {
+            mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
+            AudioController.getInstance().seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
+        }
+        mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+        mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+    }
+
+    @Override
+    public void onMiddleProgressChanged(float progress) {
+        mSpeakItem.setAudioMiddleMark(progress);
+        if (!mCurrentPlaying && !mNextPlaying) {
+            mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+            mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+        }
+
+    }
+
+    @Override
+    public void onRightProgressChanged(float progress) {
+        mSpeakItem.setAudioRightMark(progress);
+        if (!mCurrentPlaying && !mNextPlaying) {
+            mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+        }
+        mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+    }
+
 }

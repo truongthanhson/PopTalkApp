@@ -32,7 +32,8 @@ public class SpeakItemModel implements BaseModel {
     private interface SpeakItemQuery {
         String[] projections = new String[]{
                 PopTalkContract.SpeakItems._ID,
-                PopTalkContract.SpeakItems.SPEAK_ITEM_SOUND_MARK,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_PATH,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_MARK,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION,
@@ -41,19 +42,21 @@ public class SpeakItemModel implements BaseModel {
         };
 
         int SPEAK_ITEM_ID = 0;
-        int SPEAK_ITEM_SOUND_MARK = 1;
-        int SPEAK_ITEM_PHOTO_PATH = 2;
-        int SPEAK_ITEM_PHOTO_DESCRIPTION = 3;
-        int SPEAK_ITEM_PHOTO_LOCATION = 4;
-        int SPEAK_ITEM_PHOTO_DATETIME = 5;
-        int SPEAK_ITEM_COLLECTION_ID = 6;
+        int SPEAK_ITEM_AUDIO_PATH = 1;
+        int SPEAK_ITEM_AUDIO_MARK = 2;
+        int SPEAK_ITEM_PHOTO_PATH = 3;
+        int SPEAK_ITEM_PHOTO_DESCRIPTION = 4;
+        int SPEAK_ITEM_PHOTO_LOCATION = 5;
+        int SPEAK_ITEM_PHOTO_DATETIME = 6;
+        int SPEAK_ITEM_COLLECTION_ID = 7;
     }
 
     public void addNewSpeakItem(SpeakItem speakItem) {
         SQLiteDatabase database = mDatabase.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_SOUND_MARK, speakItem.getMark());
+        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_PATH, speakItem.getAudioPath());
+        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_MARK, speakItem.getAudioMark());
         contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH, speakItem.getPhotoPath());
         contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION, speakItem.getDescription());
         contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION, speakItem.getLocation());
@@ -71,18 +74,14 @@ public class SpeakItemModel implements BaseModel {
             SQLiteDatabase database = mDatabase.getWritableDatabase();
 
             cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
-                    SpeakItemQuery.projections,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
+                    SpeakItemQuery.projections, null, null, null, null, null);
 
             if (cursor.moveToFirst()) {
                 do {
                     SpeakItem speakItem = new SpeakItem();
                     speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
-                    speakItem.setMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_SOUND_MARK));
+                    speakItem.setAudioPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_PATH));
+                    speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
                     speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
                     speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
                     speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
