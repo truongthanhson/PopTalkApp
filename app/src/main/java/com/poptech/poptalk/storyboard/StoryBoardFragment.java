@@ -72,7 +72,7 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.loadData(2);
+        mPresenter.loadData(3);
     }
 
     @Override
@@ -92,10 +92,10 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
 
     private void initView() {
         mStoryBoardView = (RecyclerView)mRootView.findViewById(R.id.story_board);
-        mStoryBoardView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        mStoryBoardView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
 //        ItemDecorationColumns itemDecorationColumns = new ItemDecorationColumns(2, MetricUtils.dpToPx(50), true);
 //        mStoryBoardView.addItemDecoration(itemDecorationColumns);
-        mStoryBoardView.addItemDecoration(new PathItemDecoration(2));
+        mStoryBoardView.addItemDecoration(new PathItemDecoration(3, MetricUtils.dpToPx(10)));
     }
 
     @Override
@@ -154,43 +154,56 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
 
     private class PathItemDecoration extends RecyclerView.ItemDecoration{
         private Paint pathPaint;
+        private int pathWidth;
+        private int itemPadding = MetricUtils.dpToPx(20);
         private int spanColumn;
+        private Rect temp = new Rect();
 
-        public PathItemDecoration(int spanColumn) {
+        public PathItemDecoration(int spanColumn, int pathWidth) {
             this.spanColumn = spanColumn;
+            this.pathWidth = pathWidth;
             init();
         }
 
         private void init() {
             pathPaint = new Paint();
             pathPaint.setColor(Color.RED);
-            pathPaint.setStrokeWidth(MetricUtils.dpToPx(25));
         }
 
         @Override
         public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
             super.onDraw(c, parent, state);
-            int left = parent.getPaddingLeft();
-
-            int right = parent.getWidth() - parent.getPaddingRight();
-
             int childCount = parent.getChildCount();
+            int totalItem = parent.getAdapter().getItemCount();
 
             for (int i = 0; i < childCount; i++) {
 
+                if(childCount <= 1)
+                    return;
+
                 View child = parent.getChildAt(i);
-
-                c.drawRect(new Rect(child.getLeft(), (int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2), child.getRight(),(int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2) + 200), pathPaint);
-
                 int pos = parent.getChildAdapterPosition(child);
 
-                if(pos == 1){
-                    c.drawRect(new Rect(child.getRight() - MetricUtils.dpToPx(20), (int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2), child.getRight(),child.getBottom()), pathPaint);
+                c.drawRect(new Rect(pos == 0?itemPadding : child.getLeft(), child.getTop() + (child.getHeight() - pathWidth)/2, child.getRight(),child.getTop() + (child.getHeight() - pathWidth)/2 + pathWidth), pathPaint);
+
+                if(pos % spanColumn == 0){
+                    if (pos != 0) {
+                        if ((pos / spanColumn) % 2 == 0) {
+                            c.drawRect(new Rect(child.getLeft(), child.getTop(), child.getLeft() + pathWidth, (child.getTop() + (child.getHeight() - pathWidth) / 2) + pathWidth), pathPaint);
+                        } else if ((pos / spanColumn) % 2 == 1) {
+                            c.drawRect(new Rect(child.getLeft(), child.getTop() + (child.getHeight() - pathWidth) / 2, child.getLeft() + pathWidth, child.getBottom()), pathPaint);
+                        }
+                    }
                 }
 
-                if(pos == 3){
-                    c.drawRect(new Rect(child.getRight() - MetricUtils.dpToPx(20), child.getTop(), child.getRight(),(int) (child.getTop() + (child.getHeight() - pathPaint.getStrokeWidth())/2)), pathPaint);
+                if(pos % spanColumn == (spanColumn - 1)){
+                    if((((pos + 1) / spanColumn)) % 2  == 1){
+                        c.drawRect(new Rect(child.getRight() - pathWidth, child.getTop() + (child.getHeight() - pathWidth)/2,child.getRight(),child.getBottom()), pathPaint);
+                    }else if((((pos + 1) / spanColumn)) % 2  == 0){
+                        c.drawRect(new Rect(child.getRight() - pathWidth, child.getTop(),child.getRight(),(child.getTop() + (child.getHeight() - pathWidth)/2 + pathWidth)), pathPaint);
+                    }
                 }
+
             }
         }
 
