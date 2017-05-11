@@ -29,6 +29,8 @@ public class PopTalkContract {
     }
 
     public interface CollectionsColumns {
+        String COLLECTION_ID = "collection_id";
+        String COLLECTION_THUMB_PATH = "collection_thumb_path";
         String COLLECTION_DESCRIPTION = "description";
         String COLLECTION_LANGUAGE = "language_1";
     }

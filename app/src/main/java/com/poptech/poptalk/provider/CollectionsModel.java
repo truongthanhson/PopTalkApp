@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.poptech.poptalk.BaseModel;
 import com.poptech.poptalk.bean.Collection;
-import com.poptech.poptalk.provider.PopTalkContract;
-import com.poptech.poptalk.provider.PopTalkDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,63 +25,93 @@ public class CollectionsModel implements BaseModel {
         this.mDatabase = database;
     }
 
-    public List<Collection> getCollections() {
-        return queryCollections();
-    }
-
     private interface CollectionQuery {
         String[] projections = new String[]{
                 PopTalkContract.Collections._ID,
+                PopTalkContract.Collections.COLLECTION_ID,
+                PopTalkContract.Collections.COLLECTION_THUMB_PATH,
                 PopTalkContract.Collections.COLLECTION_DESCRIPTION,
                 PopTalkContract.Collections.COLLECTION_LANGUAGE
         };
 
-        int COLLETION_ID = 0;
-        int COLLECTION_DESCRIPTION = 1;
-        int COLLECTION_LANGUAGE = 2;
+        int COLLECTION_ID = 1;
+        int COLLECTION_THUMB_PATH = 2;
+        int COLLECTION_DESCRIPTION = 3;
+        int COLLECTION_LANGUAGE = 4;
     }
 
     public void addNewCollection(Collection collection) {
         SQLiteDatabase database = mDatabase.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
+        contentValues.put(PopTalkContract.Collections.COLLECTION_ID, collection.getId());
+        contentValues.put(PopTalkContract.Collections.COLLECTION_THUMB_PATH, collection.getThumbPath());
         contentValues.put(PopTalkContract.Collections.COLLECTION_DESCRIPTION, collection.getDescription());
         contentValues.put(PopTalkContract.Collections.COLLECTION_LANGUAGE, collection.getLanguage());
-
         database.insert(PopTalkContract.Tables.COLLECTIONS, null, contentValues);
     }
 
-    public List<Collection> queryCollections() {
+
+    public List<Collection> getCollections() {
         List<Collection> collections = new ArrayList<>();
         Cursor cursor = null;
+        synchronized (this) {
+            try {
+                SQLiteDatabase database = mDatabase.getWritableDatabase();
+                cursor = database.query(PopTalkContract.Tables.COLLECTIONS,
+                        CollectionQuery.projections,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null);
 
-        try {
-            SQLiteDatabase database = mDatabase.getWritableDatabase();
-
-            cursor = database.query(PopTalkContract.Tables.COLLECTIONS,
-                    CollectionQuery.projections,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    Collection collection = new Collection();
-                    collection.setId(cursor.getLong(CollectionQuery.COLLETION_ID));
-                    collection.setDescription(cursor.getString(CollectionQuery.COLLECTION_DESCRIPTION));
-                    collection.setLanguage(cursor.getString(CollectionQuery.COLLECTION_LANGUAGE));
-                    collections.add(collection);
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+                if (cursor.moveToFirst()) {
+                    do {
+                        Collection collection = new Collection();
+                        collection.setId(cursor.getLong(CollectionQuery.COLLECTION_ID));
+                        collection.setThumbPath(cursor.getString(CollectionQuery.COLLECTION_THUMB_PATH));
+                        collection.setDescription(cursor.getString(CollectionQuery.COLLECTION_DESCRIPTION));
+                        collection.setLanguage(cursor.getString(CollectionQuery.COLLECTION_LANGUAGE));
+                        collections.add(collection);
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
         }
         return collections;
     }
+
+
+    public boolean isCollectionExisted(long withCollectionId) {
+        boolean ret = false;
+        synchronized (this) {
+            Cursor cursor = null;
+            try {
+                SQLiteDatabase database = mDatabase.getWritableDatabase();
+                cursor = database.query(PopTalkContract.Tables.COLLECTIONS,
+                        CollectionsModel.CollectionQuery.projections,
+                        PopTalkContract.Collections.COLLECTION_ID + " = ?",
+                        new String[]{"" + withCollectionId},
+                        null,
+                        null,
+                        null);
+                if (cursor != null && cursor.getCount() > 0)
+                    ret = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        return ret;
+    }
+
 
     //Testing purpose only
     public void generateTestData() {

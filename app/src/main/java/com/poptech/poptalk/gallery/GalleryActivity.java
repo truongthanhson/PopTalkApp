@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,13 +21,20 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
+import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.Collection;
+import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.provider.CollectionsModel;
+import com.poptech.poptalk.provider.PopTalkDatabase;
+import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * Created by sontt on 29/04/2017.
@@ -37,6 +45,8 @@ public class GalleryActivity extends AppCompatActivity {
     private static final String TAG = "GalleryActivity";
     private Toolbar mToolbar;
     private String mPhotoString;
+    SpeakItemModel mSpeakItemModel;
+    private CollectionsModel mCollectionModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +68,9 @@ public class GalleryActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(), photoLGalleryFragment, R.id.container_body);
         }
+        PopTalkDatabase database = new PopTalkDatabase(PopTalkApplication.applicationContext);
+        mSpeakItemModel = new SpeakItemModel(database);
+        mCollectionModel = new CollectionsModel(database);
     }
 
     @Override
@@ -129,7 +142,7 @@ public class GalleryActivity extends AppCompatActivity {
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                openSpeakItemDetailScreen();
+                openSpeakItemDetailScreen(result.getUri().getPath());
                 finish();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
@@ -146,10 +159,26 @@ public class GalleryActivity extends AppCompatActivity {
                 .start(this);
     }
 
-    public void openSpeakItemDetailScreen() {
+    public void openSpeakItemDetailScreen(String photoPath) {
+        long COLLECTION_ID = -1;
+        long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
+        Collection collection = new Collection();
+        collection.setThumbPath(photoPath);
+        collection.setDescription("Unknown");
+        collection.setId(COLLECTION_ID);
+        if (!mCollectionModel.isCollectionExisted(collection.getId())) {
+            mCollectionModel.addNewCollection(collection);
+        }
+
+        SpeakItem speakItem = new SpeakItem();
+        speakItem.setId(SPEAK_ITEM_ID);
+        speakItem.setPhotoPath(photoPath);
+        speakItem.setCollectionId(collection.getId());
+        mSpeakItemModel.addNewSpeakItem(speakItem);
+
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);
-        intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, 0);
-        intent.putExtra(Constants.KEY_COLLECTION_ID, -1);
+        intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, speakItem.getId());
+        intent.putExtra(Constants.KEY_COLLECTION_ID, speakItem.getCollectionId());
         startActivity(intent);
     }
 

@@ -22,6 +22,8 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
 
     public static final String SQL_CREATE_COLLECTIONS = "CREATE TABLE " + Tables.COLLECTIONS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + CollectionsColumns.COLLECTION_ID + " INTEGER,"
+            + CollectionsColumns.COLLECTION_THUMB_PATH + " TEXT,"
             + CollectionsColumns.COLLECTION_DESCRIPTION + " TEXT,"
             + CollectionsColumns.COLLECTION_LANGUAGE + " TEXT)";
 
