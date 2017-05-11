@@ -3,6 +3,7 @@ package com.poptech.poptalk.login;
 import android.content.Context;
 
 import com.poptech.poptalk.*;
+import com.poptech.poptalk.bean.Credentials;
 
 import javax.inject.Inject;
 
@@ -40,11 +41,20 @@ public class LoginPresenter implements LoginContract.Presenter {
         } else if (password.isEmpty()) {
             mView.showErrorPassword(mContext.getString(R.string.login_error_password));
         } else {
-            if(mModel.getUser().getName().equalsIgnoreCase(userName) && mModel.getUser().getPassword().equalsIgnoreCase(password)){
+            if (mModel.getCredentials().getName().equalsIgnoreCase(userName) && mModel.getCredentials().getPassword().equalsIgnoreCase(password)) {
                 mView.onLoginSuccessful();
-            }else{
+            } else {
                 mView.onLoginFailed();
             }
+        }
+    }
+
+    @Override
+    public void updateCredentials(Credentials credentials) {
+        if (mModel.isCredentialsExisted()) {
+            mModel.updateCredentials(credentials);
+        } else {
+            mModel.addNewCredentials(credentials);
         }
     }
 

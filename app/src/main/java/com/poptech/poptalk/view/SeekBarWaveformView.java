@@ -44,10 +44,6 @@ public class SeekBarWaveformView extends View {
         invalidate();
     }
 
-    public boolean isDragging() {
-        return seekBarWaveform.isDragging();
-    }
-
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);

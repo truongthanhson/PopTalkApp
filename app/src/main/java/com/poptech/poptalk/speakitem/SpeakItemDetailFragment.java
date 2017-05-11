@@ -4,6 +4,7 @@ import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -54,6 +56,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Inject
     SpeakItemDetailPresenter mPresenter;
     private View mView;
+    private ViewPager mViewPager;
+    private ScrollView mScrollView;
     private ImageView mPhotoView;
     private ImageButton mPhotoEdit;
     private TextView mPhotoLocation;
@@ -103,6 +107,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void initView() {
+        mViewPager = (ViewPager) getActivity().findViewById(R.id.speak_item_pager_id);
+        mScrollView = (ScrollView) mView.findViewById(R.id.speak_item_scroll_id);
         mPhotoView = (ImageView) mView.findViewById(R.id.photo_img_id);
         mPhotoEdit = (ImageButton) mView.findViewById(R.id.photo_edit_btn_id);
         mPhotoLocation = (TextView) mView.findViewById(R.id.photo_location_id);
@@ -322,6 +328,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (v.getId() == R.id.record_fl_id) {
+                    mViewPager.requestDisallowInterceptTouchEvent(true);
+                    mScrollView.requestDisallowInterceptTouchEvent(true);
                     Dexter.withActivity(getActivity())
                             .withPermissions(
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -352,6 +360,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 break;
             case MotionEvent.ACTION_UP:
                 if (v.getId() == R.id.record_fl_id) {
+                    mViewPager.requestDisallowInterceptTouchEvent(false);
+                    mScrollView.requestDisallowInterceptTouchEvent(false);
                     if (mRecordPermission) {
                         mStartedDraggingX = -1;
                         mRecording = false;
@@ -362,6 +372,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (v.getId() == R.id.record_fl_id) {
+                    mViewPager.requestDisallowInterceptTouchEvent(true);
+                    mScrollView.requestDisallowInterceptTouchEvent(true);
                     float x = event.getX();
                     x = x + mRecordButton.getX();
                     if ((x - mStartedDraggingX) < -mDistCanMove) {

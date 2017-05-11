@@ -17,11 +17,9 @@ import java.util.ArrayList;
 public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapter.ViewHolder> {
     private ArrayList<String> mPhotoList;
     private Context mContext;
-    private String mPhotoId;
 
-    public PhotoGalleryAdapter(Context context, String photo_id, ArrayList<String> photoList) {
+    public PhotoGalleryAdapter(Context context, ArrayList<String> photoList) {
         this.mPhotoList = photoList;
-        this.mPhotoId = photo_id;
         this.mContext = context;
     }
 

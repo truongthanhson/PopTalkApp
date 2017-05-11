@@ -7,18 +7,57 @@ package com.poptech.poptalk.bean;
 public class Credentials {
     String name;
     String password;
+    String phone;
+    String email;
+    String profile_picture;
 
-    public Credentials(String name, String password) {
+    public Credentials() {
+        name = "";
+        password = "";
+        phone = "";
+        email = "";
+        profile_picture = "";
+    }
+
+    public void setName(String name) {
         this.name = name;
-        this.password = password;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setProfilePicture(String profile_picture) {
+        this.profile_picture = profile_picture;
+    }
+
+    public String getProfilePicture() {
+        return profile_picture;
     }
 
     @Override

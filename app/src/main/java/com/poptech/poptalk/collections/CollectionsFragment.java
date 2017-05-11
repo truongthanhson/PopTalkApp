@@ -42,7 +42,7 @@ import javax.inject.Inject;
 
 public class CollectionsFragment extends Fragment implements CollectionsContract.View {
 
-    public interface CollectionsFragmentCallback{
+    public interface CollectionsFragmentCallback {
         void onClickCollections(long collectionId);
     }
 
@@ -59,8 +59,8 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof CollectionsFragmentCallback){
-            callback = (CollectionsFragmentCallback)context;
+        if (context instanceof CollectionsFragmentCallback) {
+            callback = (CollectionsFragmentCallback) context;
         }
     }
 
@@ -77,7 +77,7 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_collections_layout,container,false);
+        mView = inflater.inflate(R.layout.fragment_collections_layout, container, false);
         initView();
         return mView;
     }
@@ -150,11 +150,11 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
 
     @Override
     public void onCollectionsLoaded(List<Collection> collections) {
-        CollectionsAdapter adapter = new CollectionsAdapter(collections,getActivity());
+        CollectionsAdapter adapter = new CollectionsAdapter(collections, getActivity());
         mCollectionsView.setAdapter(adapter);
     }
 
-    public class CollectionsAdapter extends RecyclerView.Adapter<CollectionViewHolder>{
+    public class CollectionsAdapter extends RecyclerView.Adapter<CollectionViewHolder> {
         private List<Collection> mCollections;
         private Context mContext;
 
@@ -184,7 +184,7 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
             holder.mRootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(callback != null){
+                    if (callback != null) {
                         callback.onClickCollections(mCollections.get(position).getId());
                     }
                 }
@@ -197,18 +197,19 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
         }
     }
 
-    public class CollectionViewHolder extends RecyclerView.ViewHolder{
+    public class CollectionViewHolder extends RecyclerView.ViewHolder {
 
         private View mRootView;
         private TextView mLanguageTv;
         private ImageView mThumbnailIv;
         private TextView mDescriptionTv;
+
         public CollectionViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
-            mDescriptionTv = (TextView)mRootView.findViewById(R.id.tv_description_id);
-            mLanguageTv = (TextView)mRootView.findViewById(R.id.tv_lang_id);
-            mThumbnailIv = (ImageView)mRootView.findViewById(R.id.iv_thumb_id);
+            mDescriptionTv = (TextView) mRootView.findViewById(R.id.tv_description_id);
+            mLanguageTv = (TextView) mRootView.findViewById(R.id.tv_lang_id);
+            mThumbnailIv = (ImageView) mRootView.findViewById(R.id.iv_thumb_id);
         }
     }
 }

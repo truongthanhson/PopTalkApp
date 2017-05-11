@@ -3,7 +3,6 @@ package com.poptech.poptalk.login;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,16 +11,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.Credentials;
 import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.utils.AnimationUtils;
+import com.poptech.poptalk.utils.SaveData;
 
-import java.io.File;
+import org.json.JSONObject;
 
 /**
  * Created by sontt on 04/03/2017.
@@ -74,6 +79,15 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
         super.onDestroy();
     }
 
+    private void onOpenCollectionActivity() {
+        SaveData.getInstance(getActivity()).setLoggedIn(true);
+        Intent intent = new Intent(getActivity(), CollectionsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
     @Override
     public void showErrorPassword(String error) {
         mPassword.setError(getString(R.string.login_error_password));
@@ -88,10 +102,11 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     @Override
     public void onLoginSuccessful() {
-        Intent intent = new Intent(getActivity(), CollectionsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        Credentials credentials = new Credentials();
+        credentials.setPassword(mPassword.getText().toString());
+        credentials.setName(mUserName.getText().toString());
+        mPresenter.updateCredentials(credentials);
+        onOpenCollectionActivity();
     }
 
     @Override
@@ -121,7 +136,26 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        onLoginSuccessful();
+        final AccessToken accessToken = loginResult.getAccessToken();
+
+        GraphRequestAsyncTask request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject user, GraphResponse graphResponse) {
+                Credentials credentials = new Credentials();
+                if (user.has("email")) {
+                    credentials.setEmail(user.optString("email"));
+                }
+                if (user.has("name")) {
+                    credentials.setName(user.optString("name"));
+                }
+                if (user.has("id")) {
+                    credentials.setProfilePicture("https://graph.facebook.com/" + user.optString("id") + "/picture?type=large");
+                }
+                mPresenter.updateCredentials(credentials);
+                onOpenCollectionActivity();
+            }
+        }).executeAsync();
+
     }
 
     @Override

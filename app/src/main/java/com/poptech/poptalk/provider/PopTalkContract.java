@@ -16,7 +16,16 @@ public class PopTalkContract {
         String UPDATED = "updated";
     }
 
+    public interface CredentialsColumns {
+        String CREDENTIALS_NAME = "name";
+        String CREDENTIALS_EMAIL = "email";
+        String CREDENTIALS_PHONE = "phone";
+        String CREDENTIALS_PASSWORD = "password";
+        String CREDENTIALS_PROFILE_PICTURE = "profile_picture";
+    }
+
     public interface Tables {
+        String CREDENTIALS = "credentials";
         String PHOTOS = "photos";
         String COLLECTIONS = "collections";
         String SPEAK_ITEMS = "speak_items";
@@ -60,6 +69,8 @@ public class PopTalkContract {
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
+    private static final String PATH_CREDENTIALS = "credentials";
+
     private static final String PATH_PHOTOS = "photos";
 
     private static final String PATH_SPEAK_ITEMS = "speak_items";
@@ -78,7 +89,23 @@ public class PopTalkContract {
             PATH_LANGUAGE_ITEMS
     };
 
+    public static class Credentials implements CredentialsColumns, BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CREDENTIALS).build();
+
+        public static final String CONTENT_TYPE_ID = "credentials";
+
+        /**
+         * Build {@link Uri} that references all photos.
+         */
+        public static Uri buildCollectionsUri() {
+            return CONTENT_URI;
+        }
+    }
+
     public static class Photos implements PhotoColumns, BaseColumns {
+
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_PHOTOS).build();
 

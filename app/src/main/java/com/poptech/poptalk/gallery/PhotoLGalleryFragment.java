@@ -48,10 +48,6 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        if (args != null) {
-            mItemId = args.getString(Constants.KEY_PHOTO_GALLERY);
-        }
     }
 
     @Override
@@ -79,7 +75,7 @@ public class PhotoLGalleryFragment extends Fragment implements OnClickListener {
                 .subscribe(new Consumer<List<String>>() {
                     @Override
                     public void accept(List<String> strings) throws Exception {
-                        PhotoGalleryAdapter adapter = new PhotoGalleryAdapter(getActivity(), mItemId, (ArrayList<String>) strings);
+                        PhotoGalleryAdapter adapter = new PhotoGalleryAdapter(getActivity(), (ArrayList<String>) strings);
                         recyclerView.setAdapter(adapter);
                     }
                 });

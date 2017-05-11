@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,23 +15,31 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
 import com.poptech.poptalk.Constants;
+import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.Credentials;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
+import com.poptech.poptalk.login.LoginModel;
+import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by sontt on 26/04/2017.
@@ -46,6 +53,12 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     private FloatingActionButton mFloatingButton;
 
     private DrawerMenuAdapter mDrawerMenuAdapter;
+
+    private CircleImageView mUserProfilePicture;
+
+    private TextView mUserName;
+
+    private LoginModel mLoginModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +89,15 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         mFloatingButton = (FloatingActionButton) findViewById(R.id.fab_add_speak_item);
         mFloatingButton.setOnClickListener(this);
 
+        mUserProfilePicture = (CircleImageView) findViewById(R.id.user_avatar_id);
+        mUserProfilePicture.setOnClickListener(this);
+
+        mUserName = (TextView) findViewById(R.id.user_name_id);
+
+        mLoginModel = new LoginModel(new PopTalkDatabase(PopTalkApplication.applicationContext));
+
+        onLoadUserProfile();
+
         onNavigateToViewCollection();
     }
 
@@ -101,6 +123,9 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             case R.id.fab_add_speak_item:
                 navigateToAddSpeakItem();
                 break;
+            case R.id.user_avatar_id:
+                navigateToChangeAvatar();
+                break;
             default:
                 break;
         }
@@ -114,6 +139,32 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
+                    intent.putExtra(
+                            Constants.KEY_PHOTO_GALLERY,
+                            GalleryActivity.GalleryType.PICK_ADDED_SPEAK_ITEM);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                super.onPermissionRationaleShouldBeShown(permissions, token);
+            }
+        }).check();
+    }
+
+
+    private void navigateToChangeAvatar() {
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).withListener(new BaseMultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                super.onPermissionsChecked(report);
+                if (report.areAllPermissionsGranted()) {
+                    Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
+                    intent.putExtra(
+                            Constants.KEY_PHOTO_GALLERY,
+                            GalleryActivity.GalleryType.PICK_PROFILE_PICTURE);
                     startActivityForResult(intent, GalleryActivity.SELECT_PHOTO_REQUEST_CODE);
                 }
             }
@@ -130,12 +181,13 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GalleryActivity.SELECT_PHOTO_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                String path = data.getExtras().getString("croppedPath");
-                Snackbar.make(mDrawerLayout, path, Snackbar.LENGTH_LONG)
-                        .show();
+                String path = data.getExtras().getString(Constants.KEY_PHOTO_GALLERY_RESULT);
+                updateUserProfile(path);
+                setUserProfilePicture(path);
             }
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -270,5 +322,32 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, speakItemId);
         intent.putExtra(Constants.KEY_COLLECTION_ID, collectionId);
         startActivity(intent);
+    }
+
+    private void onLoadUserProfile() {
+        Credentials credentials = mLoginModel.getCredentials();
+        setUserProfilePicture(credentials.getProfilePicture());
+        setUserName(credentials.getName());
+    }
+
+    private void updateUserProfile(String path) {
+        Credentials credentials = mLoginModel.getCredentials();
+        credentials.setProfilePicture(path);
+        mLoginModel.updateCredentials(credentials);
+    }
+
+    private void setUserProfilePicture(String path) {
+        Glide.with(PopTalkApplication.applicationContext)
+                .load(path)
+                .centerCrop()
+                .dontAnimate()
+                .thumbnail(0.5f)
+                .placeholder(R.color.colorAccent)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(mUserProfilePicture);
+    }
+
+    private void setUserName(String name) {
+        mUserName.setText(name);
     }
 }

@@ -20,6 +20,14 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
 
     private final Context mContext;
 
+    public static final String SQL_CREATE_CREDENTIALS = "CREATE TABLE " + Tables.CREDENTIALS + " ("
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + CredentialsColumns.CREDENTIALS_NAME + " TEXT,"
+            + CredentialsColumns.CREDENTIALS_EMAIL + " TEXT,"
+            + CredentialsColumns.CREDENTIALS_PASSWORD + " TEXT,"
+            + CredentialsColumns.CREDENTIALS_PHONE + " TEXT,"
+            + CredentialsColumns.CREDENTIALS_PROFILE_PICTURE + " TEXT)";
+
     public static final String SQL_CREATE_COLLECTIONS = "CREATE TABLE " + Tables.COLLECTIONS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + CollectionsColumns.COLLECTION_ID + " INTEGER,"
@@ -60,6 +68,7 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_CREATE_CREDENTIALS);
         db.execSQL(SQL_CREATE_PHOTOS);
         db.execSQL(SQL_CREATE_COLLECTIONS);
         db.execSQL(SQL_CREATE_SPEAK_ITEMS);

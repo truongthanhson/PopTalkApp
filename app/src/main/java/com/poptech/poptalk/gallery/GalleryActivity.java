@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -41,23 +40,32 @@ import java.util.Random;
  */
 
 public class GalleryActivity extends AppCompatActivity {
-    public static final int SELECT_PHOTO_REQUEST_CODE = 1111;
+    public enum GalleryType {
+        PICK_PROFILE_PICTURE,
+        PICK_ADDED_SPEAK_ITEM,
+        PICK_EDITED_SPEAK_ITEM
+    }
+
     private static final String TAG = "GalleryActivity";
+
+    public static final int SELECT_PHOTO_REQUEST_CODE = 1111;
     private Toolbar mToolbar;
     private String mPhotoString;
     SpeakItemModel mSpeakItemModel;
     private CollectionsModel mCollectionModel;
+    private GalleryType mGalleryType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
 
+        mGalleryType = (GalleryType) getIntent().getSerializableExtra(Constants.KEY_PHOTO_GALLERY);
+
+        setContentView(R.layout.activity_photo);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         getSupportActionBar().setTitle(getString(R.string.photo_gallery));
 
         PhotoLGalleryFragment photoLGalleryFragment =
@@ -142,8 +150,7 @@ public class GalleryActivity extends AppCompatActivity {
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                openSpeakItemDetailScreen(result.getUri().getPath());
-                finish();
+                handleActivityResult(result.getUri().getPath());
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Intent errorIntent = new Intent();
@@ -159,7 +166,24 @@ public class GalleryActivity extends AppCompatActivity {
                 .start(this);
     }
 
-    public void openSpeakItemDetailScreen(String photoPath) {
+    private void handleActivityResult(String photoPath) {
+        switch (mGalleryType) {
+            case PICK_PROFILE_PICTURE:
+                onProfilePicture(photoPath);
+                break;
+            case PICK_ADDED_SPEAK_ITEM:
+                onSpeakItemDetailScreen(photoPath);
+                break;
+        }
+    }
+
+    public void onProfilePicture(String photoPath) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.KEY_PHOTO_GALLERY_RESULT, photoPath);
+        setResult(Activity.RESULT_OK, intent);
+    }
+
+    public void onSpeakItemDetailScreen(String photoPath) {
         long COLLECTION_ID = -1;
         long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
         Collection collection = new Collection();
