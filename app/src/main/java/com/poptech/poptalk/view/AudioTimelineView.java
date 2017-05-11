@@ -32,11 +32,11 @@ public class AudioTimelineView extends View {
     private float chooseDx = 0;
 
     private float pressDx = 0;
-    private AudioWaveFormTimelineViewDelegate delegate = null;
+    private AudioTimelineDelegate delegate = null;
     private Bitmap mBitmap;
     private SamplePlayer mPlayer;
 
-    public interface AudioWaveFormTimelineViewDelegate {
+    public interface AudioTimelineDelegate {
         void onLeftProgressChanged(float progress);
 
         void onMiddleProgressChanged(float progress);
@@ -203,7 +203,7 @@ public class AudioTimelineView extends View {
         return false;
     }
 
-    public void setDelegate(AudioWaveFormTimelineViewDelegate delegate) {
+    public void setDelegate(AudioTimelineDelegate delegate) {
         this.delegate = delegate;
     }
 

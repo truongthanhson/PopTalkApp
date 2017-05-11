@@ -23,14 +23,14 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
     }
 
     @Inject
-    public void setListeners(){
+    public void setListeners() {
         mView.setPresenter(this);
     }
 
     @Override
-    public void loadSpeakItems() {
-//        mModel.generateTestData();
-        List<SpeakItem> speakItems = mModel.getSpeakItems();
+    public void loadSpeakItems(long collectionId) {
+        //mModel.generateTestData();
+        List<SpeakItem> speakItems = mModel.getSpeakItems(collectionId);
         mView.onSpeakItemsLoaded(speakItems);
     }
 

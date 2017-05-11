@@ -13,6 +13,7 @@ import android.util.Log;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.AndroidUtilities;
+import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
 
 import java.io.File;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
+
+import static android.R.attr.path;
 
 public class AudioController {
     private static final String TAG = "AudioController";
@@ -50,6 +53,8 @@ public class AudioController {
 
     public static int[] mReadArgs = new int[3];
 
+    private long mAudioId;
+
     private class AudioBuffer {
         public AudioBuffer(int capacity) {
             buffer = ByteBuffer.allocateDirect(capacity);
@@ -64,7 +69,11 @@ public class AudioController {
     }
 
     private Runnable mRecordStartRunnable;
+    private DispatchQueue mGlobalQueue;
     private DispatchQueue mRecordQueue;
+    private DispatchQueue mFileEncodingQueue;
+    private DispatchQueue mFileDecodingQueue;
+    private DispatchQueue mPlayerQueue;
     private AudioRecord mAudioRecorder = null;
     private File mRecordingAudioFile = null;
     private SpeakItem mRecordingAudio;
@@ -73,9 +82,6 @@ public class AudioController {
     private int mSendAfterDone;
     private int mPlayerBufferSize = 0;
     private ArrayList<ByteBuffer> mRecordBuffers = new ArrayList<>();
-    private DispatchQueue mFileEncodingQueue;
-    private DispatchQueue mFileDecodingQueue;
-    private DispatchQueue mPlayerQueue;
     private ArrayList<AudioBuffer> mUsedPlayerBuffers = new ArrayList<>();
     private ArrayList<AudioBuffer> mFreePlayerBuffers = new ArrayList<>();
     private Runnable mRecordRunnable = new Runnable() {
@@ -163,7 +169,7 @@ public class AudioController {
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         @Override
                         public void run() {
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordProgressChanged, System.currentTimeMillis() - mRecordStartTime, amplitude);
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordProgressChanged, mAudioId, System.currentTimeMillis() - mRecordStartTime, amplitude);
                         }
                     });
                 } else {
@@ -195,20 +201,22 @@ public class AudioController {
 
     private static volatile AudioController mInstance = null;
 
-    public static AudioController getInstance() {
+    public static AudioController getInstance(long id) {
         AudioController localInstance = mInstance;
         if (localInstance == null) {
             synchronized (AudioController.class) {
                 localInstance = mInstance;
                 if (localInstance == null) {
-                    mInstance = localInstance = new AudioController();
+                    mInstance = localInstance = new AudioController(id);
                 }
             }
         }
+        localInstance.mAudioId = id;
         return localInstance;
     }
 
-    public AudioController() {
+    public AudioController(long id) {
+        this.mAudioId = id;
         try {
             mRecordBufferSize = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
             if (mRecordBufferSize <= 0) {
@@ -231,6 +239,7 @@ public class AudioController {
         }
 
         mFileBuffer = ByteBuffer.allocateDirect(1920);
+        mGlobalQueue = new DispatchQueue("mGlobalQueue");
         mRecordQueue = new DispatchQueue("mRecordQueue");
         mRecordQueue.setPriority(Thread.MAX_PRIORITY);
         mFileEncodingQueue = new DispatchQueue("mFileEncodingQueue");
@@ -261,7 +270,7 @@ public class AudioController {
                         @Override
                         public void run() {
                             mRecordStartRunnable = null;
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartError);
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartError, mAudioId);
                         }
                     });
                     return;
@@ -282,7 +291,7 @@ public class AudioController {
                             @Override
                             public void run() {
                                 mRecordStartRunnable = null;
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartError);
+                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStartError, mAudioId);
                             }
                         });
                         return;
@@ -305,7 +314,7 @@ public class AudioController {
                     @Override
                     public void run() {
                         mRecordStartRunnable = null;
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStarted);
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStarted, mAudioId);
                     }
                 });
             }
@@ -329,7 +338,7 @@ public class AudioController {
                             long duration = mRecordTimeCount;
                             audioToSend.setAudioDuration((int) (mRecordTimeCount / 1000));
                             if (duration > 700) {
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidSent, audioToSend);
+                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidSent, mAudioId, audioToSend);
                             } else {
                                 recordingAudioFileToSend.delete();
                             }
@@ -382,7 +391,7 @@ public class AudioController {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStopped);
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStopped, mAudioId);
                     }
                 });
             }
@@ -599,7 +608,7 @@ public class AudioController {
                                         mLastProgress = progress;
                                         currentPlayingSpeakItem.setAudioProgress(value);
                                         currentPlayingSpeakItem.setAudioProgressSec(mLastProgress / 1000);
-                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, value, mLastProgress / 1000);
+                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, mAudioId, value, mLastProgress / 1000);
                                     } catch (Exception e) {
                                         Log.e(TAG, e.toString());
                                     }
@@ -681,7 +690,7 @@ public class AudioController {
                 mAudioTrackPlayer.pause();
             }
             mIsPaused = true;
-            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged);
+            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged, mAudioId);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
             mIsPaused = false;
@@ -704,7 +713,7 @@ public class AudioController {
                 checkPlayerQueue();
             }
             mIsPaused = false;
-            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged);
+            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged, mAudioId);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
             return false;
@@ -762,8 +771,8 @@ public class AudioController {
                     mAudioTrackPlayer.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener() {
                         @Override
                         public void onMarkerReached(AudioTrack audioTrack) {
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
                             cleanupPlayer();
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted, mAudioId);
                         }
 
                         @Override
@@ -790,15 +799,15 @@ public class AudioController {
                 mAudioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
                         cleanupPlayer();
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted, mAudioId);
                     }
                 });
                 mAudioPlayer.prepare();
                 mAudioPlayer.start();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
-                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged);
+                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioPlayStateChanged, mAudioId);
                 if (mAudioPlayer != null) {
                     mAudioPlayer.release();
                     mAudioPlayer = null;
@@ -814,7 +823,7 @@ public class AudioController {
         mLastPlayPcm = 0;
         mPlayingAudioItem = audioItem;
         startProgressTimer(mPlayingAudioItem);
-        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidStarted, audioItem);
+        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidStarted, mAudioId, audioItem);
 
         if (mAudioPlayer != null) {
             try {
@@ -825,7 +834,7 @@ public class AudioController {
             } catch (Exception e2) {
                 mPlayingAudioItem.setAudioProgress(0);
                 mPlayingAudioItem.setAudioProgressSec(0);
-                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, 0.0f, 0);
+                NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, mAudioId, 0.0f, 0);
                 Log.e(TAG, e2.toString());
             }
 
@@ -892,6 +901,31 @@ public class AudioController {
         stopProgressTimer();
         mPlayingAudioItem = null;
         mIsPaused = false;
-        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted);
+        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted, mAudioId);
+    }
+
+    public void generateWaveform(final SpeakItem audioItem) {
+        if (StringUtils.isNullOrEmpty(audioItem.getAudioPath())) {
+            return;
+        }
+        File audioFile = new File(audioItem.getAudioPath());
+        if (!audioFile.exists()) {
+            return;
+        }
+        mGlobalQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                final byte[] waveform = getWaveform(audioItem.getAudioPath());
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (waveform != null) {
+                            audioItem.setAudioWaveform(waveform);
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidSent, mAudioId, audioItem);
+                        }
+                    }
+                });
+            }
+        });
     }
 }

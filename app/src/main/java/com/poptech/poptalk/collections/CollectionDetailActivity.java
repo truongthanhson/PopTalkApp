@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
@@ -38,8 +40,9 @@ public class CollectionDetailActivity extends AppCompatActivity implements Speak
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.NONE);
+        bundle.putLong(Constants.KEY_COLLECTION_ID, getIntent().getLongExtra(Constants.KEY_COLLECTION_ID, -1));
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.NONE);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -59,9 +62,10 @@ public class CollectionDetailActivity extends AppCompatActivity implements Speak
         openSpeakItemDetailScreen(speakItemId, collectionId);
     }
 
-    public void openSpeakItemDetailScreen(long speakItemId, long collectionId){
-        Toast.makeText(this,"speakItemId = " + speakItemId + " --- collectionId = " + collectionId,Toast.LENGTH_SHORT).show();
+    public void openSpeakItemDetailScreen(long speakItemId, long collectionId) {
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);
+        intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, speakItemId);
+        intent.putExtra(Constants.KEY_COLLECTION_ID, collectionId);
         startActivity(intent);
     }
 }

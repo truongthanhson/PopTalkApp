@@ -36,7 +36,7 @@ public class GalleryActivity extends AppCompatActivity {
     public static final int SELECT_PHOTO_REQUEST_CODE = 1111;
     private static final String TAG = "GalleryActivity";
     private Toolbar mToolbar;
-    private String mFilePathString;
+    private String mPhotoString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +112,12 @@ public class GalleryActivity extends AppCompatActivity {
         if (searchItem != null) {
             searchItem.setVisible(false);
         }
+
+        MenuItem moreItem = menu.findItem(R.id.action_more);
+        if (moreItem != null) {
+            moreItem.setVisible(false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -119,15 +125,10 @@ public class GalleryActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.REQUEST_AVATAR_CAPTURE && resultCode == Activity.RESULT_OK) {
-            startActivityCrop(mFilePathString);
+            startActivityCrop(mPhotoString);
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-//                Uri resultUri = result.getUri();
-//                Intent resultIntent = new Intent();
-//                resultIntent.putExtra("croppedPath", resultUri.getPath());
-//                setResult(Activity.RESULT_OK,resultIntent);
-//                Toast.makeText(this,resultUri.getPath()+ "", Toast.LENGTH_LONG).show();
                 openSpeakItemDetailScreen();
                 finish();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -147,6 +148,8 @@ public class GalleryActivity extends AppCompatActivity {
 
     public void openSpeakItemDetailScreen() {
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);
+        intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, 0);
+        intent.putExtra(Constants.KEY_COLLECTION_ID, -1);
         startActivity(intent);
     }
 
@@ -155,8 +158,8 @@ public class GalleryActivity extends AppCompatActivity {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         try {
             Uri mImageCaptureUri;
-            mFilePathString = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_PHOTO + "/" + System.currentTimeMillis() + ".jpg";
-            File iFilePath = new File(mFilePathString);
+            mPhotoString = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_PHOTO + "/" + System.currentTimeMillis() + ".jpg";
+            File iFilePath = new File(mPhotoString);
             try {
                 if (!iFilePath.getParentFile().exists()) {
                     Utils.forceMkdir(iFilePath.getParentFile());

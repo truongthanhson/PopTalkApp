@@ -23,6 +23,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.BasePermissionListener;
+import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
@@ -42,9 +43,9 @@ import static com.poptech.poptalk.collections.SpeakItemsFragment.GroupSpeakItemV
  * Created by sontt on 26/04/2017.
  */
 
-public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.View{
+public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.View {
 
-    public interface SpeakItemsFragmentCallback{
+    public interface SpeakItemsFragmentCallback {
         void onClickSpeakItem(long speakItemId, long collectionId);
     }
 
@@ -55,19 +56,17 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         RECENT
     }
 
-    public enum GroupSpeakItemViewType{
+    public enum GroupSpeakItemViewType {
         GRID,
         LIST
     }
-
-    public static final String KEY_SPEAK_ITEM_VIEW_TYPE = "key_speak_item_view_type";
-    public static final String KEY_SPEAK_ITEM_SORT_TYPE = "key_speak_item_sort_type";
 
     @Inject
     SpeakItemPresenter mPresenter;
 
     private View mView;
     private RecyclerView mSpeakItemsView;
+    private long mCollectionId;
     GroupSpeakItemSortType mSortType;
     GroupSpeakItemViewType mViewType;
     private SectionedRecyclerViewAdapter mSectionedSpeakItemAdapter;
@@ -81,7 +80,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof SpeakItemsFragmentCallback){
+        if (context instanceof SpeakItemsFragmentCallback) {
             mCallback = (SpeakItemsFragmentCallback) context;
         }
     }
@@ -91,20 +90,21 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         super.onCreate(savedInstanceState);
 
         // Create the presenter
-        DaggerSpeakItemComponent.builder().appComponent(((PopTalkApplication)PopTalkApplication.applicationContext).getAppComponent()).
+        DaggerSpeakItemComponent.builder().appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent()).
                 speakItemsPresenterModule(new SpeakItemsPresenterModule(this)).build().inject(this);
 
         Bundle args = getArguments();
-        if(args != null){
-            mSortType = (GroupSpeakItemSortType) args.getSerializable(KEY_SPEAK_ITEM_SORT_TYPE);
-            mViewType = (GroupSpeakItemViewType) args.getSerializable(KEY_SPEAK_ITEM_VIEW_TYPE);
+        if (args != null) {
+            mCollectionId = args.getLong(Constants.KEY_COLLECTION_ID);
+            mSortType = (GroupSpeakItemSortType) args.getSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE);
+            mViewType = (GroupSpeakItemViewType) args.getSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE);
         }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_speak_items_layout,container,false);
+        mView = inflater.inflate(R.layout.fragment_speak_items_layout, container, false);
         initView();
         return mView;
     }
@@ -131,7 +131,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
                 super.onPermissionGranted(response);
-                mPresenter.loadSpeakItems();
+                mPresenter.loadSpeakItems(mCollectionId);
             }
 
             @Override
@@ -167,12 +167,12 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onSpeakItemsLoaded(List<SpeakItem> speakItems) {
-        if(mSortType == GroupSpeakItemSortType.NONE){
-            mSpeakItemAdapter = new SpeakItemsAdapter(speakItems,getActivity());
+        if (mSortType == GroupSpeakItemSortType.NONE) {
+            mSpeakItemAdapter = new SpeakItemsAdapter(speakItems, getActivity());
             RecyclerView.LayoutManager layoutManager = getLayoutManager();
             mSpeakItemsView.setLayoutManager(layoutManager);
             mSpeakItemsView.setAdapter(mSpeakItemAdapter);
-        }else{
+        } else {
             mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
             List<SpeakItem> speakItemSection1 = new ArrayList<>();
             speakItemSection1.add(speakItems.get(0));
@@ -219,12 +219,12 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     public RecyclerView.LayoutManager getLayoutManager() {
         RecyclerView.LayoutManager layoutManager = null;
 
-        if(mViewType == GRID){
+        if (mViewType == GRID) {
             layoutManager = new GridLayoutManager(getContext(), 4);
-            ((GridLayoutManager)layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    switch(mSectionedSpeakItemAdapter.getSectionItemViewType(position)) {
+                    switch (mSectionedSpeakItemAdapter.getSectionItemViewType(position)) {
                         case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
                             return 4;
                         default:
@@ -232,8 +232,8 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                     }
                 }
             });
-        }else if(mViewType == LIST){
-            layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+        } else if (mViewType == LIST) {
+            layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         }
         return layoutManager;
     }
@@ -243,7 +243,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         this.mPresenter = (SpeakItemPresenter) presenter;
     }
 
-    public class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder>{
+    public class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder> {
         private List<SpeakItem> mSpeakItems;
         private Context mContext;
 
@@ -272,7 +272,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mCallback != null){
+                    if (mCallback != null) {
                         mCallback.onClickSpeakItem(mSpeakItems.get(position).getId(), mSpeakItems.get(position).getCollectionId());
                     }
                 }
@@ -285,23 +285,24 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         }
     }
 
-    public class SpeakItemViewHolder extends RecyclerView.ViewHolder{
+    public class SpeakItemViewHolder extends RecyclerView.ViewHolder {
 
         private View mRootView;
         private TextView mLanguageTv;
         private ImageView mThumbnailIv;
         private TextView mDescriptionTv;
+
         public SpeakItemViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
-            mDescriptionTv = (TextView)mRootView.findViewById(R.id.tv_description_id);
-            mLanguageTv = (TextView)mRootView.findViewById(R.id.tv_lang_id);
-            mThumbnailIv = (ImageView)mRootView.findViewById(R.id.iv_thumb_id);
+            mDescriptionTv = (TextView) mRootView.findViewById(R.id.tv_description_id);
+            mLanguageTv = (TextView) mRootView.findViewById(R.id.tv_lang_id);
+            mThumbnailIv = (ImageView) mRootView.findViewById(R.id.iv_thumb_id);
         }
     }
 
     //section adapter for speak items
-    class SpeakItemSection extends StatelessSection{
+    class SpeakItemSection extends StatelessSection {
 
         private List<SpeakItem> speakItems;
         private String header;
@@ -337,7 +338,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mCallback != null){
+                    if (mCallback != null) {
                         mCallback.onClickSpeakItem(speakItems.get(i).getId(), speakItems.get(i).getCollectionId());
                     }
                 }

@@ -35,7 +35,7 @@ public class CollectionsPresenter implements CollectionsContract.Presenter {
 
     @Override
     public void loadCollections() {
-//        mModel.generateTestData();
+        //mModel.generateTestData();
         List<Collection> collections = mModel.getCollections();
         mView.onCollectionsLoaded(collections);
 

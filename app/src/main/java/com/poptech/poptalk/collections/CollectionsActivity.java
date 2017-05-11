@@ -23,6 +23,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
+import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
@@ -72,7 +73,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         }
 
         //setup floating button
-        mFloatingButton = (FloatingActionButton)findViewById(R.id.fab_add_speak_item);
+        mFloatingButton = (FloatingActionButton) findViewById(R.id.fab_add_speak_item);
         mFloatingButton.setOnClickListener(this);
 
         onNavigateToViewCollection();
@@ -127,10 +128,10 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GalleryActivity.SELECT_PHOTO_REQUEST_CODE){
-            if(resultCode == Activity.RESULT_OK){
+        if (requestCode == GalleryActivity.SELECT_PHOTO_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
                 String path = data.getExtras().getString("croppedPath");
-                Snackbar.make(mDrawerLayout,path,Snackbar.LENGTH_LONG)
+                Snackbar.make(mDrawerLayout, path, Snackbar.LENGTH_LONG)
                         .show();
             }
         }
@@ -165,8 +166,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -181,8 +182,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.GRID);
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.GRID);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -197,8 +198,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.DESCRIPTION);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.DESCRIPTION);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -213,8 +214,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.LANGUAGE);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.LANGUAGE);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -229,8 +230,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         SpeakItemsFragment speakItemsFragment = SpeakItemsFragment.newInstance();
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
-        bundle.putSerializable(SpeakItemsFragment.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.LIST);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -255,7 +256,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     private void navigateToCollectionDetailScreen(long collectionId) {
         Intent intent = new Intent(this, CollectionDetailActivity.class);
-        intent.putExtra("collection_id", collectionId);
+        intent.putExtra(Constants.KEY_COLLECTION_ID, collectionId);
         startActivity(intent);
     }
 
@@ -264,9 +265,10 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         openSpeakItemDetailScreen(speakItemId, collectionId);
     }
 
-    public void openSpeakItemDetailScreen(long speakItemId, long collectionId){
-        Toast.makeText(this,"speakItemId = " + speakItemId + " --- collectionId = " + collectionId,Toast.LENGTH_SHORT).show();
+    public void openSpeakItemDetailScreen(long speakItemId, long collectionId) {
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);
+        intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, speakItemId);
+        intent.putExtra(Constants.KEY_COLLECTION_ID, collectionId);
         startActivity(intent);
     }
 }

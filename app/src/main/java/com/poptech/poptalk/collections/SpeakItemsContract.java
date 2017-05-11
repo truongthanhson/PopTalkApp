@@ -16,6 +16,6 @@ public interface SpeakItemsContract {
     }
 
     interface Presenter extends BasePresenter{
-       void loadSpeakItems();
+       void loadSpeakItems(long collectionId);
     }
 }

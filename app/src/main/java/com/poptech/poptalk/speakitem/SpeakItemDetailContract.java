@@ -7,11 +7,12 @@ import com.poptech.poptalk.bean.SpeakItem;
 import java.util.List;
 
 public interface SpeakItemDetailContract {
-    interface View extends BaseView<Presenter>{
-      void  onSpeakItemLoaded(SpeakItem speakItem);
+    interface View extends BaseView<Presenter> {
+        void onSpeakItemLoaded(SpeakItem speakItem);
     }
 
-    interface Presenter extends BasePresenter{
-       void loadSpeakItem(int itemId);
+    interface Presenter extends BasePresenter {
+        void loadSpeakItem(long itemId);
+        void updateSpeakItem(SpeakItem speakItem);
     }
 }

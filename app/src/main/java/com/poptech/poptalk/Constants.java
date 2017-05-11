@@ -27,6 +27,14 @@ public class Constants {
 
     public static final String KEY_PHOTO_GALLERY = "key_photo_gallery";
 
+    public static final String KEY_SPEAK_ITEM_ID = "key_speak_item_id";
+
+    public static final String KEY_COLLECTION_ID = "key_collection_id";
+
+    public static final String KEY_SPEAK_ITEM_VIEW_TYPE = "key_speak_item_view_type";
+
+    public static final String KEY_SPEAK_ITEM_SORT_TYPE = "key_speak_item_sort_type";
+
     public static final int REQUEST_AVATAR_CAPTURE = 0;
 
     public static final String PATH_APP = "/PopTalk";

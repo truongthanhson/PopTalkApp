@@ -1,13 +1,8 @@
 
 package com.poptech.poptalk.gallery;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,7 +17,6 @@ import android.view.ViewGroup;
 
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.bean.PhotoGalleryAdapter;
 import com.poptech.poptalk.utils.MetricUtils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
 

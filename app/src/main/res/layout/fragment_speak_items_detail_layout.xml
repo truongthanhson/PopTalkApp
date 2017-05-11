@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
-    android:id="@+id/photo_detail_scroll_id"
+    android:id="@+id/speak_item_scroll_id"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f1f5f7"

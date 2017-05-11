@@ -31,8 +31,10 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
 
     public static final String SQL_CREATE_SPEAK_ITEMS = "CREATE TABLE " + Tables.SPEAK_ITEMS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + SpeakItemColumns.SPEAK_ITEM_ID + " INTEGER,"
             + SpeakItemColumns.SPEAK_ITEM_AUDIO_PATH + " TEXT,"
             + SpeakItemColumns.SPEAK_ITEM_AUDIO_MARK + " TEXT,"
+            + SpeakItemColumns.SPEAK_ITEM_AUDIO_DURATION + " INTEGER,"
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_PATH + " TEXT,"
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_DESCRIPTION + " TEXT, "
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_LOCATION + " TEXT, "

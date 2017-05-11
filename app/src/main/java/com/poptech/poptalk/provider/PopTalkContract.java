@@ -34,8 +34,10 @@ public class PopTalkContract {
     }
 
     public interface SpeakItemColumns {
+        String SPEAK_ITEM_ID = "speak_item_id";
         String SPEAK_ITEM_AUDIO_PATH = "audio_path";
         String SPEAK_ITEM_AUDIO_MARK = "audio_mark";
+        String SPEAK_ITEM_AUDIO_DURATION = "audio_duration";
         String SPEAK_ITEM_PHOTO_PATH = "photo_path";
         String SPEAK_ITEM_PHOTO_DESCRIPTION = "photo_description";
         String SPEAK_ITEM_PHOTO_LOCATION = "photo_location";

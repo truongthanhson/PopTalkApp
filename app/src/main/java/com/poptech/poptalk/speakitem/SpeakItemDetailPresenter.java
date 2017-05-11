@@ -29,8 +29,12 @@ public class SpeakItemDetailPresenter implements SpeakItemDetailContract.Present
     }
 
     @Override
-    public void loadSpeakItem(int itemId) {
-        List<SpeakItem> speakItems = mModel.getSpeakItems();
-        mView.onSpeakItemLoaded(speakItems.get(itemId));
+    public void loadSpeakItem(long itemId) {
+        mView.onSpeakItemLoaded(mModel.getSpeakItem(itemId));
+    }
+
+    @Override
+    public void updateSpeakItem(SpeakItem speakItem) {
+        mModel.updateSpeakItem(speakItem);
     }
 }

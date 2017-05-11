@@ -3,6 +3,7 @@ package com.poptech.poptalk.provider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.poptech.poptalk.BaseModel;
 import com.poptech.poptalk.bean.SpeakItem;
@@ -25,115 +26,200 @@ public class SpeakItemModel implements BaseModel {
         this.mDatabase = database;
     }
 
-    public List<SpeakItem> getSpeakItems() {
-        return querySpeakItems();
-    }
-
     private interface SpeakItemQuery {
         String[] projections = new String[]{
                 PopTalkContract.SpeakItems._ID,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_ID,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_PATH,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_MARK,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_DURATION,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME,
                 PopTalkContract.SpeakItems.COLLECTION_ID
         };
-
-        int SPEAK_ITEM_ID = 0;
-        int SPEAK_ITEM_AUDIO_PATH = 1;
-        int SPEAK_ITEM_AUDIO_MARK = 2;
-        int SPEAK_ITEM_PHOTO_PATH = 3;
-        int SPEAK_ITEM_PHOTO_DESCRIPTION = 4;
-        int SPEAK_ITEM_PHOTO_LOCATION = 5;
-        int SPEAK_ITEM_PHOTO_DATETIME = 6;
-        int SPEAK_ITEM_COLLECTION_ID = 7;
+        int SPEAK_ITEM_ID = 1;
+        int SPEAK_ITEM_AUDIO_PATH = 2;
+        int SPEAK_ITEM_AUDIO_MARK = 3;
+        int SPEAK_ITEM_AUDIO_DURATION = 4;
+        int SPEAK_ITEM_PHOTO_PATH = 5;
+        int SPEAK_ITEM_PHOTO_DESCRIPTION = 6;
+        int SPEAK_ITEM_PHOTO_LOCATION = 7;
+        int SPEAK_ITEM_PHOTO_DATETIME = 8;
+        int SPEAK_ITEM_COLLECTION_ID = 9;
     }
 
-    public void addNewSpeakItem(SpeakItem speakItem) {
-        SQLiteDatabase database = mDatabase.getWritableDatabase();
+    public long addNewSpeakItem(SpeakItem speakItem) {
+        synchronized (this) {
+            long ret = 0;
+            SQLiteDatabase database = mDatabase.getWritableDatabase();
 
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_ID, speakItem.getId());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_PATH, speakItem.getAudioPath());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_MARK, speakItem.getAudioMark());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_DURATION, speakItem.getAudioDuration());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH, speakItem.getPhotoPath());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION, speakItem.getDescription());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION, speakItem.getLocation());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
+            contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
+
+            ret = database.insert(PopTalkContract.Tables.SPEAK_ITEMS, null, contentValues);
+            return ret;
+        }
+    }
+
+    public List<SpeakItem> getSpeakItems() {
+        synchronized (this) {
+            List<SpeakItem> speakItems = new ArrayList<>();
+            Cursor cursor = null;
+
+            try {
+                SQLiteDatabase database = mDatabase.getWritableDatabase();
+                cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
+                        SpeakItemQuery.projections, null, null, null, null, null);
+
+                if (cursor.moveToFirst()) {
+                    do {
+                        SpeakItem speakItem = new SpeakItem();
+                        speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
+                        speakItem.setAudioPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_PATH));
+                        speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
+                        speakItem.setAudioDuration(cursor.getInt(SpeakItemQuery.SPEAK_ITEM_AUDIO_DURATION));
+                        speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
+                        speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
+                        speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                        speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                        speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
+                        speakItems.add(speakItem);
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+            return speakItems;
+        }
+    }
+
+    public SpeakItem getSpeakItem(long withSpeakItemId) {
+        synchronized (this) {
+            SpeakItem speakItem = new SpeakItem();
+            Cursor cursor = null;
+            try {
+                SQLiteDatabase database = mDatabase.getWritableDatabase();
+
+                cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
+                        SpeakItemQuery.projections,
+                        PopTalkContract.SpeakItems.SPEAK_ITEM_ID + " = ?",
+                        new String[]{"" + withSpeakItemId},
+                        null,
+                        null,
+                        null);
+
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
+                            speakItem.setAudioPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_PATH));
+                            speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
+                            speakItem.setAudioDuration(cursor.getInt(SpeakItemQuery.SPEAK_ITEM_AUDIO_DURATION));
+                            speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
+                            speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
+                            speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                            speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                            speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
+                        } while (cursor.moveToNext());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+            return speakItem;
+        }
+    }
+
+    public List<SpeakItem> getSpeakItems(long withCollectionId) {
+        synchronized (this) {
+            List<SpeakItem> speakItems = new ArrayList<>();
+            Cursor cursor = null;
+            try {
+                SQLiteDatabase database = mDatabase.getWritableDatabase();
+                cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
+                        SpeakItemQuery.projections,
+                        PopTalkContract.SpeakItems.COLLECTION_ID + " = ?",
+                        new String[]{"" + withCollectionId},
+                        null,
+                        null,
+                        null);
+
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            SpeakItem speakItem = new SpeakItem();
+                            speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
+                            speakItem.setAudioPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_PATH));
+                            speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
+                            speakItem.setAudioDuration(cursor.getInt(SpeakItemQuery.SPEAK_ITEM_AUDIO_DURATION));
+                            speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
+                            speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
+                            speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                            speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                            speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
+                            speakItems.add(speakItem);
+                        } while (cursor.moveToNext());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+            return speakItems;
+        }
+    }
+
+
+    public long updateSpeakItem(SpeakItem speakItem) {
+        long ret = 0;
         ContentValues contentValues = new ContentValues();
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_PATH, speakItem.getAudioPath());
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_MARK, speakItem.getAudioMark());
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH, speakItem.getPhotoPath());
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION, speakItem.getDescription());
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION, speakItem.getLocation());
-        contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
-        contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
+        synchronized (this) {
+            try {
+                SQLiteDatabase database = mDatabase.getWritableDatabase();
 
-        database.insert(PopTalkContract.Tables.SPEAK_ITEMS, null, contentValues);
-    }
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_ID, speakItem.getId());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_PATH, speakItem.getAudioPath());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_MARK, speakItem.getAudioMark());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_AUDIO_DURATION, speakItem.getAudioDuration());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH, speakItem.getPhotoPath());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION, speakItem.getDescription());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION, speakItem.getLocation());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
+                contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
 
-    public List<SpeakItem> querySpeakItems() {
-        List<SpeakItem> speakItems = new ArrayList<>();
-        Cursor cursor = null;
-
-        try {
-            SQLiteDatabase database = mDatabase.getWritableDatabase();
-
-            cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
-                    SpeakItemQuery.projections, null, null, null, null, null);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    SpeakItem speakItem = new SpeakItem();
-                    speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
-                    speakItem.setAudioPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_PATH));
-                    speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
-                    speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
-                    speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
-                    speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
-                    speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
-                    speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
-
-                    speakItems.add(speakItem);
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+                ret = database.update(PopTalkContract.Tables.SPEAK_ITEMS,
+                        contentValues,
+                        PopTalkContract.SpeakItems.SPEAK_ITEM_ID + " = ?",
+                        new String[]{"" + speakItem.getId()});
+                if (ret < 0) {
+                    ret = addNewSpeakItem(speakItem);
+                }
+                return ret;
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                return -1;
+            } finally {
             }
         }
-        return speakItems;
-    }
-
-    public List<SpeakItem> getSpeakItems(long withCollectionId){
-        List<SpeakItem> speakItems = new ArrayList<>();
-        Cursor cursor = null;
-
-        try {
-            SQLiteDatabase database = mDatabase.getWritableDatabase();
-
-            cursor = database.query(PopTalkContract.Tables.SPEAK_ITEMS,
-                    SpeakItemQuery.projections,
-                    PopTalkContract.SpeakItems.COLLECTION_ID + "=?",
-                    new String[]{"" + withCollectionId},
-                    null,
-                    null,
-                    null);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    SpeakItem speakItem = new SpeakItem();
-                    speakItem.setId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_ID));
-                    speakItem.setAudioMark(cursor.getString(SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
-                    speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
-                    speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
-                    speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
-                    speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
-                    speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
-
-                    speakItems.add(speakItem);
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return speakItems;
     }
 
     //Testing purpose only
@@ -162,23 +248,23 @@ public class SpeakItemModel implements BaseModel {
         speakItem.setCollectionId(1);
         speakItem1.setCollectionId(1);
         speakItem2.setCollectionId(1);
-        speakItem3.setCollectionId(1);
-        speakItem4.setCollectionId(1);
+        speakItem3.setCollectionId(2);
+        speakItem4.setCollectionId(2);
         speakItem5.setCollectionId(2);
-        speakItem6.setCollectionId(2);
+        speakItem6.setCollectionId(3);
         speakItem7.setCollectionId(3);
-        speakItem8.setCollectionId(3);
-        speakItem9.setCollectionId(3);
-        speakItem10.setCollectionId(3);
+        speakItem8.setCollectionId(4);
+        speakItem9.setCollectionId(4);
+        speakItem10.setCollectionId(5);
         speakItem11.setCollectionId(5);
-        speakItem12.setCollectionId(4);
-        speakItem13.setCollectionId(4);
-        speakItem14.setCollectionId(4);
-        speakItem15.setCollectionId(4);
-        speakItem16.setCollectionId(4);
-        speakItem17.setCollectionId(4);
-        speakItem18.setCollectionId(4);
-        speakItem19.setCollectionId(4);
+        speakItem12.setCollectionId(6);
+        speakItem13.setCollectionId(7);
+        speakItem14.setCollectionId(7);
+        speakItem15.setCollectionId(7);
+        speakItem16.setCollectionId(8);
+        speakItem17.setCollectionId(8);
+        speakItem18.setCollectionId(9);
+        speakItem19.setCollectionId(10);
 
         addNewSpeakItem(speakItem);
         addNewSpeakItem(speakItem1);
