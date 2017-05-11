@@ -26,7 +26,7 @@ public class SeekBarWaveformView extends View {
 
     private void init(Context context) {
         seekBarWaveform = new SeekBarWaveform(context);
-        seekBarWaveform.setColors(0xFF78C272, 0xFFF4B400 , 0xFFA9DD96);
+        seekBarWaveform.setColors(0xFF78C272, 0xFFF4B400, 0xFFA9DD96);
     }
 
     public void setWaveform(byte[] waveform) {

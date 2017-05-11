@@ -22,8 +22,8 @@ public class SeekBarWaveform {
 
     private static Paint paintInner;
     private static Paint paintOuter;
-    private int thumbLeftX = 0;
-    private int thumbRightX = 0;
+    private float leftProgress = 0.0f;
+    private float rightProgress = 1.0f;
     private int thumbDX = 0;
     private float startX;
     private boolean startDraging = false;
@@ -74,62 +74,64 @@ public class SeekBarWaveform {
         return startDraging;
     }
 
-    public boolean onTouch(int action, float x, float y) {
-        if (action == MotionEvent.ACTION_DOWN) {
-            if (0 <= x && x <= width && y >= 0 && y <= height) {
-                startX = x;
-                pressed = true;
-                thumbDX = (int) (x - thumbLeftX);
-                startDraging = false;
-                return true;
-            }
-        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            if (pressed) {
-                if (action == MotionEvent.ACTION_UP && delegate != null) {
-                    delegate.onSeekBarDrag((float) thumbLeftX / (float) width);
-                }
-                pressed = false;
-                return true;
-            }
-        } else if (action == MotionEvent.ACTION_MOVE) {
-            if (pressed) {
-                if (startDraging) {
-                    thumbLeftX = (int) (x - thumbDX);
-                    if (thumbLeftX < 0) {
-                        thumbLeftX = 0;
-                    } else if (thumbLeftX > width) {
-                        thumbLeftX = width;
-                    }
-                }
-                if (startX != -1 && Math.abs(x - startX) > AndroidUtilities.getPixelsInCM((Activity) mContext, 0.2f, true)) {
-                    if (parentView != null && parentView.getParent() != null) {
-                        parentView.getParent().requestDisallowInterceptTouchEvent(true);
-                    }
-                    startDraging = true;
-                    startX = -1;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean onTouch(int action, float x, float y) {
+//        if (action == MotionEvent.ACTION_DOWN) {
+//            if (0 <= x && x <= width && y >= 0 && y <= height) {
+//                startX = x;
+//                pressed = true;
+//                thumbDX = (int) (x - thumbLeftX);
+//                startDraging = false;
+//                return true;
+//            }
+//        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+//            if (pressed) {
+//                if (action == MotionEvent.ACTION_UP && delegate != null) {
+//                    delegate.onSeekBarDrag((float) thumbLeftX / (float) width);
+//                }
+//                pressed = false;
+//                return true;
+//            }
+//        } else if (action == MotionEvent.ACTION_MOVE) {
+//            if (pressed) {
+//                if (startDraging) {
+//                    thumbLeftX = (int) (x - thumbDX);
+//                    if (thumbLeftX < 0) {
+//                        thumbLeftX = 0;
+//                    } else if (thumbLeftX > width) {
+//                        thumbLeftX = width;
+//                    }
+//                }
+//                if (startX != -1 && Math.abs(x - startX) > AndroidUtilities.getPixelsInCM((Activity) mContext, 0.2f, true)) {
+//                    if (parentView != null && parentView.getParent() != null) {
+//                        parentView.getParent().requestDisallowInterceptTouchEvent(true);
+//                    }
+//                    startDraging = true;
+//                    startX = -1;
+//                }
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public void setLeftProgress(float progress) {
-        thumbLeftX = (int) Math.ceil(width * progress);
-        if (thumbLeftX < 0) {
-            thumbLeftX = 0;
-        } else if (thumbLeftX > width) {
-            thumbLeftX = width;
-        }
+        this.leftProgress = progress;
+//        thumbLeftX = (int) Math.ceil(width * progress);
+//        if (thumbLeftX < 0) {
+//            thumbLeftX = 0;
+//        } else if (thumbLeftX > width) {
+//            thumbLeftX = width;
+//        }
     }
 
     public void setRightProgress(float progress) {
-        thumbRightX = (int) Math.ceil(width * progress);
-        if (thumbRightX < 0) {
-            thumbRightX = 0;
-        } else if (thumbRightX > width) {
-            thumbRightX = width;
-        }
+        this.rightProgress = progress;
+//        thumbRightX = (int) Math.ceil(width * progress);
+//        if (thumbRightX < 0) {
+//            thumbRightX = 0;
+//        } else if (thumbRightX > width) {
+//            thumbRightX = width;
+//        }
     }
 
     public boolean isDragging() {
@@ -139,14 +141,27 @@ public class SeekBarWaveform {
     public void setSize(int w, int h) {
         width = w;
         height = h;
-        thumbLeftX = 0;
-        thumbRightX = w;
+//        thumbLeftX = 0;
+//        thumbRightX = w;
     }
 
     public void draw(Canvas canvas) {
         int colWidth = 3;
         int colHeight = 90;
         int colSpace = 4;
+
+        int thumbLeftX = (int) Math.ceil(width * leftProgress);
+        if (thumbLeftX < 0) {
+            thumbLeftX = 0;
+        } else if (thumbLeftX > width) {
+            thumbLeftX = width;
+        }
+        int thumbRightX = (int) Math.ceil(width * rightProgress);
+        if (thumbRightX < 0) {
+            thumbRightX = 0;
+        } else if (thumbRightX > width) {
+            thumbRightX = width;
+        }
 
         if (waveformBytes == null || width == 0) {
             return;

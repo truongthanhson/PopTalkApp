@@ -135,22 +135,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mCurrentPausing = false;
         mRecording = false;
         setNotification();
-    }
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         Dexter.withActivity(getActivity())
                 .withPermission(Manifest.permission.INTERNET).withListener(new BasePermissionListener() {
             @Override
@@ -171,6 +155,22 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         }).check();
     }
 
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -178,15 +178,25 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onStop() {
-        mPresenter.updateSpeakItem(mSpeakItem);
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        mAudioCtrl.cleanupPlayer();
+        stopPlay();
         clearNotification();
+        mPresenter.updateSpeakItem(mSpeakItem);
         super.onDestroy();
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (!isVisibleToUser) {
+            if (mView != null && mAudioCtrl != null && mSpeakItem != null) {
+                stopPlay();
+            }
+        }
     }
 
     @Override
@@ -215,7 +225,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
         // Reload waveform
         mAudioCtrl.generateWaveform(speakItem);
-        Log.d("cuonghl", "Left " + mSpeakItem.getAudioLeftMark() + " right " + mSpeakItem.getAudioRightMark());
     }
 
     private void setNotification() {
@@ -293,6 +302,19 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             mAudioCtrl.pauseAudio(mSpeakItem);
             mNextPausing = true;
         }
+    }
+
+    private void stopPlay() {
+        mCurrentPlaying = false;
+        mCurrentPausing = false;
+        mNextPlaying = false;
+        mNextPausing = false;
+        mRecording = false;
+        setPlayView();
+        setRecordView();
+        mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
+        mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
+        mAudioCtrl.cleanupPlayer();
     }
 
     @Override
@@ -500,11 +522,9 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mRecordWave.setLeftProgress(mSpeakItem.getAudioLeftMark());
         mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
         mRecordWave.setWaveform(mSpeakItem.getAudioWaveform());
+        mRecordWave.setVisibility(View.VISIBLE);
         mView.findViewById(R.id.play_ll_id).setVisibility(View.VISIBLE);
         mView.findViewById(R.id.waveform_menu_id).setVisibility(View.VISIBLE);
-        mRecordWave.setVisibility(View.VISIBLE);
-        mRecordWave.invalidate();
-        Log.d("cuonghl", "Left " + mSpeakItem.getAudioLeftMark() + " right " + mSpeakItem.getAudioRightMark());
     }
 
     private void onRecordStarted() {
