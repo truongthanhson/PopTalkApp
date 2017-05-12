@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,9 +37,9 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     private TextView mUserName;
 
-    private EditText mPassword;
+    private EditText mEmail;
 
-    private TextView mLoginButton;
+    private Button mLoginButton;
 
     private View mView;
 
@@ -59,8 +60,8 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_login_layout, container, false);
         mUserName = (TextView) mView.findViewById(R.id.user_name_id);
-        mPassword = (EditText) mView.findViewById(R.id.password_id);
-        mLoginButton = (TextView) mView.findViewById(R.id.login_title_tv_id);
+        mEmail = (EditText) mView.findViewById(R.id.email_id);
+        mLoginButton = (Button) mView.findViewById(R.id.login_button_id);
         mLoginButton.setOnClickListener(this);
         mCallbackManager = CallbackManager.Factory.create();
         mFacebookLogin = (LoginButton) mView.findViewById(R.id.facebook_login_id);
@@ -89,9 +90,9 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     }
 
     @Override
-    public void showErrorPassword(String error) {
-        mPassword.setError(getString(R.string.login_error_password));
-        AnimationUtils.shake(getActivity().getApplicationContext(), mPassword);
+    public void showErrorEmail(String error) {
+        mEmail.setError(getString(R.string.login_error_email));
+        AnimationUtils.shake(getActivity().getApplicationContext(), mEmail);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Override
     public void onLoginSuccessful() {
         Credentials credentials = new Credentials();
-        credentials.setPassword(mPassword.getText().toString());
+        credentials.setPassword(mEmail.getText().toString());
         credentials.setName(mUserName.getText().toString());
         mPresenter.updateCredentials(credentials);
         onOpenCollectionActivity();
@@ -121,8 +122,8 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.login_title_tv_id:
-                mPresenter.login(mUserName.getText().toString(), mPassword.getText().toString());
+            case R.id.login_button_id:
+                mPresenter.login(mUserName.getText().toString(), mEmail.getText().toString());
                 break;
             default:
                 break;

@@ -27,7 +27,7 @@ public class Constants {
 
     public static final String KEY_PHOTO_GALLERY = "key_photo_gallery";
 
-    public static final String KEY_PHOTO_GALLERY_RESULT = "key_p";
+    public static final String KEY_PHOTO_GALLERY_RESULT = "key_photo_gallery_result";
 
     public static final String KEY_SPEAK_ITEM_ID = "key_speak_item_id";
 
@@ -48,7 +48,7 @@ public class Constants {
 
     public static final int GRID_COLUMN_COUNT = 3;
 
-    public static final int SPLASH_DISPLAY_LENGTH = 2000;
+    public static final int SPLASH_DISPLAY_LENGTH = 1000;
 
     public static boolean DEBUG_VERSION = false;
 

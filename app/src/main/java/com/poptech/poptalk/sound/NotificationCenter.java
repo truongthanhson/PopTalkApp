@@ -19,6 +19,7 @@ public class NotificationCenter {
     public static final int recordStarted = totalEvents++;
     public static final int recordStartError = totalEvents++;
     public static final int recordStopped = totalEvents++;
+    public static final int recordCompleted = totalEvents++;
     public static final int audioProgressDidChanged = totalEvents++;
     public static final int audioDidReset = totalEvents++;
     public static final int audioPlayStateChanged = totalEvents++;

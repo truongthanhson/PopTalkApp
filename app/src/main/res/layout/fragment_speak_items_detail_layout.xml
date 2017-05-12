@@ -41,9 +41,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|right"
-                    android:layout_margin="5dp"
-                    android:background="@color/transparent"
-                    android:src="@drawable/ic_edit" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_edit"
+                    android:visibility="gone"/>
             </FrameLayout>
         </android.support.v7.widget.CardView>
 
@@ -137,19 +139,6 @@
                         android:inputType="textMultiLine"
                         android:textSize="16sp" />
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/language_button_id"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/bg_language_button"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="Language"
-                    android:textSize="15sp" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -169,8 +158,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="5dp">
+                android:orientation="vertical">
 
                 <FrameLayout
                     android:id="@+id/waveform_menu_id"
@@ -178,6 +166,15 @@
                     android:layout_height="120dp"
                     android:layout_marginBottom="5dp"
                     android:visibility="gone">
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@color/colorAccent"
+                        android:indeterminateTintMode="src_atop"
+                        android:visibility="gone" />
 
                     <com.poptech.poptalk.view.SeekBarWaveformView
                         android:id="@+id/record_waveform_id"
