@@ -54,10 +54,15 @@ public class StoryBoardPresenter implements StoryBoardContract.Presenter {
         }
 
         int numberOfLines = speakItems.size() / column;
+        if(speakItems.size() % column != 0){
+            numberOfLines ++;
+        }
 
         for(int i=0; i < numberOfLines; i++){
             tempList.clear();
             for(int j = 0; j < column; j++){
+                if(i * column + j > speakItems.size() - 1)
+                    break;
                 tempList.add(speakItems.get(i * column + j));
             }
 

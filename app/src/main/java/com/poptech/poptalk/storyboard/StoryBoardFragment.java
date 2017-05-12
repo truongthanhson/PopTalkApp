@@ -37,6 +37,8 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
         return new StoryBoardFragment();
     }
 
+    private static final int STORY_COLUMN = 3;
+
     @Inject
     StoryBoardPresenter mPresenter;
 
@@ -72,7 +74,7 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.loadData(3);
+        mPresenter.loadData(STORY_COLUMN);
     }
 
     @Override
@@ -92,10 +94,8 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
 
     private void initView() {
         mStoryBoardView = (RecyclerView)mRootView.findViewById(R.id.story_board);
-        mStoryBoardView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-//        ItemDecorationColumns itemDecorationColumns = new ItemDecorationColumns(2, MetricUtils.dpToPx(50), true);
-//        mStoryBoardView.addItemDecoration(itemDecorationColumns);
-        mStoryBoardView.addItemDecoration(new PathItemDecoration(3, MetricUtils.dpToPx(10)));
+        mStoryBoardView.setLayoutManager(new GridLayoutManager(getActivity(), STORY_COLUMN));
+        mStoryBoardView.addItemDecoration(new PathItemDecoration(STORY_COLUMN, MetricUtils.dpToPx(10)));
     }
 
     @Override
@@ -109,7 +109,10 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
         mStoryBoardView.setAdapter(mAdapter);
     }
 
-    public class StoryBoardAdapter extends RecyclerView.Adapter<StoryBoardItemViewHolder>{
+
+    private final int VIEW_TYPE_STORY_BOARD_ITEM = 1;
+    private final int VIEW_TYPE_STORY_BOARD_PADDING_ITEM = 2;
+    public class StoryBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         private List<SpeakItem> mSpeakItems;
         private Context mContext;
 
@@ -119,25 +122,42 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
         }
 
         @Override
-        public StoryBoardItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_story_board_layout, parent, false);
-            return new StoryBoardItemViewHolder(rootView);
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            if(viewType == VIEW_TYPE_STORY_BOARD_ITEM){
+                View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_story_board_layout, parent, false);
+                return new StoryBoardItemViewHolder(rootView);
+            }else if(viewType == VIEW_TYPE_STORY_BOARD_PADDING_ITEM){
+                View rootView = new View(getContext());
+                return new StoryBoardItemFakeDataViewHolder(rootView);
+            }
+            return null;
         }
 
         @Override
-        public void onBindViewHolder(StoryBoardItemViewHolder holder, final int position) {
-            Glide.with(mContext)
-                    .load(mSpeakItems.get(position).getPhotoPath())
-                    .centerCrop()
-                    .thumbnail(0.5f)
-                    .placeholder(R.color.colorAccent)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.mThumbnailIv);
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+            if(holder.getItemViewType() == VIEW_TYPE_STORY_BOARD_ITEM){
+                StoryBoardItemViewHolder storyBoardItemViewHolder = (StoryBoardItemViewHolder) holder;
+                Glide.with(mContext)
+                        .load(mSpeakItems.get(position).getPhotoPath())
+                        .centerCrop()
+                        .thumbnail(0.5f)
+                        .placeholder(R.color.colorAccent)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(storyBoardItemViewHolder.mThumbnailIv);
+            }
+
         }
 
         @Override
         public int getItemCount() {
             return mSpeakItems.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if(mSpeakItems.get(position).getId() < 0)
+                return VIEW_TYPE_STORY_BOARD_PADDING_ITEM;
+            return VIEW_TYPE_STORY_BOARD_ITEM;
         }
     }
 
@@ -149,6 +169,15 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
             super(itemView);
             mRootView = itemView;
             mThumbnailIv = (ImageView)mRootView.findViewById(R.id.iv_thumb_id);
+        }
+    }
+
+    public class StoryBoardItemFakeDataViewHolder extends RecyclerView.ViewHolder{
+
+        private View mRootView;
+        public StoryBoardItemFakeDataViewHolder(View itemView) {
+            super(itemView);
+            mRootView = itemView;
         }
     }
 
@@ -174,7 +203,6 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
         public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
             super.onDraw(c, parent, state);
             int childCount = parent.getChildCount();
-            int totalItem = parent.getAdapter().getItemCount();
 
             for (int i = 0; i < childCount; i++) {
 
@@ -182,29 +210,77 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
                     return;
 
                 View child = parent.getChildAt(i);
-                int pos = parent.getChildAdapterPosition(child);
+                int position = parent.getChildAdapterPosition(child);
 
-                c.drawRect(new Rect(pos == 0?itemPadding : child.getLeft(), child.getTop() + (child.getHeight() - pathWidth)/2, child.getRight(),child.getTop() + (child.getHeight() - pathWidth)/2 + pathWidth), pathPaint);
+                if(parent.getAdapter().getItemViewType(position) == VIEW_TYPE_STORY_BOARD_ITEM) {
+                    boolean lastItem = isLastItem(position,parent.getAdapter().getItemCount(), spanColumn, parent.getAdapter());
+                    int lineTop =  child.getTop() + (child.getHeight() - pathWidth) / 2;
+                    int lintBottom = child.getTop() + (child.getHeight() - pathWidth) / 2 + pathWidth;
+                    int lineLeft = child.getLeft();
+                    int lineRight = child.getRight();
+                    if(position == 0){
+                        lineLeft += itemPadding;
+                        if(lastItem)
+                            lineRight -= itemPadding;
+                    }else if(lastItem){
+                        if((position / spanColumn) % 2 == 0){
+                            lineRight -= itemPadding;
+                        }else{
+                            lineLeft += itemPadding;
+                        }
+                    }
+                    temp.set(lineLeft, lineTop, lineRight, lintBottom);
+                    c.drawRect(temp, pathPaint);
 
-                if(pos % spanColumn == 0){
-                    if (pos != 0) {
-                        if ((pos / spanColumn) % 2 == 0) {
-                            c.drawRect(new Rect(child.getLeft(), child.getTop(), child.getLeft() + pathWidth, (child.getTop() + (child.getHeight() - pathWidth) / 2) + pathWidth), pathPaint);
-                        } else if ((pos / spanColumn) % 2 == 1) {
-                            c.drawRect(new Rect(child.getLeft(), child.getTop() + (child.getHeight() - pathWidth) / 2, child.getLeft() + pathWidth, child.getBottom()), pathPaint);
+                    if (position % spanColumn == 0) {
+                        if (position != 0) {
+                            if ((position / spanColumn) % 2 == 0) {
+                                temp.set(child.getLeft(), child.getTop(), child.getLeft() + pathWidth, (child.getTop() + (child.getHeight() - pathWidth) / 2) + pathWidth);
+                                c.drawRect(temp, pathPaint);
+                            } else if ((position / spanColumn) % 2 == 1 && !lastItem) {
+                                temp.set(child.getLeft(), child.getTop() + (child.getHeight() - pathWidth) / 2, child.getLeft() + pathWidth, child.getBottom());
+                                c.drawRect(temp, pathPaint);
+                            }
+                        }
+                    }
+
+                    if (position % spanColumn == (spanColumn - 1)) {
+                        if ((((position + 1) / spanColumn)) % 2 == 1 && !lastItem) {
+                            temp.set(child.getRight() - pathWidth, child.getTop() + (child.getHeight() - pathWidth) / 2, child.getRight(), child.getBottom());
+                            c.drawRect(temp, pathPaint);
+                        } else if ((((position + 1) / spanColumn)) % 2 == 0) {
+                            temp.set(child.getRight() - pathWidth, child.getTop(), child.getRight(), (child.getTop() + (child.getHeight() - pathWidth) / 2 + pathWidth));
+                            c.drawRect(temp, pathPaint);
                         }
                     }
                 }
+            }
+        }
 
-                if(pos % spanColumn == (spanColumn - 1)){
-                    if((((pos + 1) / spanColumn)) % 2  == 1){
-                        c.drawRect(new Rect(child.getRight() - pathWidth, child.getTop() + (child.getHeight() - pathWidth)/2,child.getRight(),child.getBottom()), pathPaint);
-                    }else if((((pos + 1) / spanColumn)) % 2  == 0){
-                        c.drawRect(new Rect(child.getRight() - pathWidth, child.getTop(),child.getRight(),(child.getTop() + (child.getHeight() - pathWidth)/2 + pathWidth)), pathPaint);
-                    }
+        private boolean isLastItem(int position, int total, int nbColumn, RecyclerView.Adapter adapter){
+            int rowOfItem = position / nbColumn + 1; // 1-based-index
+            int lastRow = total / nbColumn + ((total % nbColumn != 0)?1:0);
+
+            if(rowOfItem < lastRow){
+                return false;
+            }
+            if(rowOfItem % 2 == 0){
+//                int itemOfLastRow = total - (rowOfItem - 1) * nbColumn;
+//                if(position == total - itemOfLastRow){
+//                    return true;
+//                }
+                if(position == total - nbColumn){
+                    return true;
                 }
 
+                if(adapter.getItemViewType(position - 1) == VIEW_TYPE_STORY_BOARD_PADDING_ITEM){
+                    return true;
+                }
+            }else{
+                if(position == total - 1)
+                    return true;
             }
+            return false;
         }
 
         @Override
