@@ -1,8 +1,9 @@
 package com.poptech.poptalk.login;
 
 import android.content.Context;
+import android.util.Patterns;
 
-import com.poptech.poptalk.*;
+import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Credentials;
 
 import javax.inject.Inject;
@@ -35,17 +36,13 @@ public class LoginPresenter implements LoginContract.Presenter {
     }
 
     @Override
-    public void login(String userName, String password) {
+    public void login(String userName, String email) {
         if (userName.isEmpty()) {
             mView.showErrorUsername(mContext.getString(R.string.login_error_username));
-        } else if (password.isEmpty()) {
-            mView.showErrorPassword(mContext.getString(R.string.login_error_password));
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mView.showErrorEmail(mContext.getString(R.string.login_error_email));
         } else {
-            if (mModel.getCredentials().getName().equalsIgnoreCase(userName) && mModel.getCredentials().getPassword().equalsIgnoreCase(password)) {
-                mView.onLoginSuccessful();
-            } else {
-                mView.onLoginFailed();
-            }
+            mView.onLoginSuccessful();
         }
     }
 

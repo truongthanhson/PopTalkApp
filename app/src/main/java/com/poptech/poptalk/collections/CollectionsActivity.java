@@ -15,27 +15,33 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
 import com.poptech.poptalk.Constants;
+import com.poptech.poptalk.LauncherActivity;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Credentials;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
+import com.poptech.poptalk.login.LoginActivity;
 import com.poptech.poptalk.login.LoginModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
+import com.poptech.poptalk.utils.SaveData;
 
 import java.util.List;
 
@@ -54,11 +60,14 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     private DrawerMenuAdapter mDrawerMenuAdapter;
 
-    private CircleImageView mUserProfilePicture;
+    private CircleImageView mProfilePicture;
 
     private TextView mUserName;
 
+    private ImageButton mLogoutButton;
+
     private LoginModel mLoginModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +98,13 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         mFloatingButton = (FloatingActionButton) findViewById(R.id.fab_add_speak_item);
         mFloatingButton.setOnClickListener(this);
 
-        mUserProfilePicture = (CircleImageView) findViewById(R.id.user_avatar_id);
-        mUserProfilePicture.setOnClickListener(this);
+        mProfilePicture = (CircleImageView) findViewById(R.id.user_avatar_id);
+        mProfilePicture.setOnClickListener(this);
 
         mUserName = (TextView) findViewById(R.id.user_name_id);
+
+        mLogoutButton = (ImageButton) findViewById(R.id.logout_button_id);
+        mLogoutButton.setOnClickListener(this);
 
         mLoginModel = new LoginModel(new PopTalkDatabase(PopTalkApplication.applicationContext));
 
@@ -126,6 +138,9 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             case R.id.user_avatar_id:
                 navigateToChangeAvatar();
                 break;
+            case R.id.logout_button_id:
+                logoutUser();
+                break;
             default:
                 break;
         }
@@ -141,7 +156,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
                     intent.putExtra(
                             Constants.KEY_PHOTO_GALLERY,
-                            GalleryActivity.GalleryType.PICK_ADDED_SPEAK_ITEM);
+                            GalleryActivity.GalleryType.ADD_SPEAK_ITEM);
                     startActivity(intent);
                 }
             }
@@ -162,9 +177,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
-                    intent.putExtra(
-                            Constants.KEY_PHOTO_GALLERY,
-                            GalleryActivity.GalleryType.PICK_PROFILE_PICTURE);
+                    intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GalleryType.PICK_GALLERY_PHOTO);
                     startActivityForResult(intent, GalleryActivity.SELECT_PHOTO_REQUEST_CODE);
                 }
             }
@@ -342,12 +355,25 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 .centerCrop()
                 .dontAnimate()
                 .thumbnail(0.5f)
-                .placeholder(R.color.colorAccent)
+                .placeholder(R.color.colorPrimary)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(mUserProfilePicture);
+                .into(mProfilePicture);
     }
 
     private void setUserName(String name) {
         mUserName.setText(name);
+    }
+
+
+    private void logoutUser() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null) {
+            LoginManager.getInstance().logOut();
+        }
+        SaveData.getInstance(this).setLoggedIn(false);
+        Intent intent = new Intent(CollectionsActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

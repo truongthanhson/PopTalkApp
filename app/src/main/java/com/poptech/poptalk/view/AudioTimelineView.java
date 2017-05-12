@@ -223,8 +223,8 @@ public class AudioTimelineView extends View {
         canvas.drawRect(startX, 0, startX + MetricUtils.dpToPx(2), height, paint);
         canvas.drawRect(midX - MetricUtils.dpToPx(1), 0, midX + MetricUtils.dpToPx(1), height, paint);
         canvas.drawRect(endX - MetricUtils.dpToPx(2), 0, endX, height, paint);
-        canvas.drawRect(startX + MetricUtils.dpToPx(1), 0, endX - MetricUtils.dpToPx(1), MetricUtils.dpToPx(1), paint);
-        canvas.drawRect(startX + MetricUtils.dpToPx(1), height - MetricUtils.dpToPx(1), endX - MetricUtils.dpToPx(1), height, paint);
+        canvas.drawRect(startX + MetricUtils.dpToPx(1), 0, endX - MetricUtils.dpToPx(1), MetricUtils.dpToPx(0), paint);
+        canvas.drawRect(startX + MetricUtils.dpToPx(1), height - MetricUtils.dpToPx(0), endX - MetricUtils.dpToPx(1), height, paint);
         canvas.restore();
     }
 

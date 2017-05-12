@@ -391,7 +391,11 @@ public class AudioController {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStopped, mAudioId);
+                        if (send == 0) {
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordStopped, mAudioId);
+                        } else {
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.recordCompleted, mAudioId);
+                        }
                     }
                 });
             }
@@ -904,13 +908,13 @@ public class AudioController {
         NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioStartCompleted, mAudioId);
     }
 
-    public void generateWaveform(final SpeakItem audioItem) {
+    public boolean generateWaveform(final SpeakItem audioItem) {
         if (StringUtils.isNullOrEmpty(audioItem.getAudioPath())) {
-            return;
+            return false;
         }
         File audioFile = new File(audioItem.getAudioPath());
         if (!audioFile.exists()) {
-            return;
+            return false;
         }
         mGlobalQueue.postRunnable(new Runnable() {
             @Override
@@ -927,5 +931,6 @@ public class AudioController {
                 });
             }
         });
+        return true;
     }
 }

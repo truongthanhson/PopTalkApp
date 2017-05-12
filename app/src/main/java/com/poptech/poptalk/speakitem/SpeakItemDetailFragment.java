@@ -1,11 +1,13 @@
 package com.poptech.poptalk.speakitem;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -27,12 +30,15 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.collections.CollectionsActivity;
+import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
 import com.poptech.poptalk.utils.AndroidUtilities;
@@ -44,7 +50,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class SpeakItemDetailFragment extends Fragment implements NotificationCenter.NotificationCenterDelegate, SpeakItemDetailContract.View, View.OnTouchListener, View.OnClickListener, AudioTimelineView.AudioTimelineDelegate {
+public class SpeakItemDetailFragment extends Fragment implements NotificationCenter.NotificationCenterDelegate, SpeakItemDetailContract.View, View.OnTouchListener, View.OnClickListener, AudioTimelineView.AudioTimelineDelegate, View.OnLongClickListener {
+
     public static SpeakItemDetailFragment newInstance(long speakItemId) {
         Bundle args = new Bundle();
         args.putLong(Constants.KEY_SPEAK_ITEM_ID, speakItemId);
@@ -58,20 +65,26 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private View mView;
     private ViewPager mViewPager;
     private ScrollView mScrollView;
+
     private ImageView mPhotoView;
     private ImageButton mPhotoEdit;
     private TextView mPhotoLocation;
     private TextView mPhotoDateTime;
     private EditText mPhotoDescription;
-    private TextView mLanguageButton;
+
     private TextView mTimerText;
-    private FrameLayout mRecordButton;
+    private ImageButton mRecordButton;
     private LinearLayout mSlideCancel;
     private RelativeLayout mRecordMenu;
+
+    private FrameLayout mWaveformMenu;
     private SeekBarWaveformView mRecordWave;
     private AudioTimelineView mRecordTimeline;
-    private FrameLayout mPlayCurrentButton;
-    private FrameLayout mPlayNextButton;
+    private ProgressBar mProgressBar;
+
+    private LinearLayout mPlayMenu;
+    private ImageButton mPlayCurrentButton;
+    private ImageButton mPlayNextButton;
 
     private AudioController mAudioCtrl;
     private SpeakItem mSpeakItem;
@@ -109,20 +122,31 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private void initView() {
         mViewPager = (ViewPager) getActivity().findViewById(R.id.speak_item_pager_id);
         mScrollView = (ScrollView) mView.findViewById(R.id.speak_item_scroll_id);
+
+        // Photo
         mPhotoView = (ImageView) mView.findViewById(R.id.photo_img_id);
+        mPhotoView.setOnLongClickListener(this);
         mPhotoEdit = (ImageButton) mView.findViewById(R.id.photo_edit_btn_id);
         mPhotoLocation = (TextView) mView.findViewById(R.id.photo_location_id);
         mPhotoDateTime = (TextView) mView.findViewById(R.id.photo_datetime_id);
         mPhotoDescription = (EditText) mView.findViewById(R.id.description_et_id);
-        mLanguageButton = (TextView) mView.findViewById(R.id.language_button_id);
+
+        // Record
         mRecordMenu = (RelativeLayout) mView.findViewById(R.id.record_menu_rl_id);
-        mRecordButton = (FrameLayout) mView.findViewById(R.id.record_fl_id);
+        mRecordButton = (ImageButton) mView.findViewById(R.id.record_ll_id);
         mTimerText = (TextView) mView.findViewById(R.id.timer_tv_id);
         mSlideCancel = (LinearLayout) mView.findViewById(R.id.slide_cancel_ll_id);
+
+        // Waveform
+        mWaveformMenu = (FrameLayout) mView.findViewById(R.id.waveform_menu_id);
         mRecordWave = (SeekBarWaveformView) mView.findViewById(R.id.record_waveform_id);
         mRecordTimeline = (AudioTimelineView) mView.findViewById(R.id.record_timeline_id);
-        mPlayCurrentButton = (FrameLayout) mView.findViewById(R.id.play_first_fl_id);
-        mPlayNextButton = (FrameLayout) mView.findViewById(R.id.play_second_fl_id);
+        mProgressBar = (ProgressBar) mView.findViewById(R.id.progress_bar_id);
+
+        // Play
+        mPlayMenu = (LinearLayout) mView.findViewById(R.id.play_menu_ll_id);
+        mPlayCurrentButton = (ImageButton) mView.findViewById(R.id.play_current_button_id);
+        mPlayNextButton = (ImageButton) mView.findViewById(R.id.play_next_button_id);
 
         mRecordButton.setOnTouchListener(this);
         mPlayCurrentButton.setOnClickListener(this);
@@ -230,7 +254,10 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mRecordTimeline.setProgressRight(speakItem.getAudioRightMark());
 
         // Reload waveform
-        mAudioCtrl.generateWaveform(speakItem);
+        if (mAudioCtrl.generateWaveform(speakItem)) {
+            mPlayMenu.setVisibility(View.VISIBLE);
+            mWaveformMenu.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setNotification() {
@@ -238,6 +265,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStartError);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStopped);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordProgressChanged);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordCompleted);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioStartCompleted);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidReset);
@@ -249,6 +277,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStartError);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStopped);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordProgressChanged);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordCompleted);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioStartCompleted);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidReset);
@@ -259,16 +288,17 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.play_first_fl_id:
+            case R.id.play_current_button_id:
                 playCurrent();
                 break;
-            case R.id.play_second_fl_id:
+            case R.id.play_next_button_id:
                 playNext();
                 break;
             default:
                 break;
         }
     }
+
 
     private void playCurrent() {
         if (!mCurrentPlaying) {
@@ -327,7 +357,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (v.getId() == R.id.record_fl_id) {
+                if (v.getId() == R.id.record_ll_id) {
                     mViewPager.requestDisallowInterceptTouchEvent(true);
                     mScrollView.requestDisallowInterceptTouchEvent(true);
                     Dexter.withActivity(getActivity())
@@ -359,7 +389,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (v.getId() == R.id.record_fl_id) {
+                if (v.getId() == R.id.record_ll_id) {
                     mViewPager.requestDisallowInterceptTouchEvent(false);
                     mScrollView.requestDisallowInterceptTouchEvent(false);
                     if (mRecordPermission) {
@@ -371,7 +401,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (v.getId() == R.id.record_fl_id) {
+                if (v.getId() == R.id.record_ll_id) {
                     mViewPager.requestDisallowInterceptTouchEvent(true);
                     mScrollView.requestDisallowInterceptTouchEvent(true);
                     float x = event.getX();
@@ -424,17 +454,15 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private void setRecordView() {
         if (mRecording) {
-            mView.findViewById(R.id.play_ll_id).setVisibility(View.GONE);
-            mView.findViewById(R.id.record_normal_fl_id).setVisibility(View.GONE);
-            mView.findViewById(R.id.record_press_fl_id).setVisibility(View.VISIBLE);
+            mRecordButton.setPressed(true);
+            mPlayMenu.setVisibility(View.GONE);
             mTimerText.setText("00:00.00");
             mSlideCancel.setVisibility(View.VISIBLE);
             mTimerText.setVisibility(View.VISIBLE);
             mRecordButton.setTranslationX(0);
             Utils.scaleView(mRecordButton, 1.3f, 1.3f);
         } else {
-            mView.findViewById(R.id.record_normal_fl_id).setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.record_press_fl_id).setVisibility(View.GONE);
+            mRecordButton.setPressed(false);
             mSlideCancel.setAlpha(1.0f);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mSlideCancel.getLayoutParams();
             params.leftMargin = AndroidUtilities.dp(100);
@@ -448,18 +476,14 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private void setPlayView() {
         if (mCurrentPlaying) {
-            mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.GONE);
+            mPlayCurrentButton.setSelected(true);
         } else {
-            mView.findViewById(R.id.play_first_press_fl_id).setVisibility(View.GONE);
-            mView.findViewById(R.id.play_first_normal_fl_id).setVisibility(View.VISIBLE);
+            mPlayCurrentButton.setSelected(false);
         }
         if (mNextPlaying) {
-            mView.findViewById(R.id.play_second_press_fl_id).setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.play_second_normal_fl_id).setVisibility(View.GONE);
+            mPlayNextButton.setSelected(true);
         } else {
-            mView.findViewById(R.id.play_second_press_fl_id).setVisibility(View.GONE);
-            mView.findViewById(R.id.play_second_normal_fl_id).setVisibility(View.VISIBLE);
+            mPlayNextButton.setSelected(false);
         }
         mTimerText.setText("00:00");
         mTimerText.setVisibility(View.VISIBLE);
@@ -472,9 +496,11 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             if (id == NotificationCenter.recordProgressChanged) {
                 onRecordProgressChanged((Long) args[1]);
             } else if (id == NotificationCenter.recordStartError || id == NotificationCenter.recordStopped) {
-                onRecordProgressStopped();
+                onRecordStopped();
             } else if (id == NotificationCenter.recordStarted) {
                 onRecordStarted();
+            } else if (id == NotificationCenter.recordCompleted) {
+                onRecordCompleted();
             } else if (id == NotificationCenter.audioDidSent) {
                 onAudioDidSent((SpeakItem) args[1]);
             } else if (id == NotificationCenter.audioDidReset) {
@@ -535,8 +561,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
         mRecordWave.setWaveform(mSpeakItem.getAudioWaveform());
         mRecordWave.setVisibility(View.VISIBLE);
-        mView.findViewById(R.id.play_ll_id).setVisibility(View.VISIBLE);
-        mView.findViewById(R.id.waveform_menu_id).setVisibility(View.VISIBLE);
+        mRecordTimeline.setVisibility(View.VISIBLE);
     }
 
     private void onRecordStarted() {
@@ -550,8 +575,17 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mTimerText.setText(String.format("%02d:%02d.%02d", time / 60, time % 60, ms));
     }
 
-    private void onRecordProgressStopped() {
+    private void onRecordStopped() {
         mTimerText.setText("00:00.00");
+        if (mSpeakItem.getAudioWaveform().length > 0) {
+            mPlayMenu.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void onRecordCompleted() {
+        mTimerText.setText("00:00.00");
+        mWaveformMenu.setVisibility(View.VISIBLE);
+        mPlayMenu.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -586,4 +620,49 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mRecordWave.setRightProgress(mSpeakItem.getAudioRightMark());
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+            case R.id.photo_img_id:
+                showChoosePhotoDialog();
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    private void showChoosePhotoDialog() {
+        CharSequence options[] = new CharSequence[]{"Gallery", "Cancel"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Pickup Photo");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    Dexter.withActivity(getActivity())
+                            .withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).withListener(new BaseMultiplePermissionsListener() {
+                        @Override
+                        public void onPermissionsChecked(MultiplePermissionsReport report) {
+                            super.onPermissionsChecked(report);
+                            if (report.areAllPermissionsGranted()) {
+                                Intent intent = new Intent(getActivity(), GalleryActivity.class);
+                                intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GalleryType.PICK_GALLERY_PHOTO);
+                                startActivityForResult(intent, GalleryActivity.SELECT_PHOTO_REQUEST_CODE);
+                            }
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                            super.onPermissionRationaleShouldBeShown(permissions, token);
+                        }
+                    }).check();
+                } else {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
 }

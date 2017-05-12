@@ -72,9 +72,15 @@ public class SpeakItemDetailActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
         } else if (item.getItemId() == R.id.action_more) {
+            onSpeakItemDetailDialog();
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void onSpeakItemDetailDialog() {
+        SpeakItemDetailDialogFragment speakItemDialogFragment = new SpeakItemDetailDialogFragment();
+        speakItemDialogFragment.show(getSupportFragmentManager(), speakItemDialogFragment.getTag());
     }
 
 

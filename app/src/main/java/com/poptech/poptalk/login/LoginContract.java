@@ -11,7 +11,7 @@ import com.poptech.poptalk.bean.Credentials;
 public class LoginContract {
 
     interface View extends BaseView<Presenter> {
-        void showErrorPassword(String error);
+        void showErrorEmail(String error);
 
         void showErrorUsername(String error);
 
@@ -21,7 +21,7 @@ public class LoginContract {
     }
 
     interface Presenter extends BasePresenter {
-        void login(String userName, String password);
+        void login(String userName, String email);
 
         void updateCredentials(Credentials credentials);
     }

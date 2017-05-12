@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#d32f2f" />
 
-    <solid android:color="#d32f2f" />
-
-    <size
-        android:width="50dp"
-        android:height="50dp" />
-    <stroke
-        android:width="0.5dp"
-        android:color="@color/transparent" />
-</shape>
+            <size
+                android:width="45dp"
+                android:height="45dp" />
+            <stroke
+                android:width="0.5dp"
+                android:color="@color/transparent" />
+        </shape>
+    </item>
+    <item
+        android:bottom="10dp"
+        android:drawable="@drawable/ic_mic_on"
+        android:left="10dp"
+        android:right="10dp"
+        android:top="10dp" />
+</layer-list>

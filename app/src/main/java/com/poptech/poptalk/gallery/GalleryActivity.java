@@ -41,9 +41,8 @@ import java.util.Random;
 
 public class GalleryActivity extends AppCompatActivity {
     public enum GalleryType {
-        PICK_PROFILE_PICTURE,
-        PICK_ADDED_SPEAK_ITEM,
-        PICK_EDITED_SPEAK_ITEM
+        PICK_GALLERY_PHOTO,
+        ADD_SPEAK_ITEM
     }
 
     private static final String TAG = "GalleryActivity";
@@ -168,27 +167,27 @@ public class GalleryActivity extends AppCompatActivity {
 
     private void handleActivityResult(String photoPath) {
         switch (mGalleryType) {
-            case PICK_PROFILE_PICTURE:
-                onProfilePicture(photoPath);
+            case PICK_GALLERY_PHOTO:
+                onPickGalleryPhoto(photoPath);
                 break;
-            case PICK_ADDED_SPEAK_ITEM:
-                onSpeakItemDetailScreen(photoPath);
+            case ADD_SPEAK_ITEM:
+                onAddSpeakItem(photoPath);
                 break;
         }
     }
 
-    public void onProfilePicture(String photoPath) {
+    public void onPickGalleryPhoto(String photoPath) {
         Intent intent = new Intent();
         intent.putExtra(Constants.KEY_PHOTO_GALLERY_RESULT, photoPath);
         setResult(Activity.RESULT_OK, intent);
     }
 
-    public void onSpeakItemDetailScreen(String photoPath) {
+    public void onAddSpeakItem(String photoPath) {
         long COLLECTION_ID = -1;
         long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
         Collection collection = new Collection();
         collection.setThumbPath(photoPath);
-        collection.setDescription("Unknown");
+        collection.setDescription("None");
         collection.setId(COLLECTION_ID);
         if (!mCollectionModel.isCollectionExisted(collection.getId())) {
             mCollectionModel.addNewCollection(collection);
