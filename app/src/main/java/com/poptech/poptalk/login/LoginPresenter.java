@@ -1,10 +1,12 @@
 package com.poptech.poptalk.login;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Patterns;
 
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Credentials;
+import com.poptech.poptalk.utils.StringUtils;
 
 import javax.inject.Inject;
 
@@ -49,7 +51,29 @@ public class LoginPresenter implements LoginContract.Presenter {
     @Override
     public void updateCredentials(Credentials credentials) {
         if (mModel.isCredentialsExisted()) {
-            mModel.updateCredentials(credentials);
+            Credentials existedCredentials = mModel.getCredentials();
+            // User existed
+            if (!StringUtils.isNullOrEmpty(credentials.getEmail()) &&
+                    existedCredentials.getEmail().equalsIgnoreCase(credentials.getEmail())) {
+                if (!StringUtils.isNullOrEmpty(credentials.getName())) {
+                    existedCredentials.setName(credentials.getName());
+                }
+                if (!StringUtils.isNullOrEmpty(credentials.getEmail())) {
+                    existedCredentials.setEmail(credentials.getEmail());
+                }
+                if (!StringUtils.isNullOrEmpty(credentials.getPhone())) {
+                    existedCredentials.setPhone(credentials.getPhone());
+                }
+                if (!StringUtils.isNullOrEmpty(credentials.getPassword())) {
+                    existedCredentials.setPassword(credentials.getPassword());
+                }
+                if (!StringUtils.isNullOrEmpty(credentials.getProfilePicture())) {
+                    existedCredentials.setProfilePicture(credentials.getProfilePicture());
+                }
+                mModel.updateCredentials(existedCredentials);
+            } else {
+                mModel.updateCredentials(credentials);
+            }
         } else {
             mModel.addNewCredentials(credentials);
         }

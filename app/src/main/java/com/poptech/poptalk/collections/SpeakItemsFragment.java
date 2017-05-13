@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
 
 import java.util.ArrayList;
@@ -131,7 +133,11 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
                 super.onPermissionGranted(response);
-                mPresenter.loadSpeakItems(mCollectionId);
+                if (mSortType == GroupSpeakItemSortType.NONE) {
+                    mPresenter.loadSpeakItems(mCollectionId);
+                } else {
+                    mPresenter.loadAllSpeakItems();
+                }
             }
 
             @Override
@@ -166,53 +172,30 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     }
 
     @Override
-    public void onSpeakItemsLoaded(List<SpeakItem> speakItems) {
-        if (mSortType == GroupSpeakItemSortType.NONE) {
-            mSpeakItemAdapter = new SpeakItemsAdapter(speakItems, getActivity());
-            RecyclerView.LayoutManager layoutManager = getLayoutManager();
-            mSpeakItemsView.setLayoutManager(layoutManager);
-            mSpeakItemsView.setAdapter(mSpeakItemAdapter);
-        } else {
+    public void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections) {
+        // TODO: Sort collection here
+        for (Collection collection : collections) {
             mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
-            List<SpeakItem> speakItemSection1 = new ArrayList<>();
-            speakItemSection1.add(speakItems.get(0));
-            speakItemSection1.add(speakItems.get(1));
-            speakItemSection1.add(speakItems.get(2));
-            speakItemSection1.add(speakItems.get(3));
-            speakItemSection1.add(speakItems.get(4));
-            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Vietnam"));
-
-            speakItemSection1 = new ArrayList<>();
-            speakItemSection1.add(speakItems.get(5));
-            speakItemSection1.add(speakItems.get(6));
-            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "England"));
-
-            speakItemSection1 = new ArrayList<>();
-            speakItemSection1.add(speakItems.get(7));
-            speakItemSection1.add(speakItems.get(8));
-            speakItemSection1.add(speakItems.get(9));
-            speakItemSection1.add(speakItems.get(10));
-            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Japan"));
-
-            speakItemSection1 = new ArrayList<>();
-            speakItemSection1.add(speakItems.get(11));
-            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "Germany"));
-
-            speakItemSection1 = new ArrayList<>();
-            speakItemSection1.add(speakItems.get(12));
-            speakItemSection1.add(speakItems.get(13));
-            speakItemSection1.add(speakItems.get(14));
-            speakItemSection1.add(speakItems.get(15));
-            speakItemSection1.add(speakItems.get(16));
-            speakItemSection1.add(speakItems.get(17));
-            speakItemSection1.add(speakItems.get(18));
-            speakItemSection1.add(speakItems.get(19));
-            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection1, "USA"));
-
-            RecyclerView.LayoutManager layoutManager = getLayoutManager();
-            mSpeakItemsView.setLayoutManager(layoutManager);
-            mSpeakItemsView.setAdapter(mSectionedSpeakItemAdapter);
+            List<SpeakItem> speakItemSection = new ArrayList<>();
+            for (SpeakItem speakItem : speakItems) {
+                if (speakItem.getCollectionId() == collection.getId()) {
+                    speakItemSection.add(speakItem);
+                }
+            }
+            // TODO: Sort speak items here
+            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
         }
+        RecyclerView.LayoutManager layoutManager = getLayoutManager();
+        mSpeakItemsView.setLayoutManager(layoutManager);
+        mSpeakItemsView.setAdapter(mSectionedSpeakItemAdapter);
+    }
+
+    @Override
+    public void onSpeakItemsLoaded(List<SpeakItem> speakItems) {
+        mSpeakItemAdapter = new SpeakItemsAdapter(speakItems, getActivity());
+        RecyclerView.LayoutManager layoutManager = getLayoutManager();
+        mSpeakItemsView.setLayoutManager(layoutManager);
+        mSpeakItemsView.setAdapter(mSpeakItemAdapter);
     }
 
 

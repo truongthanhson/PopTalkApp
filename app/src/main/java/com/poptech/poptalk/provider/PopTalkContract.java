@@ -52,6 +52,8 @@ public class PopTalkContract {
         String SPEAK_ITEM_PHOTO_PATH = "photo_path";
         String SPEAK_ITEM_PHOTO_DESCRIPTION = "photo_description";
         String SPEAK_ITEM_PHOTO_LOCATION = "photo_location";
+        String SPEAK_ITEM_PHOTO_LATITUDE = "photo_latitude";
+        String SPEAK_ITEM_PHOTO_LONGITUDE = "photo_longitude";
         String SPEAK_ITEM_PHOTO_DATETIME = "photo_datetime";
         String COLLECTION_ID = "collection_id";
     }

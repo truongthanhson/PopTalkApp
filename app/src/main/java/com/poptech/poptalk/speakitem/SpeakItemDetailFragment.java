@@ -37,7 +37,6 @@ import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
-import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
@@ -577,7 +576,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private void onRecordStopped() {
         mTimerText.setText("00:00.00");
-        if (mSpeakItem.getAudioWaveform().length > 0) {
+        if (mSpeakItem.getAudioWaveform() != null && mSpeakItem.getAudioWaveform().length > 0) {
             mPlayMenu.setVisibility(View.VISIBLE);
         }
     }
@@ -648,8 +647,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                             super.onPermissionsChecked(report);
                             if (report.areAllPermissionsGranted()) {
                                 Intent intent = new Intent(getActivity(), GalleryActivity.class);
-                                intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GalleryType.PICK_GALLERY_PHOTO);
-                                startActivityForResult(intent, GalleryActivity.SELECT_PHOTO_REQUEST_CODE);
+                                intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GALLERY_RESULT_PICK_PHOTO);
+                                startActivityForResult(intent, GalleryActivity.GALLERY_REQUEST_CODE);
                             }
                         }
 

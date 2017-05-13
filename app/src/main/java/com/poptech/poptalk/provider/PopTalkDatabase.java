@@ -48,6 +48,8 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_PATH + " TEXT,"
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_DESCRIPTION + " TEXT, "
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_LOCATION + " TEXT, "
+            + SpeakItemColumns.SPEAK_ITEM_PHOTO_LATITUDE + " TEXT, "
+            + SpeakItemColumns.SPEAK_ITEM_PHOTO_LONGITUDE + " TEXT, "
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_DATETIME + " TEXT, "
             + SpeakItemColumns.COLLECTION_ID + " INTEGER)";
 

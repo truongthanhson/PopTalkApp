@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import com.poptech.poptalk.utils.AnimationUtils;
 import com.poptech.poptalk.utils.SaveData;
 
 import org.json.JSONObject;
+
+import java.util.Arrays;
 
 /**
  * Created by sontt on 04/03/2017.
@@ -60,11 +63,12 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_login_layout, container, false);
         mUserName = (TextView) mView.findViewById(R.id.user_name_id);
-        mEmail = (EditText) mView.findViewById(R.id.email_id);
+        mEmail = (EditText) mView.findViewById(R.id.user_email_id);
         mLoginButton = (Button) mView.findViewById(R.id.login_button_id);
         mLoginButton.setOnClickListener(this);
         mCallbackManager = CallbackManager.Factory.create();
         mFacebookLogin = (LoginButton) mView.findViewById(R.id.facebook_login_id);
+        mFacebookLogin.setReadPermissions(Arrays.asList("email"));
         mFacebookLogin.registerCallback(mCallbackManager, this);
         mFacebookLogin.setFragment(this);
         return mView;
@@ -104,7 +108,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Override
     public void onLoginSuccessful() {
         Credentials credentials = new Credentials();
-        credentials.setPassword(mEmail.getText().toString());
+        credentials.setEmail(mEmail.getText().toString());
         credentials.setName(mUserName.getText().toString());
         mPresenter.updateCredentials(credentials);
         onOpenCollectionActivity();

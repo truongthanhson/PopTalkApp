@@ -1,7 +1,4 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,88 +13,69 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@android:color/transparent"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="80dp">
+        android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/login_card_id"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:duplicateParentState="true"
-            card_view:cardBackgroundColor="@color/login_base_background"
-            card_view:cardCornerRadius="4dp"
-            card_view:cardElevation="2dp"
-            card_view:cardPreventCornerOverlap="true"
-            card_view:cardUseCompatPadding="true">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="80dp"
+            android:background="@android:color/transparent">
 
-            <LinearLayout
+            <ImageView
+                android:id="@+id/logo_photo_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="40dp"
+                android:src="@mipmap/ic_launcher" />
+
+            <EditText
+                android:id="@+id/user_name_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:orientation="vertical"
-                android:paddingBottom="20dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="30dp">
+                android:layout_below="@+id/logo_photo_id"
+                android:layout_marginBottom="20dp"
+                android:background="@color/white"
+                android:hint="Username"
+                android:inputType="textVisiblePassword|textNoSuggestions"
+                android:padding="10dp"
+                android:textSize="16sp" />
 
-                <RelativeLayout
-                    android:id="@+id/login_username_ll_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp">
 
-                    <EditText
-                        android:id="@+id/user_name_id"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:background="@color/white"
-                        android:hint="Username"
-                        android:inputType="textVisiblePassword|textNoSuggestions"
-                        android:padding="10dp"
-                        android:textSize="16sp" />
-                </RelativeLayout>
+            <EditText
+                android:id="@+id/user_email_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/user_name_id"
+                android:layout_marginBottom="40dp"
+                android:background="@color/white"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:padding="10dp"
+                android:textSize="16sp" />
 
-                <RelativeLayout
-                    android:id="@+id/login_email_ll_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp">
+            <Button
+                android:id="@+id/login_button_id"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/user_email_id"
+                android:layout_centerHorizontal="true"
+                android:paddingLeft="50dp"
+                android:paddingRight="50dp"
+                android:text="Log In"
+                android:textSize="16sp" />
 
-                    <EditText
-                        android:id="@+id/email_id"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:background="@color/white"
-                        android:hint="Email"
-                        android:inputType="textEmailAddress"
-                        android:padding="10dp"
-                        android:textSize="16sp" />
-                </RelativeLayout>
-
-                <Button
-                    android:id="@+id/login_button_id"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="80dp"
-                    android:gravity="center"
-                    android:text="Log In"
-                    android:textSize="16sp" />
-
-                <com.facebook.login.widget.LoginButton
-                    android:id="@+id/facebook_login_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="center" />
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/facebook_login_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center" />
+        </RelativeLayout>
     </LinearLayout>
 </ScrollView>

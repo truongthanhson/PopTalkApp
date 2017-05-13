@@ -2,6 +2,7 @@ package com.poptech.poptalk.collections;
 
 import com.poptech.poptalk.BasePresenter;
 import com.poptech.poptalk.BaseView;
+import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
 
 import java.util.List;
@@ -11,11 +12,15 @@ import java.util.List;
  */
 
 public interface SpeakItemsContract {
-    interface View extends BaseView<Presenter>{
-      void  onSpeakItemsLoaded(List<SpeakItem> speakItems);
+    interface View extends BaseView<Presenter> {
+        void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections);
+
+        void onSpeakItemsLoaded(List<SpeakItem> speakItems);
     }
 
-    interface Presenter extends BasePresenter{
-       void loadSpeakItems(long collectionId);
+    interface Presenter extends BasePresenter {
+        void loadAllSpeakItems();
+
+        void loadSpeakItems(long collectionId);
     }
 }

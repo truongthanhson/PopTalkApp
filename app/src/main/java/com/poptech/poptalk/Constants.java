@@ -27,7 +27,13 @@ public class Constants {
 
     public static final String KEY_PHOTO_GALLERY = "key_photo_gallery";
 
-    public static final String KEY_PHOTO_GALLERY_RESULT = "key_photo_gallery_result";
+    public static final String KEY_GALLERY_PATH = "key_photo_gallery_path";
+
+    public static final String KEY_GALLERY_LATITUDE = "key_photo_gallery_latitude";
+
+    public static final String KEY_GALLERY_LONGITUDE = "key_photo_gallery_longitude";
+
+    public static final String KEY_GALLERY_DATETIME = "key_photo_gallery_datetime";
 
     public static final String KEY_SPEAK_ITEM_ID = "key_speak_item_id";
 

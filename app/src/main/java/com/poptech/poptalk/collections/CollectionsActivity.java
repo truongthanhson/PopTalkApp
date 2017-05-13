@@ -1,7 +1,6 @@
 package com.poptech.poptalk.collections;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -25,25 +25,32 @@ import com.facebook.login.LoginManager;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
+import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
-import com.poptech.poptalk.LauncherActivity;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.Credentials;
+import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.drawer.DrawerMenuAdapter;
 import com.poptech.poptalk.drawer.DrawerMenuDataFactory;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.login.LoginActivity;
 import com.poptech.poptalk.login.LoginModel;
+import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
+import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 import com.poptech.poptalk.utils.SaveData;
 
 import java.util.List;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -67,6 +74,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     private ImageButton mLogoutButton;
 
     private LoginModel mLoginModel;
+    private SpeakItemModel mSpeakItemModel;
+    private CollectionsModel mCollectionModel;
 
 
     @Override
@@ -106,11 +115,56 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         mLogoutButton = (ImageButton) findViewById(R.id.logout_button_id);
         mLogoutButton.setOnClickListener(this);
 
-        mLoginModel = new LoginModel(new PopTalkDatabase(PopTalkApplication.applicationContext));
-
-        onLoadUserProfile();
+        PopTalkDatabase database = new PopTalkDatabase(PopTalkApplication.applicationContext);
+        mSpeakItemModel = new SpeakItemModel(database);
+        mCollectionModel = new CollectionsModel(database);
+        mLoginModel = new LoginModel(database);
 
         onNavigateToViewCollection();
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.INTERNET).withListener(new BasePermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse response) {
+                super.onPermissionGranted(response);
+                onLoadUserProfile();
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionDeniedResponse response) {
+                super.onPermissionDenied(response);
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                super.onPermissionRationaleShouldBeShown(permission, token);
+            }
+        }).check();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     private void setupNavigationBar() {
@@ -156,8 +210,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
                     intent.putExtra(
                             Constants.KEY_PHOTO_GALLERY,
-                            GalleryActivity.GalleryType.ADD_SPEAK_ITEM);
-                    startActivity(intent);
+                            GalleryActivity.GALLERY_RESULT_SPEAK_ITEM);
+                    startActivityForResult(intent, GalleryActivity.GALLERY_REQUEST_CODE);
                 }
             }
 
@@ -177,8 +231,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
-                    intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GalleryType.PICK_GALLERY_PHOTO);
-                    startActivityForResult(intent, GalleryActivity.SELECT_PHOTO_REQUEST_CODE);
+                    intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GALLERY_RESULT_PICK_PHOTO);
+                    startActivityForResult(intent, GalleryActivity.GALLERY_REQUEST_CODE);
                 }
             }
 
@@ -190,13 +244,19 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GalleryActivity.SELECT_PHOTO_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                String path = data.getExtras().getString(Constants.KEY_PHOTO_GALLERY_RESULT);
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == GalleryActivity.GALLERY_REQUEST_CODE) {
+            if (resultCode == GalleryActivity.GALLERY_RESULT_PICK_PHOTO) {
+                String path = intent.getExtras().getString(Constants.KEY_GALLERY_PATH);
                 updateUserProfile(path);
                 setUserProfilePicture(path);
+            } else if (resultCode == GalleryActivity.GALLERY_RESULT_SPEAK_ITEM) {
+                String path = intent.getExtras().getString(Constants.KEY_GALLERY_PATH);
+                String date = intent.getExtras().getString(Constants.KEY_GALLERY_DATETIME);
+                float lat = intent.getExtras().getFloat(Constants.KEY_GALLERY_LATITUDE);
+                float lng = intent.getExtras().getFloat(Constants.KEY_GALLERY_LONGITUDE);
+                onAddSpeakItem(path, date, lat, lng);
             }
         }
     }
@@ -337,6 +397,33 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         startActivity(intent);
     }
 
+
+    public void onAddSpeakItem(String path, String date, float lat, float lng) {
+        long COLLECTION_ID = -1;
+        long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
+        Collection collection = new Collection();
+        collection.setThumbPath(path);
+        collection.setDescription("None");
+        collection.setId(COLLECTION_ID);
+        if (!mCollectionModel.isCollectionExisted(collection.getId())) {
+            mCollectionModel.addNewCollection(collection);
+        }
+
+        SpeakItem speakItem = new SpeakItem();
+        speakItem.setId(SPEAK_ITEM_ID);
+        speakItem.setPhotoPath(path);
+        speakItem.setLatitude(lat);
+        speakItem.setLongitude(lng);
+        speakItem.setDateTime(date);
+        speakItem.setCollectionId(collection.getId());
+        mSpeakItemModel.addNewSpeakItem(speakItem);
+
+        Intent intent = new Intent(this, SpeakItemDetailActivity.class);
+        intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, speakItem.getId());
+        intent.putExtra(Constants.KEY_COLLECTION_ID, speakItem.getCollectionId());
+        startActivity(intent);
+    }
+
     private void onLoadUserProfile() {
         Credentials credentials = mLoginModel.getCredentials();
         setUserProfilePicture(credentials.getProfilePicture());
@@ -355,7 +442,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 .centerCrop()
                 .dontAnimate()
                 .thumbnail(0.5f)
-                .placeholder(R.color.colorPrimary)
+                .placeholder(R.drawable.ic_profile)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mProfilePicture);
     }
@@ -363,7 +450,6 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     private void setUserName(String name) {
         mUserName.setText(name);
     }
-
 
     private void logoutUser() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();

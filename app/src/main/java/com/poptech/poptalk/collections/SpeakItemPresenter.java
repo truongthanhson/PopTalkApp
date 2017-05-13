@@ -1,6 +1,8 @@
 package com.poptech.poptalk.collections;
 
+import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.SpeakItemModel;
 
 import java.util.List;
@@ -13,12 +15,14 @@ import javax.inject.Inject;
 
 public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
 
-    private SpeakItemModel mModel;
+    private SpeakItemModel mSpeakItemModel;
+    private CollectionsModel mCollectionModel;
     private SpeakItemsContract.View mView;
 
     @Inject
-    public SpeakItemPresenter(SpeakItemModel mModel, SpeakItemsContract.View mView) {
-        this.mModel = mModel;
+    public SpeakItemPresenter(SpeakItemModel mSpeakItemModel, CollectionsModel mCollectionModel, SpeakItemsContract.View mView) {
+        this.mSpeakItemModel = mSpeakItemModel;
+        this.mCollectionModel = mCollectionModel;
         this.mView = mView;
     }
 
@@ -28,9 +32,16 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
     }
 
     @Override
+    public void loadAllSpeakItems() {
+        List<SpeakItem> speakItems = mSpeakItemModel.getSpeakItems();
+        List<Collection> collections = mCollectionModel.getCollections();
+        mView.onAllSpeakItemsLoaded(speakItems, collections);
+    }
+
+    @Override
     public void loadSpeakItems(long collectionId) {
         //mModel.generateTestData();
-        List<SpeakItem> speakItems = mModel.getSpeakItems(collectionId);
+        List<SpeakItem> speakItems = mSpeakItemModel.getSpeakItems(collectionId);
         mView.onSpeakItemsLoaded(speakItems);
     }
 

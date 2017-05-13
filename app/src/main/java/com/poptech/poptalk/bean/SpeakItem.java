@@ -15,6 +15,8 @@ public class SpeakItem {
     private String photoPath;
     private String datetime;
     private String location;
+    private float latitude;
+    private float longitude;
     private long collectionId;
     private String audioPath;
     private int audioDuration;
@@ -78,6 +80,38 @@ public class SpeakItem {
 
     public String getLocation() {
         return location;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        try {
+            this.latitude = Float.valueOf(latitude);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        try {
+            this.longitude = Float.valueOf(longitude);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public float getLongitude() {
+        return longitude;
     }
 
     public long getCollectionId() {

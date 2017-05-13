@@ -62,7 +62,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
         public void onClick(View v) {
             String selectedPhoto = mPhotoList.get(getAdapterPosition());
             if(mContext instanceof GalleryActivity){
-                ((GalleryActivity)mContext).startActivityCrop(selectedPhoto);
+                ((GalleryActivity)mContext).parsePhoAttribute(selectedPhoto);
             }
         }
     }

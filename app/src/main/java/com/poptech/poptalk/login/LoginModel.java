@@ -86,7 +86,7 @@ public class LoginModel implements BaseModel {
             Cursor cursor = null;
             try {
                 SQLiteDatabase database = mDatabase.getWritableDatabase();
-                cursor = database.query(PopTalkContract.Tables.COLLECTIONS,
+                cursor = database.query(PopTalkContract.Tables.CREDENTIALS,
                         LoginModel.CredentialsQuery.projections,
                         null,
                         null,

@@ -36,6 +36,8 @@ public class SpeakItemModel implements BaseModel {
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LATITUDE,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LONGITUDE,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME,
                 PopTalkContract.SpeakItems.COLLECTION_ID
         };
@@ -46,8 +48,10 @@ public class SpeakItemModel implements BaseModel {
         int SPEAK_ITEM_PHOTO_PATH = 5;
         int SPEAK_ITEM_PHOTO_DESCRIPTION = 6;
         int SPEAK_ITEM_PHOTO_LOCATION = 7;
-        int SPEAK_ITEM_PHOTO_DATETIME = 8;
-        int SPEAK_ITEM_COLLECTION_ID = 9;
+        int SPEAK_ITEM_PHOTO_LATITUDE = 8;
+        int SPEAK_ITEM_PHOTO_LONGITUDE = 9;
+        int SPEAK_ITEM_PHOTO_DATETIME = 10;
+        int SPEAK_ITEM_COLLECTION_ID = 11;
     }
 
     public long addNewSpeakItem(SpeakItem speakItem) {
@@ -63,6 +67,8 @@ public class SpeakItemModel implements BaseModel {
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH, speakItem.getPhotoPath());
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION, speakItem.getDescription());
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION, speakItem.getLocation());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LATITUDE, speakItem.getLatitude());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LONGITUDE, speakItem.getLongitude());
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
             contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
 
@@ -91,6 +97,8 @@ public class SpeakItemModel implements BaseModel {
                         speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
                         speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
                         speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                        speakItem.setLatitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LATITUDE));
+                        speakItem.setLongitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LONGITUDE));
                         speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
                         speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
                         speakItems.add(speakItem);
@@ -130,6 +138,8 @@ public class SpeakItemModel implements BaseModel {
                             speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
                             speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
                             speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                            speakItem.setLatitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LATITUDE));
+                            speakItem.setLongitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LONGITUDE));
                             speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
                             speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
                         } while (cursor.moveToNext());
@@ -171,6 +181,8 @@ public class SpeakItemModel implements BaseModel {
                             speakItem.setPhotoPath(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
                             speakItem.setDescription(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION));
                             speakItem.setLocation(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LOCATION));
+                            speakItem.setLatitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LATITUDE));
+                            speakItem.setLongitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LONGITUDE));
                             speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
                             speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
                             speakItems.add(speakItem);
@@ -203,6 +215,8 @@ public class SpeakItemModel implements BaseModel {
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_PATH, speakItem.getPhotoPath());
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DESCRIPTION, speakItem.getDescription());
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LOCATION, speakItem.getLocation());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LATITUDE, speakItem.getLatitude());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LONGITUDE, speakItem.getLongitude());
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
                 contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
 
