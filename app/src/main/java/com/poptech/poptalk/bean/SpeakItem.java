@@ -1,6 +1,8 @@
 package com.poptech.poptalk.bean;
 
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.utils.StringUtils;
@@ -9,7 +11,7 @@ import com.poptech.poptalk.utils.StringUtils;
  * Created by sontt on 30/04/2017.
  */
 
-public class SpeakItem {
+public class SpeakItem implements Parcelable {
     private long id;
     private String description;
     private String photoPath;
@@ -214,4 +216,61 @@ public class SpeakItem {
     public float getAudioRightMark() {
         return audioRightMark;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.description);
+        dest.writeString(this.photoPath);
+        dest.writeString(this.datetime);
+        dest.writeString(this.location);
+        dest.writeFloat(this.latitude);
+        dest.writeFloat(this.longitude);
+        dest.writeLong(this.collectionId);
+        dest.writeString(this.audioPath);
+        dest.writeInt(this.audioDuration);
+        dest.writeFloat(this.audioProgress);
+        dest.writeInt(this.audioProgressSec);
+        dest.writeByteArray(this.audioWaveform);
+        dest.writeFloat(this.audioLeftMark);
+        dest.writeFloat(this.audioRightMark);
+        dest.writeFloat(this.audioMiddleMark);
+    }
+
+    protected SpeakItem(Parcel in) {
+        this.id = in.readLong();
+        this.description = in.readString();
+        this.photoPath = in.readString();
+        this.datetime = in.readString();
+        this.location = in.readString();
+        this.latitude = in.readFloat();
+        this.longitude = in.readFloat();
+        this.collectionId = in.readLong();
+        this.audioPath = in.readString();
+        this.audioDuration = in.readInt();
+        this.audioProgress = in.readFloat();
+        this.audioProgressSec = in.readInt();
+        this.audioWaveform = in.createByteArray();
+        this.audioLeftMark = in.readFloat();
+        this.audioRightMark = in.readFloat();
+        this.audioMiddleMark = in.readFloat();
+    }
+
+    public static final Parcelable.Creator<SpeakItem> CREATOR = new Parcelable.Creator<SpeakItem>() {
+        @Override
+        public SpeakItem createFromParcel(Parcel source) {
+            return new SpeakItem(source);
+        }
+
+        @Override
+        public SpeakItem[] newArray(int size) {
+            return new SpeakItem[size];
+        }
+    };
 }

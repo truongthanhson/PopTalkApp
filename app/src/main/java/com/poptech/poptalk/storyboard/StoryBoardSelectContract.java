@@ -10,13 +10,13 @@ import java.util.List;
  * Created by sontt on 09/05/2017.
  */
 
-public interface StoryBoardContract {
+public interface StoryBoardSelectContract {
 
     interface View extends BaseView<Presenter>{
-        void onGenerateData(List<SpeakItem> sortedList);
+        void onSpeakItemLoaded(List<SpeakItem> speakItems);
     }
 
     interface Presenter extends BasePresenter{
-        void loadData(int column, List<SpeakItem> speakItems);
+        void loadAllSpeakItems();
     }
 }

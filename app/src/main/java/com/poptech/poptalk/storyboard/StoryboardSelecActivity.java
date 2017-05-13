@@ -1,10 +1,13 @@
 package com.poptech.poptalk.storyboard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.poptech.poptalk.R;
@@ -12,15 +15,15 @@ import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sontt on 09/05/2017.
  */
 
-public class StoryboardActivity extends AppCompatActivity {
+public class StoryboardSelecActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolBar;
-    private ArrayList<SpeakItem> speakItems;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,29 +35,45 @@ public class StoryboardActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Story Board");
+        getSupportActionBar().setTitle("Story Board Select");
 
-        if(getIntent() != null){
-            speakItems = getIntent().getParcelableArrayListExtra("selected_speak_items");
-        }
-        showStoryBoard(speakItems);
+        showAllSpeakItems();
     }
 
-    private void showStoryBoard(ArrayList<SpeakItem> speakItems){
-        StoryBoardFragment storyBoardFragment = StoryBoardFragment.newInstance();
-        Bundle args = new Bundle();
-        args.putParcelableArrayList("selected_speak_items", speakItems);
-        storyBoardFragment.setArguments(args);
+    private void showAllSpeakItems(){
+        StoryBoardSelectFragment storyBoardFragment = StoryBoardSelectFragment.newInstance();
         ActivityUtils.addFragmentToActivity(
                 getSupportFragmentManager(), storyBoardFragment, R.id.contentFrame);
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_story_board_select, menu);
+        return true;
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+        if (item.getItemId() == R.id.action_build) {
+            buildStoryBoard();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void buildStoryBoard() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if(fragment == null)
+            return;
+        if(fragment instanceof StoryBoardSelectFragment){
+            ArrayList<SpeakItem> chosenSpeakItems = (((StoryBoardSelectFragment) fragment).getSelectedSpeakItems());
+
+            Intent intent = new Intent(this, StoryboardActivity.class);
+            intent.putParcelableArrayListExtra("selected_speak_items", chosenSpeakItems);
+
+            startActivity(intent);
+        }
+
     }
 
 }

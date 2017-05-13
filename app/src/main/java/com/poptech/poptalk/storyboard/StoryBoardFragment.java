@@ -23,6 +23,7 @@ import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.MetricUtils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -48,6 +49,8 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
 
     private StoryBoardAdapter mAdapter;
 
+    private ArrayList<SpeakItem> speakItems;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +59,8 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
                 .appComponent(((PopTalkApplication) PopTalkApplication.applicationContext).getAppComponent())
                 .storyBoardPresenterModule(new StoryBoardPresenterModule(this))
                 .build().inject(this);
+
+        speakItems = getArguments().getParcelableArrayList("selected_speak_items");
     }
 
     @Nullable
@@ -74,7 +79,7 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.loadData(STORY_COLUMN);
+        mPresenter.loadData(STORY_COLUMN, speakItems);
     }
 
     @Override

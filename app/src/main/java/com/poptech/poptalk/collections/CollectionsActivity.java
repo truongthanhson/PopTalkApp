@@ -45,7 +45,9 @@ import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
+import com.poptech.poptalk.storyboard.StoryBoardSelectFragment;
 import com.poptech.poptalk.storyboard.StoryboardActivity;
+import com.poptech.poptalk.storyboard.StoryboardSelecActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 import com.poptech.poptalk.utils.SaveData;
 
@@ -365,7 +367,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onNavigateStoryboardMap() {
-        Intent intent = new Intent(this, StoryboardActivity.class);
+        Intent intent = new Intent(this, StoryboardSelecActivity.class);
         startActivity(intent);
     }
 

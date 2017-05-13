@@ -15,19 +15,22 @@
         <activity
             android:name=".LauncherActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".login.LoginActivity" />
         <activity
             android:name=".collections.CollectionsActivity"
-            android:theme="@style/AppTheme.OverlapSystemBar" />
-        <activity android:name=".collections.CollectionDetailActivity" />
+            android:theme="@style/AppTheme.OverlapSystemBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            </activity>
+        <activity android:name=".collections.CollectionDetailActivity" >
+            </activity>
         <activity android:name=".gallery.GalleryActivity" />
         <activity android:name=".speakitem.SpeakItemDetailActivity" />
         <activity android:name=".storyboard.StoryboardActivity" />
+        <activity android:name=".storyboard.StoryboardSelecActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".storyboard.StoryboardSelecActivity">
+    <item
+        android:id="@+id/action_build"
+        android:orderInCategory="200"
+        android:title="Build"
+        android:visible="true"
+        app:showAsAction="always"></item>
+
+</menu>

@@ -34,8 +34,7 @@ public class StoryBoardPresenter implements StoryBoardContract.Presenter {
     }
 
     @Override
-    public void loadData(int column) {
-        List<SpeakItem> speakItems = mModel.getSpeakItems(4);
+    public void loadData(int column, List<SpeakItem> speakItems) {
         if(speakItems.size() <= column){
             mView.onGenerateData(speakItems);
             return;
