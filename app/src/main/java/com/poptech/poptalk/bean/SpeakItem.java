@@ -17,8 +17,8 @@ public class SpeakItem implements Parcelable {
     private String photoPath;
     private String datetime;
     private String location;
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
     private long collectionId;
     private String audioPath;
     private int audioDuration;
@@ -31,6 +31,15 @@ public class SpeakItem implements Parcelable {
 
 
     public SpeakItem() {
+        id = -1;
+        description = "";
+        photoPath = "";
+        datetime = "";
+        location = "";
+        latitude = 0;
+        longitude = 0;
+        collectionId = -1;
+        audioPath = "";
         setDefaultMark();
     }
 
@@ -84,35 +93,35 @@ public class SpeakItem implements Parcelable {
         return location;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
     public void setLatitude(String latitude) {
         try {
-            this.latitude = Float.valueOf(latitude);
+            this.latitude = Double.valueOf(latitude);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
     public void setLongitude(String longitude) {
         try {
-            this.longitude = Float.valueOf(longitude);
+            this.longitude = Double.valueOf(longitude);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
@@ -230,8 +239,8 @@ public class SpeakItem implements Parcelable {
         dest.writeString(this.photoPath);
         dest.writeString(this.datetime);
         dest.writeString(this.location);
-        dest.writeFloat(this.latitude);
-        dest.writeFloat(this.longitude);
+        dest.writeDouble(this.latitude);
+        dest.writeDouble(this.longitude);
         dest.writeLong(this.collectionId);
         dest.writeString(this.audioPath);
         dest.writeInt(this.audioDuration);

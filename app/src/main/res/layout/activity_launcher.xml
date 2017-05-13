@@ -5,10 +5,12 @@
     android:background="#f1f5f7">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -24,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="POWER OF PASSION \nTECHNOLOGY SOLUTIONS"
+            android:text="POWER OF PASSION TECHNOLOGY SOLUTIONS"
             android:textColor="#231f20"
             android:textSize="16sp" />
     </LinearLayout>

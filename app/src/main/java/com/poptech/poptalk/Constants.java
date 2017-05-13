@@ -29,9 +29,7 @@ public class Constants {
 
     public static final String KEY_GALLERY_PATH = "key_photo_gallery_path";
 
-    public static final String KEY_GALLERY_LATITUDE = "key_photo_gallery_latitude";
-
-    public static final String KEY_GALLERY_LONGITUDE = "key_photo_gallery_longitude";
+    public static final String KEY_GALLERY_LOCATION = "key_photo_gallery_latitude";
 
     public static final String KEY_GALLERY_DATETIME = "key_photo_gallery_datetime";
 
@@ -45,6 +43,16 @@ public class Constants {
 
     public static final int REQUEST_AVATAR_CAPTURE = 0;
 
+    public static final int REQUEST_LOCATION_ENABLE = 2;
+
+    public static final int REQUEST_GALLERY_CAPTURE = 1111;
+
+    public static final int GALLERY_RESULT_FAILED = 1112;
+
+    public static final int GALLERY_RESULT_PICK_PHOTO = 1113;
+
+    public static final int GALLERY_RESULT_SPEAK_ITEM = 1114;
+
     public static final String PATH_APP = "/PopTalk";
 
     public static final String PATH_PHOTO = "/photo";
@@ -55,6 +63,13 @@ public class Constants {
     public static final int GRID_COLUMN_COUNT = 3;
 
     public static final int SPLASH_DISPLAY_LENGTH = 1000;
+
+    // The minimum distance to change Updates in meters (10m)
+    public static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
+
+    // The minimum time between updates in milliseconds (10 seconds)
+    public static final long MIN_TIME_BW_UPDATES = 1000 * 10;
+
 
     public static boolean DEBUG_VERSION = false;
 

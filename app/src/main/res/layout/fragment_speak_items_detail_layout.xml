@@ -70,7 +70,7 @@
                 android:padding="5dp">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="5dp"
@@ -84,17 +84,21 @@
 
                     <TextView
                         android:id="@+id/photo_location_id"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+                        android:ellipsize="end"
                         android:inputType="text"
-                        android:text="Ho Chi Minh, Vietnam"
+                        android:maxLines="1"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:scrollHorizontally="true"
+                        android:text=""
                         android:textSize="15sp"
                         android:textStyle="normal" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="5dp"
@@ -107,11 +111,15 @@
 
                     <TextView
                         android:id="@+id/photo_datetime_id"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+                        android:ellipsize="end"
                         android:inputType="text"
-                        android:text="May 10, 2017"
+                        android:maxLines="1"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:scrollHorizontally="true"
+                        android:text=""
                         android:textSize="15sp"
                         android:textStyle="normal" />
                 </LinearLayout>

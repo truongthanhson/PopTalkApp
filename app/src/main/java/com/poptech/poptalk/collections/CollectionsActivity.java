@@ -2,6 +2,7 @@ package com.poptech.poptalk.collections;
 
 import android.Manifest;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,7 +14,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -210,10 +210,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
-                    intent.putExtra(
-                            Constants.KEY_PHOTO_GALLERY,
-                            GalleryActivity.GALLERY_RESULT_SPEAK_ITEM);
-                    startActivityForResult(intent, GalleryActivity.GALLERY_REQUEST_CODE);
+                    intent.putExtra(Constants.KEY_PHOTO_GALLERY, Constants.GALLERY_RESULT_SPEAK_ITEM);
+                    startActivityForResult(intent, Constants.REQUEST_GALLERY_CAPTURE);
                 }
             }
 
@@ -233,8 +231,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(CollectionsActivity.this, GalleryActivity.class);
-                    intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GALLERY_RESULT_PICK_PHOTO);
-                    startActivityForResult(intent, GalleryActivity.GALLERY_REQUEST_CODE);
+                    intent.putExtra(Constants.KEY_PHOTO_GALLERY, Constants.GALLERY_RESULT_PICK_PHOTO);
+                    startActivityForResult(intent, Constants.REQUEST_GALLERY_CAPTURE);
                 }
             }
 
@@ -248,17 +246,16 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == GalleryActivity.GALLERY_REQUEST_CODE) {
-            if (resultCode == GalleryActivity.GALLERY_RESULT_PICK_PHOTO) {
+        if (requestCode == Constants.REQUEST_GALLERY_CAPTURE) {
+            if (resultCode == Constants.GALLERY_RESULT_PICK_PHOTO) {
                 String path = intent.getExtras().getString(Constants.KEY_GALLERY_PATH);
                 updateUserProfile(path);
                 setUserProfilePicture(path);
-            } else if (resultCode == GalleryActivity.GALLERY_RESULT_SPEAK_ITEM) {
+            } else if (resultCode == Constants.GALLERY_RESULT_SPEAK_ITEM) {
                 String path = intent.getExtras().getString(Constants.KEY_GALLERY_PATH);
                 String date = intent.getExtras().getString(Constants.KEY_GALLERY_DATETIME);
-                float lat = intent.getExtras().getFloat(Constants.KEY_GALLERY_LATITUDE);
-                float lng = intent.getExtras().getFloat(Constants.KEY_GALLERY_LONGITUDE);
-                onAddSpeakItem(path, date, lat, lng);
+                Location location = intent.getExtras().getParcelable(Constants.KEY_GALLERY_LOCATION);
+                onAddSpeakItem(path, date, location);
             }
         }
     }
@@ -310,7 +307,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
         Bundle bundle = new Bundle();
         bundle.putSerializable(Constants.KEY_SPEAK_ITEM_VIEW_TYPE, SpeakItemsFragment.GroupSpeakItemViewType.GRID);
-        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.RECENT);
+        bundle.putSerializable(Constants.KEY_SPEAK_ITEM_SORT_TYPE, SpeakItemsFragment.GroupSpeakItemSortType.LOCATION);
         speakItemsFragment.setArguments(bundle);
 
         ActivityUtils.replaceFragmentToActivity(
@@ -400,7 +397,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    public void onAddSpeakItem(String path, String date, float lat, float lng) {
+    public void onAddSpeakItem(String path, String date, Location location) {
         long COLLECTION_ID = -1;
         long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
         Collection collection = new Collection();
@@ -414,8 +411,10 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         SpeakItem speakItem = new SpeakItem();
         speakItem.setId(SPEAK_ITEM_ID);
         speakItem.setPhotoPath(path);
-        speakItem.setLatitude(lat);
-        speakItem.setLongitude(lng);
+        if (location != null) {
+            speakItem.setLatitude(location.getLatitude());
+            speakItem.setLongitude(location.getLongitude());
+        }
         speakItem.setDateTime(date);
         speakItem.setCollectionId(collection.getId());
         mSpeakItemModel.addNewSpeakItem(speakItem);

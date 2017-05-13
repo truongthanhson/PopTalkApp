@@ -29,6 +29,7 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,8 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         NONE,
         DESCRIPTION,
         LANGUAGE,
-        RECENT
+        RECENT,
+        LOCATION
     }
 
     public enum GroupSpeakItemViewType {
@@ -173,17 +175,37 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections) {
-        // TODO: Sort collection here
-        for (Collection collection : collections) {
-            mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
-            List<SpeakItem> speakItemSection = new ArrayList<>();
+        if (mSortType == GroupSpeakItemSortType.LOCATION) {
+            List<String> locations = new ArrayList<>();
+            // get all locations
             for (SpeakItem speakItem : speakItems) {
-                if (speakItem.getCollectionId() == collection.getId()) {
-                    speakItemSection.add(speakItem);
+                if (!StringUtils.isContainIgnoreCase(speakItem.getLocation(), locations)) {
+                    locations.add(speakItem.getLocation().trim());
                 }
             }
-            // TODO: Sort speak items here
-            mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
+            for (String location : locations) {
+                mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
+                List<SpeakItem> speakItemSection = new ArrayList<>();
+                for (SpeakItem speakItem : speakItems) {
+                    if (location.equalsIgnoreCase(speakItem.getLocation().trim())) {
+                        speakItemSection.add(speakItem);
+                    }
+                }
+                mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, location));
+            }
+        } else {
+            // TODO: Sort collection here
+            for (Collection collection : collections) {
+                mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
+                List<SpeakItem> speakItemSection = new ArrayList<>();
+                for (SpeakItem speakItem : speakItems) {
+                    if (speakItem.getCollectionId() == collection.getId()) {
+                        speakItemSection.add(speakItem);
+                    }
+                }
+                // TODO: Sort speak items here
+                mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
+            }
         }
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         mSpeakItemsView.setLayoutManager(layoutManager);

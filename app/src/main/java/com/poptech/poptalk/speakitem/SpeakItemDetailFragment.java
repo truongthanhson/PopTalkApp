@@ -3,6 +3,7 @@ package com.poptech.poptalk.speakitem;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -38,9 +39,11 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.gallery.GalleryActivity;
+import com.poptech.poptalk.location.LocationTask;
 import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
 import com.poptech.poptalk.utils.AndroidUtilities;
+import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.view.AudioTimelineView;
 import com.poptech.poptalk.view.SeekBarWaveformView;
@@ -236,24 +239,54 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Override
     public void onSpeakItemLoaded(SpeakItem speakItem) {
         mSpeakItem = speakItem;
+        onReloadPhotoView();
+        onReloadPhotoAttribute();
+        onReloadAudioWave();
+    }
+
+    private void onReloadPhotoView() {
         Glide.with(getActivity())
-                .load(speakItem.getPhotoPath())
+                .load(mSpeakItem.getPhotoPath())
                 .centerCrop()
                 .thumbnail(0.5f)
                 .placeholder(R.color.colorAccent)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mPhotoView);
+    }
 
-        mPhotoLocation.setText(speakItem.getLocation());
-        mPhotoDateTime.setText(speakItem.getDateTime());
+    private void onReloadPhotoAttribute() {
+        mPhotoDateTime.setText(mSpeakItem.getDateTime());
+        mPhotoLocation.setText(mSpeakItem.getLocation());
+        if (mSpeakItem.getLatitude() != 0 || mSpeakItem.getLongitude() != 0) {
+            Location location = new Location("");
+            location.setLatitude(mSpeakItem.getLatitude());
+            location.setLongitude(mSpeakItem.getLongitude());
+            LocationTask task = new LocationTask(getActivity());
+            task.setListener(new LocationTask.onGetAddressTaskListener() {
+                @Override
+                public void onStart() {
+                }
 
+                @Override
+                public void onSuccess(String address) {
+                    if (!StringUtils.isNullOrEmpty(address)) {
+                        mSpeakItem.setLocation(address);
+                        mPhotoLocation.setText(address);
+                    }
+                }
+            });
+            task.execute(location);
+        }
+    }
+
+    private void onReloadAudioWave() {
         // Reload marks
-        mRecordTimeline.setProgressLeft(speakItem.getAudioLeftMark());
-        mRecordTimeline.setProgressMiddle(speakItem.getAudioMiddleMark());
-        mRecordTimeline.setProgressRight(speakItem.getAudioRightMark());
+        mRecordTimeline.setProgressLeft(mSpeakItem.getAudioLeftMark());
+        mRecordTimeline.setProgressMiddle(mSpeakItem.getAudioMiddleMark());
+        mRecordTimeline.setProgressRight(mSpeakItem.getAudioRightMark());
 
         // Reload waveform
-        if (mAudioCtrl.generateWaveform(speakItem)) {
+        if (mAudioCtrl.generateWaveform(mSpeakItem)) {
             mPlayMenu.setVisibility(View.VISIBLE);
             mWaveformMenu.setVisibility(View.VISIBLE);
         }
@@ -647,8 +680,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                             super.onPermissionsChecked(report);
                             if (report.areAllPermissionsGranted()) {
                                 Intent intent = new Intent(getActivity(), GalleryActivity.class);
-                                intent.putExtra(Constants.KEY_PHOTO_GALLERY, GalleryActivity.GALLERY_RESULT_PICK_PHOTO);
-                                startActivityForResult(intent, GalleryActivity.GALLERY_REQUEST_CODE);
+                                intent.putExtra(Constants.KEY_PHOTO_GALLERY, Constants.GALLERY_RESULT_PICK_PHOTO);
+                                startActivityForResult(intent, Constants.REQUEST_GALLERY_CAPTURE);
                             }
                         }
 
@@ -663,5 +696,24 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             }
         });
         builder.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == Constants.REQUEST_GALLERY_CAPTURE) {
+            if (resultCode == Constants.GALLERY_RESULT_PICK_PHOTO) {
+                String photoPath = intent.getExtras().getString(Constants.KEY_GALLERY_PATH);
+                String dateTime = intent.getExtras().getString(Constants.KEY_GALLERY_DATETIME);
+                Location location = intent.getExtras().getParcelable(Constants.KEY_GALLERY_LOCATION);
+                mSpeakItem.setPhotoPath(photoPath);
+                mSpeakItem.setDateTime(dateTime);
+                mSpeakItem.setLatitude(location.getLatitude());
+                mSpeakItem.setLongitude(location.getLongitude());
+                mSpeakItem.setLocation("");
+                onReloadPhotoView();
+                onReloadPhotoAttribute();
+            }
+        }
     }
 }
