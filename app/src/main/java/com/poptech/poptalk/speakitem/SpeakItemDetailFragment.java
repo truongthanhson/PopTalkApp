@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -40,8 +41,10 @@ import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.location.LocationTask;
+import com.poptech.poptalk.maps.MapActivity;
 import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
+import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.AndroidUtilities;
 import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
@@ -128,6 +131,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         // Photo
         mPhotoView = (ImageView) mView.findViewById(R.id.photo_img_id);
         mPhotoView.setOnLongClickListener(this);
+        mPhotoView.setOnClickListener(this);
+
         mPhotoEdit = (ImageButton) mView.findViewById(R.id.photo_edit_btn_id);
         mPhotoLocation = (TextView) mView.findViewById(R.id.photo_location_id);
         mPhotoDateTime = (TextView) mView.findViewById(R.id.photo_datetime_id);
@@ -326,9 +331,19 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             case R.id.play_next_button_id:
                 playNext();
                 break;
+            case R.id.photo_img_id:
+                showMap();
+                break;
             default:
                 break;
         }
+    }
+
+    private void showMap() {
+        Intent intent = new Intent(getActivity(), MapActivity.class);
+        intent.putExtra("lat", mSpeakItem.getLatitude());
+        intent.putExtra("long", mSpeakItem.getLongitude());
+        startActivity(intent);
     }
 
 

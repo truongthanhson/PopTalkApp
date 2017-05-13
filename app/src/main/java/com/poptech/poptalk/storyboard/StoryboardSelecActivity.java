@@ -55,7 +55,9 @@ public class StoryboardSelecActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_build) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }else if (item.getItemId() == R.id.action_build) {
             buildStoryBoard();
         }
         return super.onOptionsItemSelected(item);
