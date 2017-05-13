@@ -175,6 +175,8 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections) {
+        mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
+
         if (mSortType == GroupSpeakItemSortType.LOCATION) {
             List<String> locations = new ArrayList<>();
             // get all locations
@@ -184,7 +186,6 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                 }
             }
             for (String location : locations) {
-                mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
                 List<SpeakItem> speakItemSection = new ArrayList<>();
                 for (SpeakItem speakItem : speakItems) {
                     if (location.equalsIgnoreCase(speakItem.getLocation().trim())) {
@@ -207,6 +208,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                 mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
             }
         }
+
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         mSpeakItemsView.setLayoutManager(layoutManager);
         mSpeakItemsView.setAdapter(mSectionedSpeakItemAdapter);

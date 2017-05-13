@@ -258,8 +258,8 @@ public class SpeakItem implements Parcelable {
         this.photoPath = in.readString();
         this.datetime = in.readString();
         this.location = in.readString();
-        this.latitude = in.readFloat();
-        this.longitude = in.readFloat();
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
         this.collectionId = in.readLong();
         this.audioPath = in.readString();
         this.audioDuration = in.readInt();
