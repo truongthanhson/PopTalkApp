@@ -10,4 +10,5 @@ import dagger.Component;
 @Component(dependencies = {AppComponent.class}, modules = {SpeakItemDetailPresenterModule.class})
 public interface SpeakItemDetailComponent {
     void inject (SpeakItemDetailFragment speakItemsDetailFragment);
+    void inject (SpeakItemDetailDialogFragment speakItemsDetailFragment);
 }

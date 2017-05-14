@@ -39,6 +39,7 @@ public class SpeakItemModel implements BaseModel {
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LATITUDE,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LONGITUDE,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME,
+                PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LANGUAGE,
                 PopTalkContract.SpeakItems.COLLECTION_ID
         };
         int SPEAK_ITEM_ID = 1;
@@ -51,7 +52,8 @@ public class SpeakItemModel implements BaseModel {
         int SPEAK_ITEM_PHOTO_LATITUDE = 8;
         int SPEAK_ITEM_PHOTO_LONGITUDE = 9;
         int SPEAK_ITEM_PHOTO_DATETIME = 10;
-        int SPEAK_ITEM_COLLECTION_ID = 11;
+        int SPEAK_ITEM_PHOTO_LANGUAGE = 11;
+        int SPEAK_ITEM_COLLECTION_ID = 12;
     }
 
     public long addNewSpeakItem(SpeakItem speakItem) {
@@ -70,6 +72,7 @@ public class SpeakItemModel implements BaseModel {
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LATITUDE, speakItem.getLatitude());
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LONGITUDE, speakItem.getLongitude());
             contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
+            contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LANGUAGE, speakItem.getLanguage());
             contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
 
             ret = database.insert(PopTalkContract.Tables.SPEAK_ITEMS, null, contentValues);
@@ -100,6 +103,7 @@ public class SpeakItemModel implements BaseModel {
                         speakItem.setLatitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LATITUDE));
                         speakItem.setLongitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LONGITUDE));
                         speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                        speakItem.setLanguage(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LANGUAGE));
                         speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
                         speakItems.add(speakItem);
                     } while (cursor.moveToNext());
@@ -141,6 +145,7 @@ public class SpeakItemModel implements BaseModel {
                             speakItem.setLatitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LATITUDE));
                             speakItem.setLongitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LONGITUDE));
                             speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                            speakItem.setLanguage(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LANGUAGE));
                             speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
                         } while (cursor.moveToNext());
                     }
@@ -184,6 +189,7 @@ public class SpeakItemModel implements BaseModel {
                             speakItem.setLatitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LATITUDE));
                             speakItem.setLongitude(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LONGITUDE));
                             speakItem.setDateTime(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_DATETIME));
+                            speakItem.setLanguage(cursor.getString(SpeakItemQuery.SPEAK_ITEM_PHOTO_LANGUAGE));
                             speakItem.setCollectionId(cursor.getLong(SpeakItemQuery.SPEAK_ITEM_COLLECTION_ID));
                             speakItems.add(speakItem);
                         } while (cursor.moveToNext());
@@ -218,6 +224,7 @@ public class SpeakItemModel implements BaseModel {
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LATITUDE, speakItem.getLatitude());
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LONGITUDE, speakItem.getLongitude());
                 contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_DATETIME, speakItem.getDateTime());
+                contentValues.put(PopTalkContract.SpeakItems.SPEAK_ITEM_PHOTO_LANGUAGE, speakItem.getLanguage());
                 contentValues.put(PopTalkContract.SpeakItems.COLLECTION_ID, speakItem.getCollectionId());
 
                 ret = database.update(PopTalkContract.Tables.SPEAK_ITEMS,

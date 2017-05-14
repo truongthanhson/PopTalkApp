@@ -28,6 +28,7 @@ public class SpeakItem implements Parcelable {
     private float audioLeftMark;
     private float audioRightMark;
     private float audioMiddleMark;
+    private String language;
 
 
     public SpeakItem() {
@@ -40,6 +41,7 @@ public class SpeakItem implements Parcelable {
         longitude = 0;
         collectionId = -1;
         audioPath = "";
+        language = "";
         setDefaultMark();
     }
 
@@ -226,6 +228,13 @@ public class SpeakItem implements Parcelable {
         return audioRightMark;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
 
     @Override
     public int describeContents() {
@@ -250,6 +259,7 @@ public class SpeakItem implements Parcelable {
         dest.writeFloat(this.audioLeftMark);
         dest.writeFloat(this.audioRightMark);
         dest.writeFloat(this.audioMiddleMark);
+        dest.writeString(this.language);
     }
 
     protected SpeakItem(Parcel in) {
@@ -269,6 +279,7 @@ public class SpeakItem implements Parcelable {
         this.audioLeftMark = in.readFloat();
         this.audioRightMark = in.readFloat();
         this.audioMiddleMark = in.readFloat();
+        this.language = in.readString();
     }
 
     public static final Parcelable.Creator<SpeakItem> CREATOR = new Parcelable.Creator<SpeakItem>() {

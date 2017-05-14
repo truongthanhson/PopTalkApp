@@ -33,7 +33,11 @@ public class Constants {
 
     public static final String KEY_GALLERY_DATETIME = "key_photo_gallery_datetime";
 
+    public static final String KEY_SPEAK_ITEM = "key_speak_item";
+
     public static final String KEY_SPEAK_ITEM_ID = "key_speak_item_id";
+
+    public static final String KEY_COLLECTION = "key_collection";
 
     public static final String KEY_COLLECTION_ID = "key_collection_id";
 

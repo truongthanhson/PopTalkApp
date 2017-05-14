@@ -329,12 +329,7 @@ public class GalleryActivity extends AppCompatActivity implements LocationListen
                 runCamera();
             }
         });
-        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                runCamera();
-            }
-        });
+        alertDialog.setCancelable(false);
         alertDialog.show();
     }
 

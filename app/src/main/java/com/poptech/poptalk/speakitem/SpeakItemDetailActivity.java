@@ -8,8 +8,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
@@ -21,12 +23,13 @@ import com.poptech.poptalk.provider.SpeakItemModel;
 import java.util.List;
 
 
-public class SpeakItemDetailActivity extends AppCompatActivity {
+public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakItemDetailFragment.SpeakItemDetailFragmentCallback, SpeakItemDetailDialogFragment.SpeakItemDetailDialogFragmentCallback {
 
     SpeakItemModel mModel;
 
     private Toolbar mToolBar;
     private ViewPager mSpeakItemPager;
+    private SpeakItemsPagerAdapter mSpeakItemPagerAdapter;
     private int mPagerIndex;
     private long mCollectionId;
     private long mSpeakItemId;
@@ -58,7 +61,8 @@ public class SpeakItemDetailActivity extends AppCompatActivity {
         }
         //setup viewpager
         mSpeakItemPager = (ViewPager) findViewById(R.id.speak_item_pager_id);
-        mSpeakItemPager.setAdapter(new SpeakItemsPagerAdapter(getSupportFragmentManager(), mModel.getSpeakItems(mCollectionId)));
+        mSpeakItemPagerAdapter = new SpeakItemsPagerAdapter(getSupportFragmentManager(), mModel.getSpeakItems(mCollectionId));
+        mSpeakItemPager.setAdapter(mSpeakItemPagerAdapter);
         mSpeakItemPager.setCurrentItem(mPagerIndex);
     }
 
@@ -71,18 +75,9 @@ public class SpeakItemDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
-        } else if (item.getItemId() == R.id.action_more) {
-            onSpeakItemDetailDialog();
-
         }
         return super.onOptionsItemSelected(item);
     }
-
-    private void onSpeakItemDetailDialog() {
-        SpeakItemDetailDialogFragment speakItemDialogFragment = new SpeakItemDetailDialogFragment();
-        speakItemDialogFragment.show(getSupportFragmentManager(), speakItemDialogFragment.getTag());
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,7 +104,27 @@ public class SpeakItemDetailActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public void onClickSpeakItemDialog(SpeakItem speakItem) {
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.KEY_SPEAK_ITEM, speakItem);
+
+        SpeakItemDetailDialogFragment speakItemDialogFragment = new SpeakItemDetailDialogFragment();
+        speakItemDialogFragment.setArguments(args);
+        speakItemDialogFragment.show(getSupportFragmentManager(), speakItemDialogFragment.getTag());
+    }
+
+    @Override
+    public void onClickSpeakItemDialogDismiss(SpeakItem speakItem) {
+        int currentItem = mSpeakItemPager.getCurrentItem();
+        SpeakItemDetailFragment fragment = (SpeakItemDetailFragment) mSpeakItemPagerAdapter.getFragment(currentItem);
+        if (fragment != null) {
+            fragment.setSpeakItemFromDialog(speakItem);
+        }
+    }
+
     public static class SpeakItemsPagerAdapter extends FragmentStatePagerAdapter {
+        SparseArray<Fragment> mFragments = new SparseArray<>();
         private List<SpeakItem> mSpeakItems;
 
         public SpeakItemsPagerAdapter(FragmentManager fragmentManager, List<SpeakItem> speakItems) {
@@ -117,19 +132,33 @@ public class SpeakItemDetailActivity extends AppCompatActivity {
             this.mSpeakItems = speakItems;
         }
 
-        // Returns total number of pages
         @Override
         public int getCount() {
             return mSpeakItems.size();
         }
 
-        // Returns the fragment to display for that page
         @Override
         public Fragment getItem(int position) {
             return SpeakItemDetailFragment.newInstance(mSpeakItems.get(position).getId());
         }
 
-        // Returns the page title for the top indicator
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            mFragments.put(position, fragment);
+            return fragment;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            mFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+        public Fragment getFragment(int position) {
+            return mFragments.get(position);
+        }
+
         @Override
         public CharSequence getPageTitle(int position) {
             return "Page " + position;

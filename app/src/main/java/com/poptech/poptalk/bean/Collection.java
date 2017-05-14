@@ -1,16 +1,24 @@
 package com.poptech.poptalk.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by sontt on 28/04/2017.
  */
 
-public class Collection {
+public class Collection implements Parcelable {
     private long id;
     private String description;
     private String language;
     private String thumbPath;
+    private int numSpeakItem;
 
     public Collection() {
+        description = "";
+        language = "";
+        thumbPath = "";
+        numSpeakItem = 0;
     }
 
     public Collection(int id, String description, String language, String thumbPath) {
@@ -51,4 +59,47 @@ public class Collection {
     public void setThumbPath(String thumbPath) {
         this.thumbPath = thumbPath;
     }
+
+    public void setNumSpeakItem(int numSpeakItem) {
+        this.numSpeakItem = numSpeakItem;
+    }
+
+    public int getNumSpeakItem() {
+        return numSpeakItem;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.description);
+        dest.writeString(this.language);
+        dest.writeString(this.thumbPath);
+        dest.writeInt(this.numSpeakItem);
+    }
+
+    protected Collection(Parcel in) {
+        this.id = in.readLong();
+        this.description = in.readString();
+        this.language = in.readString();
+        this.thumbPath = in.readString();
+        this.numSpeakItem = in.readInt();
+    }
+
+    public static final Parcelable.Creator<Collection> CREATOR = new Parcelable.Creator<Collection>() {
+        @Override
+        public Collection createFromParcel(Parcel source) {
+            return new Collection(source);
+        }
+
+        @Override
+        public Collection[] newArray(int size) {
+            return new Collection[size];
+        }
+    };
 }

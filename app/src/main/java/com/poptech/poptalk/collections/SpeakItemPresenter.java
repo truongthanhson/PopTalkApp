@@ -46,6 +46,11 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
     }
 
     @Override
+    public void loadCollection(long collectionId) {
+        mView.onCollectionLoaded(mCollectionModel.getCollection(collectionId));
+    }
+
+    @Override
     public void start() {
         mView.setPresenter(this);
     }

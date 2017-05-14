@@ -1,6 +1,7 @@
 package com.poptech.poptalk.location;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -81,23 +82,25 @@ public class LocationTask extends AsyncTask<Location, Void, String> {
         if (addresses != null && addresses.size() > 0) {
             // Get the first address
             Address address = addresses.get(0);
-            StringBuilder result = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
+            List<String> stringList = new ArrayList<>();
 
-            /* if (address.getMaxAddressLineIndex() >= 0) {
-                result.append(address.getAddressLine(0));
-            }
-            if (!StringUtils.isNullOrEmpty(address.getAdminArea())) {
-                result.append(address.getAdminArea());
-            } */
             if (!StringUtils.isNullOrEmpty(address.getLocality())) {
-                result.append(address.getLocality());
+                stringList.add(address.getLocality());
+            } else if (!StringUtils.isNullOrEmpty(address.getAdminArea())) {
+                stringList.add(address.getAdminArea());
             }
             if (!StringUtils.isNullOrEmpty(address.getCountryName())) {
-                result.append(", " + address.getCountryName());
+                stringList.add(address.getCountryName());
             }
-
+            for (int i = 0; i < stringList.size(); i++) {
+                stringBuilder.append(stringList.get(i));
+                if (i < stringList.size() - 1) {
+                    stringBuilder.append(", ");
+                }
+            }
             // Return the text
-            return result.toString();
+            return stringBuilder.toString();
 
             // If there aren't any addresses, post a message
         } else {

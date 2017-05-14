@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,6 +134,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
                 super.onPermissionGranted(response);
+                mPresenter.loadCollection(mCollectionId);
                 if (mSortType == GroupSpeakItemSortType.NONE) {
                     mPresenter.loadSpeakItems(mCollectionId);
                 } else {
@@ -220,6 +220,13 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         mSpeakItemsView.setLayoutManager(layoutManager);
         mSpeakItemsView.setAdapter(mSpeakItemAdapter);
+    }
+
+    @Override
+    public void onCollectionLoaded(Collection collection) {
+        if (!StringUtils.isNullOrEmpty(collection.getDescription())) {
+            ((CollectionDetailActivity) getActivity()).getSupportActionBar().setTitle(collection.getDescription());
+        }
     }
 
 

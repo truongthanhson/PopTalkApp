@@ -31,6 +31,7 @@ import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Inflater;
 
@@ -150,7 +151,13 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
 
     @Override
     public void onCollectionsLoaded(List<Collection> collections) {
-        CollectionsAdapter adapter = new CollectionsAdapter(collections, getActivity());
+        List<Collection> newCollections = new ArrayList<>();
+        for (Collection collection : collections) {
+            if (collection.getNumSpeakItem() > 0) {
+                newCollections.add(collection);
+            }
+        }
+        CollectionsAdapter adapter = new CollectionsAdapter(newCollections, getActivity());
         mCollectionsView.setAdapter(adapter);
     }
 

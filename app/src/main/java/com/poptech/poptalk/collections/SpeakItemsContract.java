@@ -16,11 +16,15 @@ public interface SpeakItemsContract {
         void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections);
 
         void onSpeakItemsLoaded(List<SpeakItem> speakItems);
+
+        void onCollectionLoaded(Collection collection);
     }
 
     interface Presenter extends BasePresenter {
         void loadAllSpeakItems();
 
         void loadSpeakItems(long collectionId);
+
+        void loadCollection(long collectionId);
     }
 }

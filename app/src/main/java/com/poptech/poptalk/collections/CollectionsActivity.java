@@ -400,14 +400,22 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     public void onAddSpeakItem(String path, String date, Location location) {
         long COLLECTION_ID = -1;
         long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
-        Collection collection = new Collection();
-        collection.setThumbPath(path);
-        collection.setDescription("None");
-        collection.setId(COLLECTION_ID);
-        if (!mCollectionModel.isCollectionExisted(collection.getId())) {
+
+        // Update Collection
+        if (mCollectionModel.isCollectionExisted(COLLECTION_ID)) {
+            Collection collection = mCollectionModel.getCollection(COLLECTION_ID);
+            collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
+            collection.setThumbPath(path);
+            mCollectionModel.updateCollection(collection);
+        } else {
+            Collection collection = new Collection();
+            collection.setId(COLLECTION_ID);
+            collection.setNumSpeakItem(1);
+            collection.setThumbPath(path);
             mCollectionModel.addNewCollection(collection);
         }
 
+        // Update Speak Item
         SpeakItem speakItem = new SpeakItem();
         speakItem.setId(SPEAK_ITEM_ID);
         speakItem.setPhotoPath(path);
@@ -416,7 +424,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             speakItem.setLongitude(location.getLongitude());
         }
         speakItem.setDateTime(date);
-        speakItem.setCollectionId(collection.getId());
+        speakItem.setCollectionId(COLLECTION_ID);
         mSpeakItemModel.addNewSpeakItem(speakItem);
 
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);

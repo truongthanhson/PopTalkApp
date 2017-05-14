@@ -1,6 +1,7 @@
 package com.poptech.poptalk.speakitem;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -9,7 +10,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +43,9 @@ import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.collections.SpeakItemsFragment;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.location.LocationTask;
 import com.poptech.poptalk.maps.MapActivity;
@@ -55,7 +62,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class SpeakItemDetailFragment extends Fragment implements NotificationCenter.NotificationCenterDelegate, SpeakItemDetailContract.View, View.OnTouchListener, View.OnClickListener, AudioTimelineView.AudioTimelineDelegate, View.OnLongClickListener {
+public class SpeakItemDetailFragment extends Fragment implements NotificationCenter.NotificationCenterDelegate, SpeakItemDetailContract.View, View.OnTouchListener, View.OnClickListener, AudioTimelineView.AudioTimelineDelegate, View.OnLongClickListener, TextWatcher {
+    public interface SpeakItemDetailFragmentCallback {
+        void onClickSpeakItemDialog(SpeakItem speakItem);
+    }
 
     public static SpeakItemDetailFragment newInstance(long speakItemId) {
         Bundle args = new Bundle();
@@ -73,6 +83,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private ImageView mPhotoView;
     private ImageButton mPhotoEdit;
+    private TextView mPhotoLanguage;
     private TextView mPhotoLocation;
     private TextView mPhotoDateTime;
     private EditText mPhotoDescription;
@@ -103,7 +114,18 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private boolean mCurrentPausing;
     private boolean mRecording;
 
+    private SpeakItemDetailFragmentCallback mCallback;
+
     public SpeakItemDetailFragment() {
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof SpeakItemDetailFragmentCallback) {
+            mCallback = (SpeakItemDetailFragmentCallback) context;
+        }
     }
 
     @Override
@@ -118,6 +140,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         mView = inflater.inflate(R.layout.fragment_speak_items_detail_layout, container, false);
         initView();
         initData();
@@ -136,7 +159,9 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mPhotoEdit = (ImageButton) mView.findViewById(R.id.photo_edit_btn_id);
         mPhotoLocation = (TextView) mView.findViewById(R.id.photo_location_id);
         mPhotoDateTime = (TextView) mView.findViewById(R.id.photo_datetime_id);
+        mPhotoLanguage = (TextView) mView.findViewById(R.id.photo_language_id);
         mPhotoDescription = (EditText) mView.findViewById(R.id.description_et_id);
+        mPhotoDescription.addTextChangedListener(this);
 
         // Record
         mRecordMenu = (RelativeLayout) mView.findViewById(R.id.record_menu_rl_id);
@@ -243,10 +268,19 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onSpeakItemLoaded(SpeakItem speakItem) {
+        mPresenter.loadCollection(speakItem.getCollectionId());
+
         mSpeakItem = speakItem;
         onReloadPhotoView();
         onReloadPhotoAttribute();
         onReloadAudioWave();
+    }
+
+    @Override
+    public void onCollectionLoaded(Collection collection) {
+        if (!StringUtils.isNullOrEmpty(collection.getDescription())) {
+            ((SpeakItemDetailActivity) getActivity()).getSupportActionBar().setTitle(collection.getDescription());
+        }
     }
 
     private void onReloadPhotoView() {
@@ -260,6 +294,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void onReloadPhotoAttribute() {
+        mPhotoLanguage.setText(mSpeakItem.getLanguage());
         mPhotoDateTime.setText(mSpeakItem.getDateTime());
         mPhotoLocation.setText(mSpeakItem.getLocation());
         if (mSpeakItem.getLatitude() != 0 || mSpeakItem.getLongitude() != 0) {
@@ -282,6 +317,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             });
             task.execute(location);
         }
+        mPhotoDescription.setText(mSpeakItem.getDescription());
     }
 
     private void onReloadAudioWave() {
@@ -730,5 +766,34 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 onReloadPhotoAttribute();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_more) {
+            mCallback.onClickSpeakItemDialog(mSpeakItem);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void setSpeakItemFromDialog(SpeakItem speakItem) {
+        mSpeakItem = speakItem;
+        onReloadPhotoAttribute();
+        mPresenter.loadCollection(speakItem.getCollectionId());
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        mSpeakItem.setDescription(s.toString());
     }
 }
