@@ -182,11 +182,11 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
         if (mSortType == GroupSpeakItemSortType.LOCATION) {
             List<String> locations = new ArrayList<>();
-            Collections.sort(speakItems, ((o1, o2) -> o1.getLocation().compareTo(o2.getLocation())));
             for (SpeakItem speakItem : speakItems) {
                 locations.add(speakItem.getLocation().trim());
             }
             locations = new ArrayList<>(new HashSet<>(locations));
+            Collections.sort(locations, String.CASE_INSENSITIVE_ORDER);
 
             for (String location : locations) {
                 List<SpeakItem> speakItemSection = new ArrayList<>();
