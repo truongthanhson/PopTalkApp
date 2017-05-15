@@ -34,6 +34,7 @@ import com.poptech.poptalk.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -181,24 +182,29 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
         if (mSortType == GroupSpeakItemSortType.LOCATION) {
             List<String> locations = new ArrayList<>();
-            // get all locations
+            Collections.sort(speakItems, ((o1, o2) -> o1.getLocation().compareTo(o2.getLocation())));
             for (SpeakItem speakItem : speakItems) {
-                if (!StringUtils.isContainIgnoreCase(speakItem.getLocation(), locations)) {
-                    locations.add(speakItem.getLocation().trim());
-                }
+                locations.add(speakItem.getLocation().trim());
             }
-            Collections.sort(locations, String.CASE_INSENSITIVE_ORDER);
+            locations = new ArrayList<>(new HashSet<>(locations));
+
             for (String location : locations) {
                 List<SpeakItem> speakItemSection = new ArrayList<>();
                 for (SpeakItem speakItem : speakItems) {
-                    if (location.equalsIgnoreCase(speakItem.getLocation().trim())) {
+                    if (location.equals(speakItem.getLocation().trim())) {
                         speakItemSection.add(speakItem);
                     }
                 }
                 mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, location));
             }
         } else {
-            // TODO: Sort collection here
+            if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
+                Collections.sort(collections, (o1, o2) -> o1.getDescription().compareTo(o2.getDescription()));
+            } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {
+                Collections.sort(collections, (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
+            } else if (mSortType == GroupSpeakItemSortType.RECENT) {
+                Collections.sort(collections, (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
+            }
             for (Collection collection : collections) {
                 if (collection.getNumSpeakItem() > 0) {
                     List<SpeakItem> speakItemSection = new ArrayList<>();
@@ -207,7 +213,13 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                             speakItemSection.add(speakItem);
                         }
                     }
-                    // TODO: Sort speak items here
+                    if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
+                        Collections.sort(speakItemSection, (o1, o2) -> o1.getDescription().compareTo(o2.getDescription()));
+                    } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {
+                        Collections.sort(speakItemSection, (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
+                    } else if (mSortType == GroupSpeakItemSortType.RECENT) {
+                        Collections.sort(speakItemSection, (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
+                    }
                     mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
                 }
             }
@@ -279,6 +291,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         @Override
         public void onBindViewHolder(SpeakItemViewHolder holder, final int position) {
             holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription());
+            holder.mLanguageTv.setText(mSpeakItems.get(position).getLanguage());
             Glide.with(mContext)
                     .load(mSpeakItems.get(position).getPhotoPath())
                     .centerCrop()
@@ -344,12 +357,13 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         @Override
         public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
             SpeakItemViewHolder holder = (SpeakItemViewHolder) viewHolder;
-            if(mViewType == LIST){
-                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(100),MetricUtils.dpToPx(100)));
-            }else{
+            if (mViewType == LIST) {
+                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(100), MetricUtils.dpToPx(100)));
+            } else {
                 holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
             holder.mDescriptionTv.setText(speakItems.get(i).getDescription());
+            holder.mLanguageTv.setText(speakItems.get(i).getLanguage());
             Glide.with(getActivity())
                     .load(speakItems.get(i).getPhotoPath())
                     .centerCrop()

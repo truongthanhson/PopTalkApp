@@ -43,6 +43,8 @@ public class PopTalkContract {
         String COLLECTION_DESCRIPTION = "description";
         String COLLECTION_LANGUAGE = "language_1";
         String COLLECTION_NUM_SPEAK_ITEM = "num_speak_item";
+        String COLLECTION_ADDED_TIME = "added_time";
+        String COLLECTION_NUM_ACCESS = "num_access";
     }
 
     public interface SpeakItemColumns {
@@ -57,6 +59,8 @@ public class PopTalkContract {
         String SPEAK_ITEM_PHOTO_LONGITUDE = "photo_longitude";
         String SPEAK_ITEM_PHOTO_DATETIME = "photo_datetime";
         String SPEAK_ITEM_PHOTO_LANGUAGE = "photo_language";
+        String SPEAK_ITEM_ADDED_TIME = "added_time";
+        String SPEAK_ITEM_NUM_ACCESS = "num_access";
         String COLLECTION_ID = "collection_id";
     }
 

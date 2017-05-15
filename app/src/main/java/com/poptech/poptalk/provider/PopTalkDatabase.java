@@ -34,7 +34,9 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
             + CollectionsColumns.COLLECTION_THUMB_PATH + " TEXT,"
             + CollectionsColumns.COLLECTION_DESCRIPTION + " TEXT,"
             + CollectionsColumns.COLLECTION_LANGUAGE + " TEXT,"
-            + CollectionsColumns.COLLECTION_NUM_SPEAK_ITEM + " INTEGER)";
+            + CollectionsColumns.COLLECTION_NUM_SPEAK_ITEM + " INTEGER,"
+            + CollectionsColumns.COLLECTION_ADDED_TIME + " INTEGER,"
+            + CollectionsColumns.COLLECTION_NUM_ACCESS + " INTEGER)";
 
     public static final String SQL_CREATE_PHOTOS = "CREATE TABLE " + Tables.PHOTOS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -53,6 +55,8 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_LONGITUDE + " TEXT, "
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_DATETIME + " TEXT, "
             + SpeakItemColumns.SPEAK_ITEM_PHOTO_LANGUAGE + " TEXT, "
+            + SpeakItemColumns.SPEAK_ITEM_ADDED_TIME + " INTEGER, "
+            + SpeakItemColumns.SPEAK_ITEM_NUM_ACCESS + " INTEGER, "
             + SpeakItemColumns.COLLECTION_ID + " INTEGER)";
 
     public static final String SQL_CREATE_LANGUAGES = "CREATE TABLE " + Tables.LANGUAGES + " ("

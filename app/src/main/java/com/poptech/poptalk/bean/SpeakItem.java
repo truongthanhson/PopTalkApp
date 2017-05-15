@@ -29,6 +29,8 @@ public class SpeakItem implements Parcelable {
     private float audioRightMark;
     private float audioMiddleMark;
     private String language;
+    private long addedTime;
+    private int numAccess;
 
 
     public SpeakItem() {
@@ -42,6 +44,8 @@ public class SpeakItem implements Parcelable {
         collectionId = -1;
         audioPath = "";
         language = "";
+        addedTime = 0;
+        numAccess = 0;
         setDefaultMark();
     }
 
@@ -139,10 +143,6 @@ public class SpeakItem implements Parcelable {
         this.audioPath = audioPath;
     }
 
-    public void generateAudioPath() {
-        this.audioPath = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_AUDIO + "/" + id + "_record.ogg";
-    }
-
     public String getAudioPath() {
         return audioPath;
     }
@@ -236,6 +236,22 @@ public class SpeakItem implements Parcelable {
         return language;
     }
 
+    public void setAddedTime(long addedTime) {
+        this.addedTime = addedTime;
+    }
+
+    public long getAddedTime() {
+        return this.addedTime;
+    }
+
+    public void setNumAccess(int numAccess) {
+        this.numAccess = numAccess;
+    }
+
+    public int getNumAccess() {
+        return this.numAccess;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -260,6 +276,8 @@ public class SpeakItem implements Parcelable {
         dest.writeFloat(this.audioRightMark);
         dest.writeFloat(this.audioMiddleMark);
         dest.writeString(this.language);
+        dest.writeLong(this.addedTime);
+        dest.writeInt(this.numAccess);
     }
 
     protected SpeakItem(Parcel in) {
@@ -280,6 +298,8 @@ public class SpeakItem implements Parcelable {
         this.audioRightMark = in.readFloat();
         this.audioMiddleMark = in.readFloat();
         this.language = in.readString();
+        this.addedTime = in.readLong();
+        this.numAccess = in.readInt();
     }
 
     public static final Parcelable.Creator<SpeakItem> CREATOR = new Parcelable.Creator<SpeakItem>() {

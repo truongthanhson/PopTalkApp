@@ -380,6 +380,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 if (collection.getDescription().equals(mDescriptionString)) {
                     collectionId = collection.getId();
                     collection.setThumbPath(mSpeakItem.getPhotoPath());
+                    collection.setLanguage(mSpeakItem.getLanguage());
                     collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
                     mCollectionModel.updateCollection(collection);
                     existed = true;
@@ -392,7 +393,9 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 collection.setDescription(mDescriptionString);
                 collection.setId(collectionId);
                 collection.setThumbPath(mSpeakItem.getPhotoPath());
+                collection.setLanguage(mSpeakItem.getLanguage());
                 collection.setNumSpeakItem(1);
+                collection.setAddedTime(System.currentTimeMillis());
                 mCollectionModel.addNewCollection(collection);
                 mCollections.add(collection);
             }
@@ -413,8 +416,10 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 mCollections.get(i).setNumSpeakItem(speakItems.size());
                 if (speakItems.size() > 0) {
                     mCollections.get(i).setThumbPath(speakItems.get(speakItems.size() - 1).getPhotoPath());
+                    mCollections.get(i).setLanguage(speakItems.get(speakItems.size() - 1).getLanguage());
                 } else {
                     mCollections.get(i).setThumbPath("");
+                    mCollections.get(i).setLanguage("");
                 }
                 mCollectionModel.updateCollection(mCollections.get(i));
             }

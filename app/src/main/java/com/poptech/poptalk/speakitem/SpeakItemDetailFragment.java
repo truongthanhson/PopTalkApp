@@ -6,13 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -27,7 +27,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -45,13 +44,11 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
-import com.poptech.poptalk.collections.SpeakItemsFragment;
 import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.location.LocationTask;
 import com.poptech.poptalk.maps.MapActivity;
 import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
-import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.AndroidUtilities;
 import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
@@ -466,8 +463,11 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                         mStartedDraggingX = -1;
                         mRecording = true;
                         setRecordView();
-                        mSpeakItem.generateAudioPath();
-                        mAudioCtrl.startRecording(mSpeakItem.getAudioPath());
+                        String audioPath = Environment.getExternalStorageDirectory() +
+                                Constants.PATH_APP + "/" +
+                                Constants.PATH_AUDIO + "/" +
+                                mSpeakItemId + "_" + System.currentTimeMillis() + "_record.ogg";
+                        mAudioCtrl.startRecording(audioPath);
                     }
                 }
                 break;

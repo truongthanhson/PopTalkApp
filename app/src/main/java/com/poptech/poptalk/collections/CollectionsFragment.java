@@ -28,6 +28,7 @@ import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
+import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
 
@@ -180,6 +181,7 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
         public void onBindViewHolder(CollectionViewHolder holder, final int position) {
             holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
             holder.mLanguageTv.setText(mCollections.get(position).getLanguage());
+
             Glide.with(mContext)
                     .load(mCollections.get(position).getThumbPath())
                     .centerCrop()

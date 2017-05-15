@@ -412,6 +412,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             collection.setId(COLLECTION_ID);
             collection.setNumSpeakItem(1);
             collection.setThumbPath(path);
+            collection.setAddedTime(System.currentTimeMillis());
             mCollectionModel.addNewCollection(collection);
         }
 
@@ -424,6 +425,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             speakItem.setLongitude(location.getLongitude());
         }
         speakItem.setDateTime(date);
+        speakItem.setAddedTime(System.currentTimeMillis());
         speakItem.setCollectionId(COLLECTION_ID);
         mSpeakItemModel.addNewSpeakItem(speakItem);
 

@@ -1,5 +1,6 @@
 package com.poptech.poptalk.speakitem;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
@@ -30,10 +37,8 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
     private Toolbar mToolBar;
     private ViewPager mSpeakItemPager;
     private SpeakItemsPagerAdapter mSpeakItemPagerAdapter;
-    private int mPagerIndex;
     private long mCollectionId;
     private long mSpeakItemId;
-    private List<SpeakItem> mSpeakItems;
 
 
     @Override
@@ -52,23 +57,45 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
         getSupportActionBar().setTitle("Speak Items");
 
         mModel = new SpeakItemModel(new PopTalkDatabase(PopTalkApplication.applicationContext));
-        mSpeakItems = mModel.getSpeakItems(mCollectionId);
-        for (int i = 0; i < mSpeakItems.size(); i++) {
-            if (mSpeakItems.get(i).getId() == mSpeakItemId) {
-                mPagerIndex = i;
-                break;
-            }
-        }
+
         //setup viewpager
         mSpeakItemPager = (ViewPager) findViewById(R.id.speak_item_pager_id);
-        mSpeakItemPagerAdapter = new SpeakItemsPagerAdapter(getSupportFragmentManager(), mModel.getSpeakItems(mCollectionId));
-        mSpeakItemPager.setAdapter(mSpeakItemPagerAdapter);
-        mSpeakItemPager.setCurrentItem(mPagerIndex);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.INTERNET).withListener(new BasePermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse response) {
+                super.onPermissionGranted(response);
+                List<SpeakItem> speakItems = mModel.getSpeakItems(mCollectionId);
+                mSpeakItemPagerAdapter = new SpeakItemsPagerAdapter(getSupportFragmentManager(), speakItems);
+                mSpeakItemPager.setAdapter(mSpeakItemPagerAdapter);
+                mSpeakItemPager.setCurrentItem(getCurrentItem(speakItems));
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionDeniedResponse response) {
+                super.onPermissionDenied(response);
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                super.onPermissionRationaleShouldBeShown(permission, token);
+            }
+        }).check();
+    }
+
+
+    private int getCurrentItem(List<SpeakItem> speakItems) {
+        for (int index = 0; index < speakItems.size(); index++) {
+            if (speakItems.get(index).getId() == mSpeakItemId) {
+                return index;
+            }
+        }
+        return 0;
     }
 
     @Override

@@ -13,12 +13,16 @@ public class Collection implements Parcelable {
     private String language;
     private String thumbPath;
     private int numSpeakItem;
+    private long addedTime;
+    private int numAccess;
 
     public Collection() {
         description = "";
         language = "";
         thumbPath = "";
         numSpeakItem = 0;
+        addedTime = 0;
+        numAccess = 0;
     }
 
     public Collection(int id, String description, String language, String thumbPath) {
@@ -68,6 +72,22 @@ public class Collection implements Parcelable {
         return numSpeakItem;
     }
 
+    public void setAddedTime(long addedTime) {
+        this.addedTime = addedTime;
+    }
+
+    public long getAddedTime() {
+        return this.addedTime;
+    }
+
+    public void setNumAccess(int numAccess) {
+        this.numAccess = numAccess;
+    }
+
+    public int getNumAccess() {
+        return this.numAccess;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -81,6 +101,8 @@ public class Collection implements Parcelable {
         dest.writeString(this.language);
         dest.writeString(this.thumbPath);
         dest.writeInt(this.numSpeakItem);
+        dest.writeLong(this.addedTime);
+        dest.writeInt(this.numAccess);
     }
 
     protected Collection(Parcel in) {
@@ -89,6 +111,8 @@ public class Collection implements Parcelable {
         this.language = in.readString();
         this.thumbPath = in.readString();
         this.numSpeakItem = in.readInt();
+        this.addedTime = in.readLong();
+        this.numAccess = in.readInt();
     }
 
     public static final Parcelable.Creator<Collection> CREATOR = new Parcelable.Creator<Collection>() {

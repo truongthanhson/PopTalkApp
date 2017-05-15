@@ -33,7 +33,9 @@ public class CollectionsModel implements BaseModel {
                 PopTalkContract.Collections.COLLECTION_THUMB_PATH,
                 PopTalkContract.Collections.COLLECTION_DESCRIPTION,
                 PopTalkContract.Collections.COLLECTION_LANGUAGE,
-                PopTalkContract.Collections.COLLECTION_NUM_SPEAK_ITEM
+                PopTalkContract.Collections.COLLECTION_NUM_SPEAK_ITEM,
+                PopTalkContract.Collections.COLLECTION_ADDED_TIME,
+                PopTalkContract.Collections.COLLECTION_NUM_ACCESS
         };
 
         int COLLECTION_ID = 1;
@@ -41,6 +43,8 @@ public class CollectionsModel implements BaseModel {
         int COLLECTION_DESCRIPTION = 3;
         int COLLECTION_LANGUAGE = 4;
         int COLLECTION_NUM_SPEAK_ITEM = 5;
+        int COLLECTION_ADDED_TIME = 6;
+        int COLLECTION_NUM_ACCESS = 7;
     }
 
     public void addNewCollection(Collection collection) {
@@ -52,6 +56,8 @@ public class CollectionsModel implements BaseModel {
         contentValues.put(PopTalkContract.Collections.COLLECTION_DESCRIPTION, collection.getDescription());
         contentValues.put(PopTalkContract.Collections.COLLECTION_LANGUAGE, collection.getLanguage());
         contentValues.put(PopTalkContract.Collections.COLLECTION_NUM_SPEAK_ITEM, collection.getNumSpeakItem());
+        contentValues.put(PopTalkContract.Collections.COLLECTION_ADDED_TIME, collection.getAddedTime());
+        contentValues.put(PopTalkContract.Collections.COLLECTION_NUM_ACCESS, collection.getNumAccess());
         database.insert(PopTalkContract.Tables.COLLECTIONS, null, contentValues);
     }
 
@@ -78,6 +84,8 @@ public class CollectionsModel implements BaseModel {
                         collection.setDescription(cursor.getString(CollectionQuery.COLLECTION_DESCRIPTION));
                         collection.setLanguage(cursor.getString(CollectionQuery.COLLECTION_LANGUAGE));
                         collection.setNumSpeakItem(cursor.getInt(CollectionQuery.COLLECTION_NUM_SPEAK_ITEM));
+                        collection.setAddedTime(cursor.getLong(CollectionQuery.COLLECTION_ADDED_TIME));
+                        collection.setNumAccess(cursor.getInt(CollectionQuery.COLLECTION_NUM_ACCESS));
                         collections.add(collection);
                     } while (cursor.moveToNext());
                 }
@@ -113,6 +121,8 @@ public class CollectionsModel implements BaseModel {
                             collection.setDescription(cursor.getString(CollectionQuery.COLLECTION_DESCRIPTION));
                             collection.setLanguage(cursor.getString(CollectionQuery.COLLECTION_LANGUAGE));
                             collection.setNumSpeakItem(cursor.getInt(CollectionQuery.COLLECTION_NUM_SPEAK_ITEM));
+                            collection.setAddedTime(cursor.getLong(CollectionQuery.COLLECTION_ADDED_TIME));
+                            collection.setNumAccess(cursor.getInt(CollectionQuery.COLLECTION_NUM_ACCESS));
                         } while (cursor.moveToNext());
                     }
                 }
@@ -139,6 +149,8 @@ public class CollectionsModel implements BaseModel {
                 contentValues.put(PopTalkContract.Collections.COLLECTION_DESCRIPTION, collection.getDescription());
                 contentValues.put(PopTalkContract.Collections.COLLECTION_LANGUAGE, collection.getLanguage());
                 contentValues.put(PopTalkContract.Collections.COLLECTION_NUM_SPEAK_ITEM, collection.getNumSpeakItem());
+                contentValues.put(PopTalkContract.Collections.COLLECTION_ADDED_TIME, collection.getAddedTime());
+                contentValues.put(PopTalkContract.Collections.COLLECTION_NUM_ACCESS, collection.getNumAccess());
 
                 ret = database.update(PopTalkContract.Tables.COLLECTIONS,
                         contentValues,
