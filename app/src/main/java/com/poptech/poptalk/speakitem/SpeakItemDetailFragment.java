@@ -779,6 +779,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     public void setSpeakItemFromDialog(SpeakItem speakItem) {
         mSpeakItem = speakItem;
         onReloadPhotoAttribute();
+        mPresenter.updateSpeakItem(speakItem);
         mPresenter.loadCollection(speakItem.getCollectionId());
     }
 

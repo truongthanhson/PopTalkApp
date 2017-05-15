@@ -31,6 +31,7 @@ import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -176,7 +177,6 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     @Override
     public void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections) {
         mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
-
         if (mSortType == GroupSpeakItemSortType.LOCATION) {
             List<String> locations = new ArrayList<>();
             // get all locations
@@ -185,6 +185,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                     locations.add(speakItem.getLocation().trim());
                 }
             }
+            Collections.sort(locations, String.CASE_INSENSITIVE_ORDER);
             for (String location : locations) {
                 List<SpeakItem> speakItemSection = new ArrayList<>();
                 for (SpeakItem speakItem : speakItems) {
@@ -197,15 +198,16 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         } else {
             // TODO: Sort collection here
             for (Collection collection : collections) {
-                mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
-                List<SpeakItem> speakItemSection = new ArrayList<>();
-                for (SpeakItem speakItem : speakItems) {
-                    if (speakItem.getCollectionId() == collection.getId()) {
-                        speakItemSection.add(speakItem);
+                if (collection.getNumSpeakItem() > 0) {
+                    List<SpeakItem> speakItemSection = new ArrayList<>();
+                    for (SpeakItem speakItem : speakItems) {
+                        if (speakItem.getCollectionId() == collection.getId()) {
+                            speakItemSection.add(speakItem);
+                        }
                     }
+                    // TODO: Sort speak items here
+                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
                 }
-                // TODO: Sort speak items here
-                mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
             }
         }
 

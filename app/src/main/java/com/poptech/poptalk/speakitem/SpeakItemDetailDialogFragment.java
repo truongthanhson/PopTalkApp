@@ -367,10 +367,21 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
     private void updateCollection() {
         boolean existed = false;
         long collectionId = -1;
+        if (!StringUtils.isNullOrEmpty(mLanguageString)) {
+            mSpeakItem.setLanguage(mLanguageString);
+        }
+
         if (!StringUtils.isNullOrEmpty(mDescriptionString)) {
+            // Update current collection
+            updateCollectionItem(mSpeakItem.getCollectionId());
+
+            // Update new collection
             for (Collection collection : mCollections) {
                 if (collection.getDescription().equals(mDescriptionString)) {
                     collectionId = collection.getId();
+                    collection.setThumbPath(mSpeakItem.getPhotoPath());
+                    collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
+                    mCollectionModel.updateCollection(collection);
                     existed = true;
                     break;
                 }
@@ -385,14 +396,9 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 mCollectionModel.addNewCollection(collection);
                 mCollections.add(collection);
             }
-
-            // Update current collection
-            updateCollectionItem(mSpeakItem.getCollectionId());
             mSpeakItem.setCollectionId(collectionId);
         }
-        if (!StringUtils.isNullOrEmpty(mLanguageString)) {
-            mSpeakItem.setLanguage(mLanguageString);
-        }
+
     }
 
     private void updateCollectionItem(long collectionId) {
