@@ -648,8 +648,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void onRecordStarted() {
-        mRecording = true;
-        setRecordView();
+        //mRecording = true;
+        //setRecordView();
     }
 
     private void onRecordProgressChanged(long t) {
