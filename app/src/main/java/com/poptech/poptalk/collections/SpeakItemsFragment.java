@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.utils.MetricUtils;
 import com.poptech.poptalk.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -324,7 +326,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         private String header;
 
         public SpeakItemSection(List<SpeakItem> speakItems, String header) {
-            super(R.layout.header_section_list_layout, R.layout.item_speak_item_layout);
+            super(R.layout.header_section_list_layout, R.layout.item_speak_item_grid_layout);
             this.speakItems = speakItems;
             this.header = header;
         }
@@ -342,6 +344,11 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         @Override
         public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
             SpeakItemViewHolder holder = (SpeakItemViewHolder) viewHolder;
+            if(mViewType == LIST){
+                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(50),MetricUtils.dpToPx(50)));
+            }else{
+                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
             holder.mDescriptionTv.setText(speakItems.get(i).getDescription());
             Glide.with(getActivity())
                     .load(speakItems.get(i).getPhotoPath())
