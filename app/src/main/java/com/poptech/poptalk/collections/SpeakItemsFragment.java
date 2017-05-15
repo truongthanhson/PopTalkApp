@@ -195,7 +195,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                         speakItemSection.add(speakItem);
                     }
                 }
-                mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, location));
+                mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, location, R.layout.item_speak_item_grid_layout));
             }
         } else {
             if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
@@ -220,7 +220,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                     } else if (mSortType == GroupSpeakItemSortType.RECENT) {
                         Collections.sort(speakItemSection, (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
                     }
-                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription()));
+                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription(), R.layout.item_speak_item_layout));
                 }
             }
         }
@@ -338,8 +338,8 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         private List<SpeakItem> speakItems;
         private String header;
 
-        public SpeakItemSection(List<SpeakItem> speakItems, String header) {
-            super(R.layout.header_section_list_layout, R.layout.item_speak_item_grid_layout);
+        public SpeakItemSection(List<SpeakItem> speakItems, String header, int itemResourceId) {
+            super(R.layout.header_section_list_layout, itemResourceId);
             this.speakItems = speakItems;
             this.header = header;
         }
@@ -358,7 +358,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
             SpeakItemViewHolder holder = (SpeakItemViewHolder) viewHolder;
             if (mViewType == LIST) {
-                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(100), MetricUtils.dpToPx(100)));
+                holder.mThumbnailIv.setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(100), MetricUtils.dpToPx(100)));
             } else {
                 holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
