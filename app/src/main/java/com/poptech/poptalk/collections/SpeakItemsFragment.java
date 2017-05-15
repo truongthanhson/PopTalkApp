@@ -345,7 +345,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         public void onBindItemViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
             SpeakItemViewHolder holder = (SpeakItemViewHolder) viewHolder;
             if(mViewType == LIST){
-                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(50),MetricUtils.dpToPx(50)));
+                holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(MetricUtils.dpToPx(100),MetricUtils.dpToPx(100)));
             }else{
                 holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
