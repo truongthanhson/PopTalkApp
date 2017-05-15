@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -149,6 +150,8 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
                         .placeholder(R.color.colorAccent)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(storyBoardItemViewHolder.mThumbnailIv);
+
+                storyBoardItemViewHolder.mDescription.setText(mSpeakItems.get(position).getDescription());
             }
 
         }
@@ -170,10 +173,12 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
 
         private View mRootView;
         private ImageView mThumbnailIv;
+        private TextView mDescription;
         public StoryBoardItemViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
             mThumbnailIv = (ImageView)mRootView.findViewById(R.id.iv_thumb_id);
+            mDescription = (TextView)mRootView.findViewById(R.id.description_tv);
         }
     }
 
@@ -189,7 +194,7 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
     private class PathItemDecoration extends RecyclerView.ItemDecoration{
         private Paint pathPaint;
         private int pathWidth;
-        private int itemPadding = MetricUtils.dpToPx(20);
+        private int itemPadding = MetricUtils.dpToPx(28);
         private int spanColumn;
         private Rect temp = new Rect();
 

@@ -250,13 +250,13 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         RecyclerView.LayoutManager layoutManager = null;
 
         if (mViewType == GRID) {
-            layoutManager = new GridLayoutManager(getContext(), 4);
+            layoutManager = new GridLayoutManager(getContext(), 3);
             ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
                     switch (mSectionedSpeakItemAdapter.getSectionItemViewType(position)) {
                         case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
-                            return 4;
+                            return 3;
                         default:
                             return 1;
                     }
