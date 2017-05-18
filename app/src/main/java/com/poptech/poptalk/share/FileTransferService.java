@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,12 +58,11 @@ public class FileTransferService extends IntentService {
 
                 Log.d(ShareActivity.TAG, "Client socket - " + socket.isConnected());
                 OutputStream stream = socket.getOutputStream();
-                ContentResolver cr = context.getContentResolver();
                 InputStream is = null;
                 try {
-                    is = cr.openInputStream(Uri.parse(fileUri));
+                    is = new FileInputStream(fileUri);
                 } catch (FileNotFoundException e) {
-                    Log.d(ShareActivity.TAG, e.toString());
+                    e.printStackTrace();
                 }
                 DeviceDetailFragment.copyFile(is, stream);
                 Log.d(ShareActivity.TAG, "Client: Data written");

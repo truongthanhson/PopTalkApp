@@ -15,4 +15,6 @@ public interface AppMenuOpen {
 
     void onNavigateStoryboardMap();
     void onNavigateStoryboardFrequency();
+
+    void onNavigateToReceiveScreen();
 }

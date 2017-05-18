@@ -12,7 +12,7 @@ import java.util.List;
 public class DrawerMenuDataFactory {
 
     public static List<TopLevelMenuDrawer> makeDrawerMenu() {
-        return Arrays.asList(makeViewMenu(), makeSortByMenu(), makeStoryBoardMenu());
+        return Arrays.asList(makeViewMenu(), makeSortByMenu(), makeStoryBoardMenu(), makeShareMenu());
     }
 
     public static TopLevelMenuDrawer makeViewMenu() {
@@ -27,6 +27,10 @@ public class DrawerMenuDataFactory {
         return new TopLevelMenuDrawer("Story Board", makeStoryBoardSubmenu(), R.drawable.ic_storyboard);
     }
 
+    public static TopLevelMenuDrawer makeShareMenu() {
+        return new TopLevelMenuDrawer("Share", makeShareSubMenu(), R.drawable.ic_view);
+    }
+
     private static List<SubMenuDrawer> makeStoryBoardSubmenu() {
         return Arrays.asList(new SubMenuDrawer("Map & Datetime"), new SubMenuDrawer("Frequency"));
     }
@@ -37,6 +41,10 @@ public class DrawerMenuDataFactory {
 
     private static List<SubMenuDrawer> makeViewSubmenu() {
         return Arrays.asList(new SubMenuDrawer("Collection"), new SubMenuDrawer("List"), new SubMenuDrawer("Location"));
+    }
+
+    private static List<SubMenuDrawer> makeShareSubMenu() {
+        return Arrays.asList(new SubMenuDrawer("WiFi Direct"));
     }
 
 }

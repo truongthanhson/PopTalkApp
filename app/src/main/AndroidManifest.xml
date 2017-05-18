@@ -30,6 +30,7 @@
         <activity android:name=".storyboard.StoryboardActivity" />
         <activity android:name=".storyboard.StoryboardSelecActivity" />
         <activity android:name=".share.ShareActivity" />
+        <activity android:name=".share.ReceiveActivity" />
         <activity android:name=".maps.MapActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
@@ -55,6 +56,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
+        <!-- Used for transferring files  after a successful connection -->
+        <service android:enabled="true" android:name=".share.FileTransferService" />
     </application>
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -69,5 +73,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- Used for transferring files  after a successful connection -->
 
 </manifest>

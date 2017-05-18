@@ -44,6 +44,7 @@ import com.poptech.poptalk.login.LoginModel;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
+import com.poptech.poptalk.share.ReceiveActivity;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.storyboard.StoryBoardSelectFragment;
 import com.poptech.poptalk.storyboard.StoryboardActivity;
@@ -371,6 +372,12 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onNavigateStoryboardFrequency() {
 
+    }
+
+    @Override
+    public void onNavigateToReceiveScreen() {
+        Intent intent = new Intent(this, ReceiveActivity.class);
+        startActivity(intent);
     }
 
     @Override
