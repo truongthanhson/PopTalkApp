@@ -1,6 +1,7 @@
 package com.poptech.poptalk.speakitem;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,17 +16,22 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.collections.CollectionsActivity;
+import com.poptech.poptalk.gallery.GalleryActivity;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
+import com.poptech.poptalk.share.ShareActivity;
 
 import java.util.List;
 
@@ -148,6 +154,37 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
         if (fragment != null) {
             fragment.setSpeakItemFromDialog(speakItem);
         }
+    }
+
+    @Override
+    public void onClickShare(SpeakItem speakItem) {
+        goToShareSpeakItemScreen(speakItem);
+    }
+
+    private void goToShareSpeakItemScreen(SpeakItem speakItem) {
+
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.CHANGE_WIFI_STATE,
+                        Manifest.permission.CHANGE_NETWORK_STATE,
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.READ_PHONE_STATE
+                        ).withListener(new BaseMultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                super.onPermissionsChecked(report);
+                if (report.areAllPermissionsGranted()) {
+                    Intent intent = new Intent(SpeakItemDetailActivity.this, ShareActivity.class);
+                    intent.putExtra("speak_item", speakItem);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                super.onPermissionRationaleShouldBeShown(permissions, token);
+            }
+        }).check();
     }
 
     public static class SpeakItemsPagerAdapter extends FragmentStatePagerAdapter {

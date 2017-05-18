@@ -35,4 +35,7 @@
     <color name="login_device_id_background">#8090a4ae</color>
 
     <color name="waveform_unselected">@color/colorAccent</color>
+
+    <color name="status_bar_color">#FF000000</color>
+    <color name="layout_border_color">#FF111111</color>
 </resources>

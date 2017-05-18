@@ -54,6 +54,7 @@ import javax.inject.Inject;
 public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
     public interface SpeakItemDetailDialogFragmentCallback {
         void onClickSpeakItemDialogDismiss(SpeakItem speakItem);
+        void onClickShare(SpeakItem speakItem);
     }
 
     @Inject
@@ -195,6 +196,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 addNewCollection();
                 break;
             case R.id.share_button_id:
+                mCallBack.onClickShare(mSpeakItem);
                 break;
             case R.id.language_button_id:
                 selectLanguage();
