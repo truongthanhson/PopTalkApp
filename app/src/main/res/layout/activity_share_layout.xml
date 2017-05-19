@@ -14,15 +14,7 @@
             class="com.poptech.poptalk.share.DeviceListFragment"
             android:id="@+id/frag_list"
             android:layout_width="match_parent"
-            android:layout_height="300dp">
-            <!-- Preview: layout=@layout/row_devices -->
-        </fragment>
-        <fragment
-            class="com.poptech.poptalk.share.DeviceDetailFragment"
-            android:id="@+id/frag_detail"
-            android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <!-- Preview: layout=@layout/device_detail -->
         </fragment>
     </LinearLayout>
 </LinearLayout>

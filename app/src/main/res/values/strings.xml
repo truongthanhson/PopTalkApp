@@ -8,6 +8,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="photo_gallery">Gallery</string>
     <string name="receiver_title">WiFi Direct Receive</string>
+    <string name="sender_title">WiFi Direct Send</string>
 
     <string name="enable_p2p_button">P2P On/Off</string>
     <string name="discover_peers_button">Discover</string>

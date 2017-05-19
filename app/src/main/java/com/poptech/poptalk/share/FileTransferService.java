@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.poptech.poptalk.utils.IOUtils;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,7 +46,6 @@ public class FileTransferService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
             String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
@@ -64,7 +65,7 @@ public class FileTransferService extends IntentService {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                DeviceDetailFragment.copyFile(is, stream);
+                IOUtils.copyFile(is, stream);
                 Log.d(ShareActivity.TAG, "Client: Data written");
             } catch (IOException e) {
                 Log.e(ShareActivity.TAG, e.getMessage());

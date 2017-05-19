@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.utils.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -105,7 +106,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
     @Override
     public void onChannelDisconnected() {
-
+        manager.initialize(this, getMainLooper(), this);
     }
 
     @Override
@@ -119,6 +120,22 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             new FileServerAsyncTask(this)
                     .execute();
         }
+    }
+
+    public void disconnect() {
+        manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onFailure(int reasonCode) {
+                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
+            }
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(ReceiveActivity.this, "disconnect", Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
     /**
@@ -179,7 +196,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
     }
 
-    public static class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
+    public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
 
         private Context context;
 
@@ -193,7 +210,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(context, "start server", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "start receiving file", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -212,11 +229,12 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
                 Log.d(ShareActivity.TAG, "server: copying files " + f.toString());
                 InputStream inputstream = client.getInputStream();
-                copyFile(inputstream, new FileOutputStream(f));
+                IOUtils.copyFile(inputstream, new FileOutputStream(f));
                 serverSocket.close();
                 return f.getAbsolutePath();
             } catch (IOException e) {
                 Log.e(ShareActivity.TAG, e.getMessage());
+                e.printStackTrace();
                 return null;
             }
         }
@@ -228,32 +246,10 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                Toast.makeText(context,"DONE", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"receive file successfully", Toast.LENGTH_SHORT).show();
             }
-
+            disconnect();
         }
 
-    }
-
-
-    public static boolean copyFile(InputStream inputStream, OutputStream out) {
-        byte buf[] = new byte[1024];
-        int len;
-        long startTime= System.currentTimeMillis();
-
-        try {
-            while ((len = inputStream.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
-            out.close();
-            inputStream.close();
-            long endTime= System.currentTimeMillis()-startTime;
-            Log.v("","Time taken to transfer all bytes is : "+endTime);
-
-        } catch (IOException e) {
-            Log.d(ShareActivity.TAG, e.toString());
-            return false;
-        }
-        return true;
     }
 }

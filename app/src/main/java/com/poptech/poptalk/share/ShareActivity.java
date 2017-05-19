@@ -1,13 +1,20 @@
 package com.poptech.poptalk.share;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,7 +31,7 @@ import com.poptech.poptalk.R;
  * Created by sontt on 17/05/2017.
  */
 
-public class ShareActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
+public class ShareActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener, WifiP2pManager.ConnectionInfoListener {
 
     public static final String TAG = "ShareActivity";
     private Toolbar mToolbar;
@@ -52,7 +59,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle(getString(R.string.photo_gallery));
+        getSupportActionBar().setTitle(getString(R.string.sender_title));
 
         // add necessary intent values to be matched.
 
@@ -86,13 +93,8 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     public void resetData() {
         DeviceListFragment fragmentList = (DeviceListFragment) getFragmentManager()
                 .findFragmentById(R.id.frag_list);
-        DeviceDetailFragment fragmentDetails = (DeviceDetailFragment) getFragmentManager()
-                .findFragmentById(R.id.frag_detail);
         if (fragmentList != null) {
             fragmentList.clearPeers();
-        }
-        if (fragmentDetails != null) {
-            fragmentDetails.resetViews();
         }
     }
 
@@ -154,10 +156,37 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     @Override
     public void showDetails(WifiP2pDevice device) {
-        DeviceDetailFragment fragment = (DeviceDetailFragment) getFragmentManager()
-                .findFragmentById(R.id.frag_detail);
-        fragment.showDetails(device);
-
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setTitle("Share")
+                .setMessage("Are you sure you want to share Speak Item with this device?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        WifiP2pConfig config = new WifiP2pConfig();
+                        config.deviceAddress = device.deviceAddress;
+                        config.wps.setup = WpsInfo.PBC;
+//                        ProgressDialog progressDialog = new ProgressDialog(ShareActivity.this);
+//                        if (progressDialog != null && progressDialog.isShowing()) {
+//                            progressDialog.dismiss();
+//                        }
+//                        progressDialog = ProgressDialog.show(ShareActivity.this, "Press back to cancel",
+//                                "Connecting to :" + device.deviceAddress, true, true
+////
+//                        );
+                        connect(config);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     @Override
@@ -179,9 +208,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     @Override
     public void disconnect() {
-        final DeviceDetailFragment fragment = (DeviceDetailFragment) getFragmentManager()
-                .findFragmentById(R.id.frag_detail);
-        fragment.resetViews();
+
         manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
 
             @Override
@@ -191,7 +218,6 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
             @Override
             public void onSuccess() {
-                fragment.getView().setVisibility(View.GONE);
             }
 
         });
@@ -247,5 +273,16 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             }
         }
 
+    }
+
+    @Override
+    public void onConnectionInfoAvailable(WifiP2pInfo info) {
+        Intent serviceIntent = new Intent(this, FileTransferService.class);
+        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, Environment.getExternalStorageDirectory() + "/girl.jpg");
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                info.groupOwnerAddress.getHostAddress());
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+       this.startService(serviceIntent);
     }
 }

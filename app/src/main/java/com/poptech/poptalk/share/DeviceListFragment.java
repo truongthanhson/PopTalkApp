@@ -141,19 +141,6 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         }
     }
 
-    /**
-     * Update UI for this device.
-     * 
-     * @param device WifiP2pDevice object
-     */
-    public void updateThisDevice(WifiP2pDevice device) {
-        this.device = device;
-        TextView view = (TextView) mContentView.findViewById(R.id.my_name);
-        view.setText(device.deviceName);
-        view = (TextView) mContentView.findViewById(R.id.my_status);
-        view.setText(getDeviceStatus(device.status));
-    }
-
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peerList) {
         if (progressDialog != null && progressDialog.isShowing()) {

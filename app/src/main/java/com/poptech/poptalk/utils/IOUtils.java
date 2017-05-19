@@ -17,9 +17,11 @@
 package com.poptech.poptalk.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.common.base.Charsets;
 import com.poptech.poptalk.BuildConfig;
+import com.poptech.poptalk.share.ShareActivity;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -127,4 +129,24 @@ public class IOUtils {
         return sb.toString();
     }
 
+    public static boolean copyFile(InputStream inputStream, OutputStream out) {
+        byte buf[] = new byte[1024];
+        int len;
+        long startTime= System.currentTimeMillis();
+
+        try {
+            while ((len = inputStream.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            out.close();
+            inputStream.close();
+            long endTime= System.currentTimeMillis()-startTime;
+            Log.v("","Time taken to transfer all bytes is : "+endTime);
+
+        } catch (IOException e) {
+            Log.d(ShareActivity.TAG, e.toString());
+            return false;
+        }
+        return true;
+    }
 }
