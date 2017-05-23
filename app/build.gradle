@@ -11,6 +11,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -49,5 +50,7 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.google.android.gms:play-services-maps:9.8.0'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
 }

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.multidex.MultiDex;
 import android.util.Base64;
 import android.util.Log;
 
@@ -28,6 +29,12 @@ public class PopTalkApplication extends Application {
     public static volatile Context applicationContext;
     public static volatile Handler applicationHandler;
     private AppComponent mAppComponent;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 
     @Override
     public void onCreate() {

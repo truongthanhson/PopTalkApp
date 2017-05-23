@@ -168,14 +168,16 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
                         Manifest.permission.CHANGE_WIFI_STATE,
                         Manifest.permission.CHANGE_NETWORK_STATE,
                         Manifest.permission.ACCESS_NETWORK_STATE,
-                        Manifest.permission.READ_PHONE_STATE
-                        ).withListener(new BaseMultiplePermissionsListener() {
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(new BaseMultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(SpeakItemDetailActivity.this, ShareActivity.class);
-                    intent.putExtra("speak_item", speakItem);
+                    intent.putExtra(Constants.KEY_SPEAK_ITEM, speakItem);
                     startActivity(intent);
                 }
             }

@@ -25,7 +25,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.utils.Utils;
+import com.poptech.poptalk.utils.ZipManager;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by sontt on 17/05/2017.
@@ -42,6 +59,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
+    private SpeakItem mSpeakItem;
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -53,6 +71,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSpeakItem = getIntent().getParcelableExtra(Constants.KEY_SPEAK_ITEM);
         setContentView(R.layout.activity_share_layout);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -72,7 +91,9 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         channel = manager.initialize(this, getMainLooper(), null);
     }
 
-    /** register the BroadcastReceiver with the intent values to be matched */
+    /**
+     * register the BroadcastReceiver with the intent values to be matched
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -277,12 +298,56 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
+        String speakItemZip = zipSpeakItem();
         Intent serviceIntent = new Intent(this, FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, Environment.getExternalStorageDirectory() + "/girl.jpg");
+        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, speakItemZip);
         serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
                 info.groupOwnerAddress.getHostAddress());
         serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
-       this.startService(serviceIntent);
+        this.startService(serviceIntent);
+    }
+
+    private String zipSpeakItem() {
+        String speakItemDir = Environment.getExternalStorageDirectory() +
+                Constants.PATH_APP + "/" +
+                Constants.PATH_SHARE + "/" +
+                Constants.PATH_SEND + "/" +
+                mSpeakItem.getId();
+        File iSpeakItemDir = new File(speakItemDir);
+        try {
+            if (!iSpeakItemDir.exists()) {
+                Utils.forceMkdir(iSpeakItemDir);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String speakItemJson = speakItemDir + "/" + mSpeakItem.getId() + ".json";
+        Gson gson = new Gson();
+        try {
+            String jsonString = gson.toJson(mSpeakItem);
+            FileWriter fileWriter = new FileWriter(speakItemJson);
+            fileWriter.write(jsonString);
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<String> zipFiles = new ArrayList<>();
+        if (new File(speakItemJson).exists()) {
+            zipFiles.add(speakItemJson);
+        }
+        if (new File(mSpeakItem.getAudioPath()).exists()) {
+            zipFiles.add(mSpeakItem.getAudioPath());
+        }
+        if (new File(mSpeakItem.getPhotoPath()).exists()) {
+            zipFiles.add(mSpeakItem.getPhotoPath());
+        }
+
+        String speakItemZip = speakItemDir + "/" + mSpeakItem.getId() + ".zip";
+        ZipManager zipManager = new ZipManager();
+        zipManager.zip(zipFiles.toArray(new String[zipFiles.size()]), speakItemZip);
+        return speakItemZip;
     }
 }

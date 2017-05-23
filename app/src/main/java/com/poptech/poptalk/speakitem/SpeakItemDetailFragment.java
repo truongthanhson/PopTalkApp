@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -237,14 +238,14 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onStop() {
+        stopPlay();
+        clearNotification();
+        mPresenter.updateSpeakItem(mSpeakItem);
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        stopPlay();
-        clearNotification();
-        mPresenter.updateSpeakItem(mSpeakItem);
         super.onDestroy();
     }
 
@@ -790,7 +791,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+        mSpeakItem.setDescription(s.toString());
     }
 
     @Override

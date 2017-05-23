@@ -60,8 +60,14 @@ public class Constants {
     public static final String PATH_APP = "/PopTalk";
 
     public static final String PATH_PHOTO = "/photo";
-    public static final String PATH_TEMP = "/temp";
+
     public static final String PATH_AUDIO = "/audio";
+
+    public static final String PATH_SHARE = "/share";
+
+    public static final String PATH_SEND = "/send";
+
+    public static final String PATH_RECEIVE = "/receive";
 
     public static final int MAX_AUDIO_RECORD_TIME_MS = 600000;
 
