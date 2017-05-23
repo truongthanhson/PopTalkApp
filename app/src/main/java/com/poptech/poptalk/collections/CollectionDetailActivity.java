@@ -15,7 +15,7 @@ import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 /**
- * Created by Administrator on 06/05/2017.
+ * Created by sontt on 06/05/2017.
  */
 
 public class CollectionDetailActivity extends AppCompatActivity implements SpeakItemsFragment.SpeakItemsFragmentCallback {

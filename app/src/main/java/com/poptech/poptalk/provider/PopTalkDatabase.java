@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import com.poptech.poptalk.bean.StoryBoard;
+
 import static com.poptech.poptalk.utils.LogUtils.makeLogTag;
 import static com.poptech.poptalk.provider.PopTalkContract.*;
 
@@ -68,6 +70,11 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
             + LanguageItemsColumns.LANGUAGE_ITEM_NAME + " TEXT,"
             + LanguageItemsColumns.LANGUAGE_ITEM_COMMENT + " TEXT)";
 
+    public static final String SQL_CREATE_STORY_BOARD = "CREATE TABLE " + Tables.STORY_BOARDS + " ("
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + StoryBoardColumns.SPEAK_ITEM_IDS + " TEXT, "
+            + StoryBoardColumns.CREATED_TIME + " INTEGER)";
+
 
     public PopTalkDatabase(Context context) {
         super(context, DATABASE_NAME, null, CURRENT_DATABASE_VERSION);
@@ -82,6 +89,7 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_SPEAK_ITEMS);
         db.execSQL(SQL_CREATE_LANGUAGES);
         db.execSQL(SQL_CREATE_LANGUAGE_ITEMS);
+        db.execSQL(SQL_CREATE_STORY_BOARD);
     }
 
     @Override

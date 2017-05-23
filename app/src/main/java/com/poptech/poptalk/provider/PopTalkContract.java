@@ -31,6 +31,7 @@ public class PopTalkContract {
         String SPEAK_ITEMS = "speak_items";
         String LANGUAGES = "languages";
         String LANGUAGE_ITEMS = "language_items";
+        String STORY_BOARDS = "story_boards";
     }
 
     public interface PhotoColumns {
@@ -73,6 +74,11 @@ public class PopTalkContract {
         String LANGUAGE_ITEM_COMMENT = "language_item_comment";
     }
 
+    public interface StoryBoardColumns {
+        String SPEAK_ITEM_IDS = "speak_items";
+        String CREATED_TIME = "created_time";
+    }
+
     public static final String CONTENT_AUTHORITY = "com.poptech.poptalk";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
@@ -89,12 +95,15 @@ public class PopTalkContract {
 
     private static final String PATH_LANGUAGE_ITEMS = "language_items";
 
+    private static final String PATH_STORY_BOARD = "storyboard";
+
     public static final String[] TOP_LEVEL_PATHS = {
             PATH_PHOTOS,
             PATH_SPEAK_ITEMS,
             PATH_COLLECTIONS,
             PATH_LANGUAGES,
-            PATH_LANGUAGE_ITEMS
+            PATH_LANGUAGE_ITEMS,
+            PATH_STORY_BOARD
     };
 
     public static class Credentials implements CredentialsColumns, BaseColumns {
@@ -177,6 +186,20 @@ public class PopTalkContract {
 
         /**
          * Build {@link Uri} that references all language items.
+         */
+        public static Uri buildCollectionsUri() {
+            return CONTENT_URI;
+        }
+    }
+
+    public static class StoryBoards implements StoryBoardColumns, BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LANGUAGE_ITEMS).build();
+
+        public static final String CONTENT_TYPE_ID = "storyboard";
+
+        /**
+         * Build {@link Uri} that references all storyboard items.
          */
         public static Uri buildCollectionsUri() {
             return CONTENT_URI;

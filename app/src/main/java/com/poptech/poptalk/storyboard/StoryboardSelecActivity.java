@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.bean.StoryBoard;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by sontt on 09/05/2017.
  */
 
-public class StoryboardSelecActivity extends AppCompatActivity {
+public class StoryboardSelecActivity extends AppCompatActivity implements StoryBoardSelectFragment.StoryBoardSelectFragmentCallBack {
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolBar;
     @Override
@@ -68,14 +69,15 @@ public class StoryboardSelecActivity extends AppCompatActivity {
         if(fragment == null)
             return;
         if(fragment instanceof StoryBoardSelectFragment){
-            ArrayList<SpeakItem> chosenSpeakItems = (((StoryBoardSelectFragment) fragment).getSelectedSpeakItems());
-
-            Intent intent = new Intent(this, StoryboardActivity.class);
-            intent.putParcelableArrayListExtra("selected_speak_items", chosenSpeakItems);
-
-            startActivity(intent);
+            ((StoryBoardSelectFragment)fragment).buildStoryBoard();
         }
 
     }
 
+    @Override
+    public void onStoryBoardBuilt(StoryBoard storyBoard) {
+        Intent intent = new Intent(this, StoryboardActivity.class);
+        intent.putExtra("storyboard", storyBoard);
+        startActivity(intent);
+    }
 }

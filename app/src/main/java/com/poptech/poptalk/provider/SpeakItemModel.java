@@ -26,7 +26,7 @@ public class SpeakItemModel implements BaseModel {
         this.mDatabase = database;
     }
 
-    private interface SpeakItemQuery {
+    public interface SpeakItemQuery {
         String[] projections = new String[]{
                 PopTalkContract.SpeakItems._ID,
                 PopTalkContract.SpeakItems.SPEAK_ITEM_ID,

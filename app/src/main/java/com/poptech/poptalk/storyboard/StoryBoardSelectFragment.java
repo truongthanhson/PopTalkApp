@@ -16,12 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.bean.StoryBoard;
 import com.poptech.poptalk.collections.SpeakItemsFragment;
 import com.poptech.poptalk.utils.MetricUtils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
@@ -37,6 +39,10 @@ import javax.inject.Inject;
 
 public class StoryBoardSelectFragment extends Fragment implements StoryBoardSelectContract.View {
 
+    public interface StoryBoardSelectFragmentCallBack{
+        void onStoryBoardBuilt(StoryBoard storyBoard);
+    }
+
     public static StoryBoardSelectFragment newInstance() {
         return new StoryBoardSelectFragment();
     }
@@ -49,6 +55,16 @@ public class StoryBoardSelectFragment extends Fragment implements StoryBoardSele
     private RecyclerView mStoryBoardSelectView;
 
     private StoryBoardSelectAdapter mAdapter;
+
+    private StoryBoardSelectFragmentCallBack mCallback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof StoryBoardSelectFragmentCallBack){
+            mCallback = (StoryBoardSelectFragmentCallBack)context;
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,6 +125,21 @@ public class StoryBoardSelectFragment extends Fragment implements StoryBoardSele
     public void onSpeakItemLoaded(List<SpeakItem> speakItems) {
         mAdapter = new StoryBoardSelectAdapter(speakItems, getActivity());
         mStoryBoardSelectView.setAdapter(mAdapter);
+    }
+
+    public void buildStoryBoard(){
+        if(getSelectedSpeakItems() == null || getSelectedSpeakItems().size() == 0){
+            Toast.makeText(getActivity(), "You did not select any speak item to build storyboard", Toast.LENGTH_SHORT).show();
+        }else{
+            mPresenter.buildStoryBoard(getSelectedSpeakItems());
+        }
+    }
+
+    @Override
+    public void onStoryBoardBuilt(StoryBoard storyBoard) {
+        if(mCallback != null){
+            mCallback.onStoryBoardBuilt(storyBoard);
+        }
     }
 
     public ArrayList<SpeakItem> getSelectedSpeakItems(){

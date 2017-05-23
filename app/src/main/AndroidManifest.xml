@@ -29,6 +29,7 @@
         <activity android:name=".speakitem.SpeakItemDetailActivity" />
         <activity android:name=".storyboard.StoryboardActivity" />
         <activity android:name=".storyboard.StoryboardSelecActivity" />
+        <activity android:name=".storyboard.StoryBoardListActivity" />
         <activity android:name=".share.ShareActivity" />
         <activity android:name=".share.ReceiveActivity" />
         <activity android:name=".maps.MapActivity" />
