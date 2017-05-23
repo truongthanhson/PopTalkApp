@@ -151,7 +151,7 @@ public class StoryBoardModel implements BaseModel {
         return querySpeakItems(speakItemIds);
     }
 
-    public static String strSeparator = "__,__";
+    public static String strSeparator = ";";
     public static String convertArrayToString(String[] array){
         String str = "";
         for (int i = 0;i<array.length; i++) {
