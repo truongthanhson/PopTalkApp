@@ -151,7 +151,7 @@ public class StoryBoardListFragment extends Fragment implements StoryBoardListCo
                     .into(holder.mThumbnailIv);
 
             calendar.setTimeInMillis(mStoryBoards.get(position).getCreatedTime());
-            holder.mCreatedTimeTv.setText("Created at " + dateFormat.format(calendar.getTime()));
+            holder.mCreatedTimeTv.setText("Built " + dateFormat.format(calendar.getTime()));
 
             holder.mRootView.setOnClickListener(new View.OnClickListener() {
                 @Override

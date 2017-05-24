@@ -274,7 +274,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         this.mPresenter = (SpeakItemPresenter) presenter;
     }
 
-    public class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder> {
+    private class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder> {
         private List<SpeakItem> mSpeakItems;
         private Context mContext;
 
@@ -317,7 +317,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         }
     }
 
-    public class SpeakItemViewHolder extends RecyclerView.ViewHolder {
+    private class SpeakItemViewHolder extends RecyclerView.ViewHolder {
 
         private View mRootView;
         private TextView mLanguageTv;

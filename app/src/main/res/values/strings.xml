@@ -7,8 +7,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="photo_gallery">Gallery</string>
-    <string name="receiver_title">WiFi Direct Receive</string>
-    <string name="sender_title">WiFi Direct Send</string>
+    <string name="receiver_title">Wifi Direct Receive</string>
+    <string name="sender_title">Wifi Direct Send</string>
 
     <string name="enable_p2p_button">P2P On/Off</string>
     <string name="discover_peers_button">Discover</string>
@@ -19,7 +19,7 @@
     <string name="yes">yes</string>
     <string name="no">no</string>
     <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>
-    <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>
+    <string name="empty_message">No devices found. Turn on P2P and perform discovery</string>
     <string name="p2p_off_warning">Enable P2P from action bar button above or system settings</string>
     <string name="group_owner_text">"Am I the Group Owner? "</string>
     <string name="label_me">ME</string>

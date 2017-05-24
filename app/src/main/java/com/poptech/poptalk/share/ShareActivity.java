@@ -133,6 +133,9 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.atn_direct_enable:
                 if (manager != null && channel != null) {
 
@@ -145,7 +148,6 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
                     Log.e(TAG, "channel or manager is null");
                 }
                 return true;
-
             case R.id.atn_direct_discover:
                 if (!isWifiP2pEnabled) {
                     Toast.makeText(ShareActivity.this, "Enable P2P from action bar button above or system settings",

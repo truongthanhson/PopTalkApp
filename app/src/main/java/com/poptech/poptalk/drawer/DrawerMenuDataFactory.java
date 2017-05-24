@@ -28,7 +28,7 @@ public class DrawerMenuDataFactory {
     }
 
     public static TopLevelMenuDrawer makeShareMenu() {
-        return new TopLevelMenuDrawer("Share", makeShareSubMenu(), R.drawable.ic_view);
+        return new TopLevelMenuDrawer("Receive Item", makeShareSubMenu(), R.drawable.ic_download);
     }
 
     private static List<SubMenuDrawer> makeStoryBoardSubmenu() {
@@ -44,7 +44,7 @@ public class DrawerMenuDataFactory {
     }
 
     private static List<SubMenuDrawer> makeShareSubMenu() {
-        return Arrays.asList(new SubMenuDrawer("WiFi Direct"));
+        return Arrays.asList(new SubMenuDrawer("Wifi Direct"));
     }
 
 }

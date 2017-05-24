@@ -14,9 +14,26 @@
         <include layout="@layout/item_toolbar_layout" />
 
         <FrameLayout
-            android:id="@+id/container_body"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/speak_item_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="#f1f5f7"
+                android:scrollbars="none" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/colorAccent"
+                android:indeterminateTintMode="src_atop"
+                android:visibility="gone" />
+        </FrameLayout>
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

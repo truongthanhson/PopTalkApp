@@ -8,45 +8,37 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
-import com.poptech.poptalk.location.LocationTask;
+import com.poptech.poptalk.collections.SpeakItemsFragment;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
-import com.poptech.poptalk.utils.IOUtils;
-import com.poptech.poptalk.utils.StringUtils;
-import com.poptech.poptalk.utils.Utils;
-import com.poptech.poptalk.utils.ZipManager;
+import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Random;
-
-/**
- * Created by sontt on 18/05/2017.
- */
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
-
     public static final String TAG = "ReceiveActivity";
     private Toolbar mToolbar;
     private WifiP2pManager manager;
@@ -58,13 +50,13 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     private BroadcastReceiver receiver = null;
     private SpeakItemModel mSpeakItemModel;
     private CollectionsModel mCollectionModel;
+    private RecyclerView mSpeakItemsView;
+    private List<SpeakItem> mSpeakItems;
 
-    /**
-     * @param isWifiP2pEnabled the isWifiP2pEnabled to set
-     */
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +83,9 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-
+        mSpeakItemsView = (RecyclerView) findViewById(R.id.speak_item_list);
+        mSpeakItemsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mSpeakItems = new ArrayList<>();
     }
 
     @Override
@@ -103,13 +97,13 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
             @Override
             public void onSuccess() {
-                Toast.makeText(ReceiveActivity.this, "Discovery Initiated",
+                Toast.makeText(ReceiveActivity.this, "Discovery initiated",
                         Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reasonCode) {
-                Toast.makeText(ReceiveActivity.this, "Discovery Failed : " + reasonCode,
+                Toast.makeText(ReceiveActivity.this, "Discovery failed : " + reasonCode,
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -139,15 +133,17 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 @Override
                 public void onStart() {
                     Toast.makeText(PopTalkApplication.applicationContext,
-                            "Start Receiving Speak Item",
+                            "Start receiving speak item",
                             Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.progress_bar_id).setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onSuccess(SpeakItem speakItem) {
+                    findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
                     if (speakItem != null) {
                         Toast.makeText(PopTalkApplication.applicationContext,
-                                "Receive Speak Item Successfully",
+                                "Receive speak item successfully",
                                 Toast.LENGTH_SHORT).show();
                         // Update Collection
                         if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
@@ -167,6 +163,8 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                         // Update Speak Item
                         speakItem.setAddedTime(System.currentTimeMillis());
                         mSpeakItemModel.addNewSpeakItem(speakItem);
+                        mSpeakItems.add(speakItem);
+                        mSpeakItemsView.setAdapter(new SpeakItemsAdapter(mSpeakItems, ReceiveActivity.this));
                     }
                     disconnect();
                 }
@@ -191,11 +189,16 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         });
     }
 
-    /**
-     * A BroadcastReceiver that notifies of important Wi-Fi p2p events.
-     */
-    private class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         private WifiP2pManager mManager;
         private WifiP2pManager.Channel mChannel;
         private ReceiveActivity mActivity;
@@ -219,16 +222,13 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 } else {
                     // Wi-Fi P2P is not enabled
                 }
-                Log.e("sontt", "state = " + state);
             } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
                 // Call WifiP2pManager.requestPeers() to get a list of current peers
-                Log.e("sontt", "WIFI_P2P_PEERS_CHANGED_ACTION");
                 if (manager != null) {
                     manager.requestPeers(channel, ReceiveActivity.this);
                 }
             } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
                 // Respond to new connection or disconnections
-                Log.e("sontt", "WIFI_P2P_CONNECTION_CHANGED_ACTION");
                 if (manager == null) {
                     return;
                 }
@@ -243,9 +243,64 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 }
             } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
                 // Respond to this device's wifi state changing
-                Log.e("sontt", "WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
             }
         }
+    }
 
+    private class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder> {
+        private List<SpeakItem> mSpeakItems;
+        private Context mContext;
+
+        public SpeakItemsAdapter(List<SpeakItem> speakItems, Context context) {
+            this.mSpeakItems = speakItems;
+            this.mContext = context;
+        }
+
+        @Override
+        public SpeakItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_speak_item_layout, parent, false);
+            return new SpeakItemViewHolder(rootView);
+        }
+
+        @Override
+        public void onBindViewHolder(SpeakItemViewHolder holder, final int position) {
+            holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription());
+            holder.mLanguageTv.setText(mSpeakItems.get(position).getLanguage());
+            Glide.with(mContext)
+                    .load(mSpeakItems.get(position).getPhotoPath())
+                    .centerCrop()
+                    .thumbnail(0.5f)
+                    .placeholder(R.color.colorAccent)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.mThumbnailIv);
+
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(mContext, SpeakItemDetailActivity.class);
+                intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, mSpeakItems.get(position).getId());
+                intent.putExtra(Constants.KEY_COLLECTION_ID, mSpeakItems.get(position).getCollectionId());
+                startActivity(intent);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mSpeakItems.size();
+        }
+    }
+
+    private class SpeakItemViewHolder extends RecyclerView.ViewHolder {
+
+        private View mRootView;
+        private TextView mLanguageTv;
+        private ImageView mThumbnailIv;
+        private TextView mDescriptionTv;
+
+        public SpeakItemViewHolder(View itemView) {
+            super(itemView);
+            mRootView = itemView;
+            mDescriptionTv = (TextView) mRootView.findViewById(R.id.tv_description_id);
+            mLanguageTv = (TextView) mRootView.findViewById(R.id.tv_lang_id);
+            mThumbnailIv = (ImageView) mRootView.findViewById(R.id.iv_thumb_id);
+        }
     }
 }

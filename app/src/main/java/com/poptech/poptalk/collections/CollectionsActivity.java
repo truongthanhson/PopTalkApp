@@ -382,7 +382,8 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onNavigateStoryboardFrequency() {
-
+        Intent intent = new Intent(this, StoryBoardListActivity.class);
+        startActivity(intent);
     }
 
     @Override

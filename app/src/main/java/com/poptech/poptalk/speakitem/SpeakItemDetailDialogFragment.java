@@ -198,6 +198,8 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 addNewCollection();
                 break;
             case R.id.share_button_id:
+                updateCollection();
+                dismiss();
                 mCallBack.onClickShare(mSpeakItem);
                 break;
             case R.id.language_button_id:
