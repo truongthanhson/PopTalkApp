@@ -1,6 +1,7 @@
 package com.poptech.poptalk.share;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -59,6 +60,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
+    private Dialog mWifiDialog = null;
     private SpeakItem mSpeakItem;
 
     /**
@@ -66,6 +68,14 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
      */
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
+        if (!isWifiP2pEnabled) {
+            showWifiSettings();
+        } else {
+            if (mWifiDialog != null) {
+                mWifiDialog.dismiss();
+            }
+            discoveryPeers();
+        }
     }
 
     @Override
@@ -121,9 +131,12 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_share, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.menu_discovery, menu);
+        MenuItem discoveryItem = menu.findItem(R.id.action_discovery);
+        if (discoveryItem != null) {
+            discoveryItem.setVisible(true);
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     /*
@@ -136,45 +149,52 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.atn_direct_enable:
-                if (manager != null && channel != null) {
-
-                    // Since this is the system wireless settings activity, it's
-                    // not going to send us a result. We will be notified by
-                    // WiFiDeviceBroadcastReceiver instead.
-
-                    startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-                } else {
-                    Log.e(TAG, "channel or manager is null");
-                }
-                return true;
-            case R.id.atn_direct_discover:
+            case R.id.action_discovery:
                 if (!isWifiP2pEnabled) {
-                    Toast.makeText(ShareActivity.this, "Enable P2P from action bar button above or system settings",
-                            Toast.LENGTH_SHORT).show();
-                    return true;
+                    showWifiSettings();
+                } else {
+                    discoveryPeers();
                 }
-                final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager()
-                        .findFragmentById(R.id.frag_list);
-                fragment.onInitiateDiscovery();
-                manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(ShareActivity.this, "Discovery Initiated",
-                                Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(int reasonCode) {
-                        Toast.makeText(ShareActivity.this, "Discovery Failed : " + reasonCode,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void showWifiSettings() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Wifi Setting");
+        alertDialog.setMessage("Wifi is not enabled. Do you want to enable wifi?");
+        alertDialog.setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+            }
+        });
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        mWifiDialog = alertDialog.create();
+        mWifiDialog.show();
+    }
+
+    public void discoveryPeers() {
+        DeviceListFragment fragment = (DeviceListFragment) getFragmentManager().findFragmentById(R.id.frag_list);
+        fragment.onInitiateDiscovery();
+        manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(ShareActivity.this, "Discovery initiated", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                Toast.makeText(ShareActivity.this, "Discovery failed: " + reasonCode, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -192,20 +212,11 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
                         WifiP2pConfig config = new WifiP2pConfig();
                         config.deviceAddress = device.deviceAddress;
                         config.wps.setup = WpsInfo.PBC;
-//                        ProgressDialog progressDialog = new ProgressDialog(ShareActivity.this);
-//                        if (progressDialog != null && progressDialog.isShowing()) {
-//                            progressDialog.dismiss();
-//                        }
-//                        progressDialog = ProgressDialog.show(ShareActivity.this, "Press back to cancel",
-//                                "Connecting to :" + device.deviceAddress, true, true
-////
-//                        );
                         connect(config);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -223,8 +234,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(ShareActivity.this, "Connect failed. Retry.",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShareActivity.this, "Connect failed. Retry.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -255,9 +265,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             retryChannel = true;
             manager.initialize(this, getMainLooper(), this);
         } else {
-            Toast.makeText(this,
-                    "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Severe! Channel is probably lost permanently. Try Disable/Re-Enable P2P.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -282,15 +290,12 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(ShareActivity.this, "Aborting connection",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ShareActivity.this, "Aborting connection", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFailure(int reasonCode) {
-                        Toast.makeText(ShareActivity.this,
-                                "Connect abort request failed. Reason Code: " + reasonCode,
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ShareActivity.this, "Connect abort request failed. Reason Code: " + reasonCode, Toast.LENGTH_SHORT).show();
                     }
                 });
             }

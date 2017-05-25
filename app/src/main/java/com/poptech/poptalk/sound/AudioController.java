@@ -187,6 +187,7 @@ public class AudioController {
     private MediaPlayer mAudioPlayer = null;
     private AudioTrack mAudioTrackPlayer = null;
     private int mLastProgress = 0;
+    private int mStartProgress = 0;
     private int mIgnoreFirstProgress = 0;
     private SpeakItem mPlayingAudioItem;
     private final Object mSync = new Object();
@@ -195,6 +196,7 @@ public class AudioController {
     private final Object mProgressTimerSync = new Object();
     private Timer mProgressTimer = null;
     private long mLastPlayPcm;
+    private long mStartPlayPcm;
     private long mCurrentTotalPcmDuration;
     private boolean mDecodingFinished = false;
     private int mBuffersWrited;
@@ -424,10 +426,12 @@ public class AudioController {
                         if (!mIsPaused) {
                             mIgnoreFirstProgress = 3;
                             mLastPlayPcm = (long) (mCurrentTotalPcmDuration * progress);
+                            mStartPlayPcm = (long) (mCurrentTotalPcmDuration * progress);
                             if (mAudioTrackPlayer != null) {
                                 mAudioTrackPlayer.play();
                             }
                             mLastProgress = (int) (mCurrentTotalPcmDuration / 48.0f * progress);
+                            mStartProgress = (int) (mCurrentTotalPcmDuration / 48.0f * progress);
                             checkPlayerQueue();
                         }
                     }
@@ -445,6 +449,7 @@ public class AudioController {
                 int seekTo = (int) (mAudioPlayer.getDuration() * progress);
                 mAudioPlayer.seekTo(seekTo);
                 mLastProgress = seekTo;
+                mStartProgress = seekTo;
             } else if (mAudioTrackPlayer != null) {
                 seekOpusPlayer(progress);
             }
@@ -604,6 +609,7 @@ public class AudioController {
                                             }
                                         } else {
                                             progress = (int) (mLastPlayPcm / 48.0f);
+                                            mStartProgress = (int) (mStartPlayPcm / 48.0f);
                                             value = (float) mLastPlayPcm / (float) mCurrentTotalPcmDuration;
                                             if (progress == mLastProgress) {
                                                 return;
@@ -611,8 +617,8 @@ public class AudioController {
                                         }
                                         mLastProgress = progress;
                                         currentPlayingSpeakItem.setAudioProgress(value);
-                                        currentPlayingSpeakItem.setAudioProgressSec(mLastProgress / 1000);
-                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, mAudioId, value, mLastProgress / 1000);
+                                        currentPlayingSpeakItem.setAudioProgressSec((mLastProgress - mStartProgress) / 1000);
+                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioProgressDidChanged, mAudioId, value, (mLastProgress - mStartProgress) / 1000);
                                     } catch (Exception e) {
                                         Log.e(TAG, e.toString());
                                     }
@@ -674,6 +680,7 @@ public class AudioController {
         }
         stopProgressTimer();
         mLastProgress = 0;
+        mStartProgress = 0;
         mIsPaused = false;
         if (mPlayingAudioItem != null) {
             mPlayingAudioItem.setAudioProgress(0.0f);
@@ -824,7 +831,9 @@ public class AudioController {
 
         mIsPaused = false;
         mLastProgress = 0;
+        mStartProgress = 0;
         mLastPlayPcm = 0;
+        mStartPlayPcm = 0;
         mPlayingAudioItem = audioItem;
         startProgressTimer(mPlayingAudioItem);
         NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidStarted, mAudioId, audioItem);
@@ -852,6 +861,7 @@ public class AudioController {
                     try {
                         if (mPlayingAudioItem != null && mPlayingAudioItem.getAudioProgress() != 0) {
                             mLastPlayPcm = (long) (mCurrentTotalPcmDuration * mPlayingAudioItem.getAudioProgress());
+                            mStartPlayPcm = (long) (mCurrentTotalPcmDuration * mPlayingAudioItem.getAudioProgress());
                             seekOpusFile(mPlayingAudioItem.getAudioProgress());
                         }
                     } catch (Exception e) {

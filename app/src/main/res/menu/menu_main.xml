@@ -8,10 +8,10 @@
         android:visible="false"
         app:showAsAction="ifRoom"></item>
     <item
-        android:id="@+id/action_plus"
-        android:icon="@drawable/ic_plus"
+        android:id="@+id/action_discovery"
+        android:icon="@drawable/ic_autorenew"
         android:orderInCategory="200"
-        android:title="Add More"
+        android:title="Discovery"
         android:visible="false"
         app:showAsAction="ifRoom"></item>
     <item

@@ -3,13 +3,13 @@
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:background="?android:attr/activatedBackgroundIndicator"
-    android:padding="5dip">
+    android:padding="10dip">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_marginRight="2dip"
+        android:layout_marginRight="5dip"
         android:src="@drawable/ic_device" />
 
     <LinearLayout

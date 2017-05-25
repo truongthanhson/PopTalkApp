@@ -145,26 +145,11 @@ public class GalleryActivity extends AppCompatActivity implements LocationListen
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_camera, menu);
         MenuItem cameraItem = menu.findItem(R.id.action_camera);
         if (cameraItem != null) {
             cameraItem.setVisible(true);
         }
-        MenuItem plusItem = menu.findItem(R.id.action_plus);
-        if (plusItem != null) {
-            plusItem.setVisible(false);
-        }
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        if (searchItem != null) {
-            searchItem.setVisible(false);
-        }
-
-        MenuItem moreItem = menu.findItem(R.id.action_more);
-        if (moreItem != null) {
-            moreItem.setVisible(false);
-        }
-
         return super.onCreateOptionsMenu(menu);
     }
 

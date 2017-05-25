@@ -114,21 +114,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem cameraItem = menu.findItem(R.id.action_camera);
-        if (cameraItem != null) {
-            cameraItem.setVisible(false);
-        }
-        MenuItem plusItem = menu.findItem(R.id.action_plus);
-        if (plusItem != null) {
-            plusItem.setVisible(false);
-        }
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        if (searchItem != null) {
-            searchItem.setVisible(false);
-        }
-
+        getMenuInflater().inflate(R.menu.menu_more, menu);
         MenuItem moreItem = menu.findItem(R.id.action_more);
         if (moreItem != null) {
             moreItem.setVisible(true);

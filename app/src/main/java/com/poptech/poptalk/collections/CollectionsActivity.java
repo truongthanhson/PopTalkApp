@@ -46,6 +46,7 @@ import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.share.ReceiveActivity;
+import com.poptech.poptalk.share.ShareActivity;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.storyboard.StoryBoardListActivity;
 import com.poptech.poptalk.storyboard.StoryBoardSelectFragment;
@@ -388,8 +389,30 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onNavigateToReceiveScreen() {
-        Intent intent = new Intent(this, ReceiveActivity.class);
-        startActivity(intent);
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.CHANGE_WIFI_STATE,
+                        Manifest.permission.CHANGE_NETWORK_STATE,
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(new BaseMultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                super.onPermissionsChecked(report);
+                if (report.areAllPermissionsGranted()) {
+                    Intent intent = new Intent(CollectionsActivity.this, ReceiveActivity.class);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                super.onPermissionRationaleShouldBeShown(permissions, token);
+            }
+        }).check();
+
     }
 
     @Override

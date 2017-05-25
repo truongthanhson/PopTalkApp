@@ -140,11 +140,11 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
                 @Override
                 public void onSuccess(SpeakItem speakItem) {
+                    Toast.makeText(PopTalkApplication.applicationContext,
+                            "Receive speak item successfully",
+                            Toast.LENGTH_SHORT).show();
                     findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
                     if (speakItem != null) {
-                        Toast.makeText(PopTalkApplication.applicationContext,
-                                "Receive speak item successfully",
-                                Toast.LENGTH_SHORT).show();
                         // Update Collection
                         if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
                             Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
