@@ -8,6 +8,8 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -202,7 +204,11 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 startReceiveFileServer();
             }
         });
-        mFileServerTask.execute();
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ) {
+            mFileServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            mFileServerTask.execute();
+        }
     }
 
     public void disconnect() {
