@@ -8,8 +8,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,6 +37,8 @@ import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
     public static final String TAG = "ReceiveActivity";
@@ -46,6 +46,8 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
+
+    private static final Executor SERVER_EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
@@ -204,11 +206,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 startReceiveFileServer();
             }
         });
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ) {
-            mFileServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } else {
-            mFileServerTask.execute();
-        }
+        mFileServerTask.executeOnExecutor(SERVER_EXECUTOR);
     }
 
     public void disconnect() {
