@@ -209,10 +209,16 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
                 .setMessage("Are you sure you want to share Speak Item with this device?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        WifiP2pConfig config = new WifiP2pConfig();
-                        config.deviceAddress = device.deviceAddress;
-                        config.wps.setup = WpsInfo.PBC;
-                        connect(config);
+                        if(device.status == WifiP2pDevice.AVAILABLE){
+                            WifiP2pConfig config = new WifiP2pConfig();
+                            config.deviceAddress = device.deviceAddress;
+                            config.wps.setup = WpsInfo.PBC;
+                            connect(config);
+                        }else if(device.status == WifiP2pDevice.CONNECTED){
+                            onConnectionInfoAvailable(mLastInfo);
+                        }else {
+                            Toast.makeText(ShareActivity.this, "cant share right now",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -225,6 +231,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     @Override
     public void connect(WifiP2pConfig config) {
+        config.groupOwnerIntent = 0; // I want this device to become the owner
         manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
             @Override
@@ -303,8 +310,10 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     }
 
+    private WifiP2pInfo mLastInfo;
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
+        mLastInfo = info;
         String speakItemZip = zipSpeakItem();
         Intent serviceIntent = new Intent(this, FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);

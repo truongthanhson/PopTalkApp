@@ -29,7 +29,6 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
-import com.poptech.poptalk.collections.SpeakItemsFragment;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
@@ -128,49 +127,53 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
         if (info.groupFormed && info.isGroupOwner) {
-            FileServerAsyncTask task = new FileServerAsyncTask(this);
-            task.setListener(new FileServerAsyncTask.FileServerTaskListener() {
-                @Override
-                public void onStart() {
-                    Toast.makeText(PopTalkApplication.applicationContext,
-                            "Start receiving speak item",
-                            Toast.LENGTH_SHORT).show();
-                    findViewById(R.id.progress_bar_id).setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onSuccess(SpeakItem speakItem) {
-                    Toast.makeText(PopTalkApplication.applicationContext,
-                            "Receive speak item successfully",
-                            Toast.LENGTH_SHORT).show();
-                    findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
-                    if (speakItem != null) {
-                        // Update Collection
-                        if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
-                            Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
-                            collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
-                            collection.setThumbPath(speakItem.getPhotoPath());
-                            mCollectionModel.updateCollection(collection);
-                        } else {
-                            Collection collection = new Collection();
-                            collection.setId(speakItem.getCollectionId());
-                            collection.setNumSpeakItem(1);
-                            collection.setThumbPath(speakItem.getPhotoPath());
-                            collection.setAddedTime(System.currentTimeMillis());
-                            mCollectionModel.addNewCollection(collection);
-                        }
-
-                        // Update Speak Item
-                        speakItem.setAddedTime(System.currentTimeMillis());
-                        mSpeakItemModel.addNewSpeakItem(speakItem);
-                        mSpeakItems.add(speakItem);
-                        mSpeakItemsView.setAdapter(new SpeakItemsAdapter(mSpeakItems, ReceiveActivity.this));
-                    }
-                    disconnect();
-                }
-            });
-            task.execute();
+            startReceiveFileServer();
         }
+    }
+
+    private void startReceiveFileServer() {
+        FileServerAsyncTask task = new FileServerAsyncTask(this);
+        task.setListener(new FileServerAsyncTask.FileServerTaskListener() {
+            @Override
+            public void onStart() {
+                Toast.makeText(PopTalkApplication.applicationContext,
+                        "Start receiving speak item",
+                        Toast.LENGTH_SHORT).show();
+                findViewById(R.id.progress_bar_id).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onSuccess(SpeakItem speakItem) {
+                Toast.makeText(PopTalkApplication.applicationContext,
+                        "Receive speak item successfully",
+                        Toast.LENGTH_SHORT).show();
+                findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
+                if (speakItem != null) {
+                    // Update Collection
+                    if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
+                        Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
+                        collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
+                        collection.setThumbPath(speakItem.getPhotoPath());
+                        mCollectionModel.updateCollection(collection);
+                    } else {
+                        Collection collection = new Collection();
+                        collection.setId(speakItem.getCollectionId());
+                        collection.setNumSpeakItem(1);
+                        collection.setThumbPath(speakItem.getPhotoPath());
+                        collection.setAddedTime(System.currentTimeMillis());
+                        mCollectionModel.addNewCollection(collection);
+                    }
+
+                    // Update Speak Item
+                    speakItem.setAddedTime(System.currentTimeMillis());
+                    mSpeakItemModel.addNewSpeakItem(speakItem);
+                    mSpeakItems.add(speakItem);
+                    mSpeakItemsView.setAdapter(new SpeakItemsAdapter(mSpeakItems, ReceiveActivity.this));
+                }
+                startReceiveFileServer();
+            }
+        });
+        task.execute();
     }
 
     public void disconnect() {
