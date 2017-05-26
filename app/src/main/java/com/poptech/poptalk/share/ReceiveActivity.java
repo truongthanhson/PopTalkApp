@@ -34,6 +34,7 @@ import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     private CollectionsModel mCollectionModel;
     private RecyclerView mSpeakItemsView;
     private List<SpeakItem> mSpeakItems;
+    private FileServerAsyncTask mFileServerTask;
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
@@ -81,17 +83,34 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
+        deletePersistentGroups();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         mSpeakItemsView = (RecyclerView) findViewById(R.id.speak_item_list);
         mSpeakItemsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mSpeakItems = new ArrayList<>();
     }
 
+
+    private void deletePersistentGroups() {
+        try {
+            Method[] methods = WifiP2pManager.class.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getName().equals("deletePersistentGroup")) {
+                    // Delete any persistent group
+                    for (int netid = 0; netid < 32; netid++) {
+                        methods[i].invoke(manager, channel, netid, null);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         registerReceiver(receiver, intentFilter);
-
         manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
             @Override
@@ -111,12 +130,22 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mFileServerTask != null) {
+            mFileServerTask.cancel(true);
+        }
+        disconnect();
         unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
     @Override
     public void onChannelDisconnected() {
         manager.initialize(this, getMainLooper(), this);
+        deletePersistentGroups();
     }
 
     @Override
@@ -132,8 +161,8 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     }
 
     private void startReceiveFileServer() {
-        FileServerAsyncTask task = new FileServerAsyncTask(this);
-        task.setListener(new FileServerAsyncTask.FileServerTaskListener() {
+        mFileServerTask = new FileServerAsyncTask(this);
+        mFileServerTask.setListener(new FileServerAsyncTask.FileServerTaskListener() {
             @Override
             public void onStart() {
                 Toast.makeText(PopTalkApplication.applicationContext,
@@ -173,7 +202,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 startReceiveFileServer();
             }
         });
-        task.execute();
+        mFileServerTask.execute();
     }
 
     public void disconnect() {

@@ -6,7 +6,6 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.IOUtils;
@@ -37,6 +36,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
     }
 
     private FileServerTaskListener mListener;
+    private ServerSocket mServerSocket;
 
     private static final String TAG = "FileServerAsyncTask";
 
@@ -60,11 +60,24 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
     }
 
     @Override
+    protected void onCancelled() {
+        if(mServerSocket != null) {
+            try {
+                mServerSocket.close();
+                Log.d(ShareActivity.TAG, "Server: Socket close");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        super.onCancelled();
+    }
+
+    @Override
     protected SpeakItem doInBackground(Void... params) {
         try {
-            ServerSocket serverSocket = new ServerSocket(8988);
+            mServerSocket = new ServerSocket(8988);
             Log.d(ShareActivity.TAG, "Server: Socket opened");
-            Socket client = serverSocket.accept();
+            Socket client = mServerSocket.accept();
             Log.d(ShareActivity.TAG, "Server: connection done");
             String zipFile = Environment.getExternalStorageDirectory() +
                     Constants.PATH_APP + "/" +
@@ -81,7 +94,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
             Log.d(ShareActivity.TAG, "server: copying files " + f.toString());
             InputStream inputstream = client.getInputStream();
             IOUtils.copyFile(inputstream, new FileOutputStream(f));
-            serverSocket.close();
+            mServerSocket.close();
             return unZipSpeakItem(f.getAbsolutePath());
         } catch (IOException e) {
             Log.e(ShareActivity.TAG, e.getMessage());
