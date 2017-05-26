@@ -66,12 +66,8 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     private BroadcastReceiver receiver = null;
     private Dialog mWifiDialog = null;
     private SpeakItem mSpeakItem;
-//    private FileServerAsyncTask mFileServerTask;
-//    private int Key;
+    private WifiP2pInfo mLastInfo;
 
-    /**
-     * @param isWifiP2pEnabled the isWifiP2pEnabled to set
-     */
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
         if (!isWifiP2pEnabled) {
@@ -225,18 +221,18 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     public void discoveryPeers() {
         DeviceListFragment fragment = (DeviceListFragment) getFragmentManager().findFragmentById(R.id.frag_list);
         fragment.onInitiateDiscovery();
-//        manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-//
-//            @Override
-//            public void onSuccess() {
-//                Toast.makeText(ShareActivity.this, "Discovery initiated", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onFailure(int reasonCode) {
-//                Toast.makeText(ShareActivity.this, "Discovery failed: " + reasonCode, Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(ShareActivity.this, "Discovery initiated", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                Toast.makeText(ShareActivity.this, "Discovery failed: " + reasonCode, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -247,31 +243,45 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         } else {
             builder = new AlertDialog.Builder(this);
         }
-
-
-        builder.setTitle("Share")
-                .setMessage("Are you sure you want to share Speak Item with this device?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (device.status == WifiP2pDevice.AVAILABLE) {
+        if (device.status == WifiP2pDevice.AVAILABLE) {
+            builder.setTitle("Connect")
+                    .setMessage("Are you sure you want to connect with this device?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
                             WifiP2pConfig config = new WifiP2pConfig();
                             config.deviceAddress = device.deviceAddress;
                             config.groupOwnerIntent = 0;
                             config.wps.setup = WpsInfo.PBC;
                             connect(config);
-                        } else if (device.status == WifiP2pDevice.CONNECTED) {
-                            startTransferFile(mLastInfo);
-                        } else {
-                            Toast.makeText(ShareActivity.this, "cant share right now", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+        } else if (device.status == WifiP2pDevice.CONNECTED) {
+            builder.setTitle("Share")
+                    .setMessage("Are you sure you want to share speak item with this device?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            startTransferFile(mLastInfo);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(R.drawable.ic_share_white)
+                    .show();
+        } else {
+            Toast.makeText(ShareActivity.this, "cant share right now", Toast.LENGTH_SHORT).show();
+        }
+
+
+
     }
 
     @Override
@@ -282,11 +292,12 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             @Override
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
+                Toast.makeText(ShareActivity.this, "Connected", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(ShareActivity.this, "Connect failed. Retry.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShareActivity.this, "Connect Failed", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -298,7 +309,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
+//                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
             }
 
             @Override
@@ -356,25 +367,25 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     }
 
-    private WifiP2pInfo mLastInfo;
-
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
         mLastInfo = info;
         if (info.groupFormed && !info.isGroupOwner) {
-            startTransferFile(info);
+//            startTransferFile(info);
         }
     }
 
     private void startTransferFile(WifiP2pInfo info) {
-        String speakItemZip = zipSpeakItem();
-        Intent serviceIntent = new Intent(this, FileTransferService.class);
-        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, speakItemZip);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                info.groupOwnerAddress.getHostAddress());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
-        this.startService(serviceIntent);
+        if(info != null) {
+            String speakItemZip = zipSpeakItem();
+            Intent serviceIntent = new Intent(this, FileTransferService.class);
+            serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+            serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, speakItemZip);
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                    info.groupOwnerAddress.getHostAddress());
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+            this.startService(serviceIntent);
+        }
     }
 
     private String zipSpeakItem() {

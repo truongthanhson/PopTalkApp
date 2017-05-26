@@ -165,10 +165,10 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         mFileServerTask.setListener(new FileServerAsyncTask.FileServerTaskListener() {
             @Override
             public void onStart() {
-                Toast.makeText(PopTalkApplication.applicationContext,
-                        "Start receiving speak item",
-                        Toast.LENGTH_SHORT).show();
-                findViewById(R.id.progress_bar_id).setVisibility(View.VISIBLE);
+//                Toast.makeText(PopTalkApplication.applicationContext,
+//                        "Start receiving speak item",
+//                        Toast.LENGTH_SHORT).show();
+//                findViewById(R.id.progress_bar_id).setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -176,7 +176,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 Toast.makeText(PopTalkApplication.applicationContext,
                         "Receive speak item successfully",
                         Toast.LENGTH_SHORT).show();
-                findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
+//                findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
                 if (speakItem != null) {
                     // Update Collection
                     if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
@@ -210,12 +210,12 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
+//                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
             }
 
             @Override
             public void onSuccess() {
-                Toast.makeText(ReceiveActivity.this, "disconnect", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ReceiveActivity.this, "disconnect", Toast.LENGTH_SHORT).show();
             }
 
         });
