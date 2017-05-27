@@ -55,6 +55,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     private SpeakItemModel mSpeakItemModel;
     private CollectionsModel mCollectionModel;
     private RecyclerView mSpeakItemsView;
+    private SpeakItemsAdapter mSpeakItemsAdapter;
     private List<SpeakItem> mSpeakItems;
     private FileServerAsyncTask mFileServerTask;
 
@@ -92,6 +93,8 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         mSpeakItemsView = (RecyclerView) findViewById(R.id.speak_item_list);
         mSpeakItemsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mSpeakItems = new ArrayList<>();
+        mSpeakItemsAdapter = new SpeakItemsAdapter(mSpeakItems, this);
+        mSpeakItemsView.setAdapter(mSpeakItemsAdapter);
     }
 
 
@@ -119,13 +122,13 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
             @Override
             public void onSuccess() {
-                Toast.makeText(ReceiveActivity.this, "Discovery initiated",
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ReceiveActivity.this, "Discovery initiated",
+//                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reasonCode) {
-                Toast.makeText(ReceiveActivity.this, "Discovery failed : " + reasonCode,
+                Toast.makeText(ReceiveActivity.this, "Discovery failed: " + reasonCode + ".\nPlease check wifi connection!",
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -133,16 +136,16 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
     @Override
     public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
         if (mFileServerTask != null) {
             mFileServerTask.cancel(true);
         }
         disconnect();
         unregisterReceiver(receiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
     }
 
@@ -154,12 +157,14 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
-        Log.e("sontt", peers.toString());
     }
 
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
         if (info.groupFormed && info.isGroupOwner) {
+            Toast.makeText(this,
+                    "Ready to receive speak item!",
+                    Toast.LENGTH_SHORT).show();
             startReceiveFileServer();
         }
     }
@@ -177,8 +182,8 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
             @Override
             public void onSuccess(SpeakItem speakItem) {
-                Toast.makeText(PopTalkApplication.applicationContext,
-                        "Receive speak item successfully",
+                Toast.makeText(ReceiveActivity.this,
+                        "Receive speak item successfully!",
                         Toast.LENGTH_SHORT).show();
 //                findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
                 if (speakItem != null) {
@@ -201,7 +206,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                     speakItem.setAddedTime(System.currentTimeMillis());
                     mSpeakItemModel.addNewSpeakItem(speakItem);
                     mSpeakItems.add(speakItem);
-                    mSpeakItemsView.setAdapter(new SpeakItemsAdapter(mSpeakItems, ReceiveActivity.this));
+                    mSpeakItemsAdapter.notifyDataSetChanged();
                 }
                 startReceiveFileServer();
             }
