@@ -1,6 +1,7 @@
 package com.poptech.poptalk.storyboard;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,9 +20,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.MetricUtils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
 
@@ -152,6 +156,12 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
                         .into(storyBoardItemViewHolder.mThumbnailIv);
 
                 storyBoardItemViewHolder.mDescription.setText(mSpeakItems.get(position).getDescription());
+                storyBoardItemViewHolder.mCardView.setOnClickListener(v -> {
+                    Intent intent = new Intent(getContext(), SpeakItemDetailActivity.class);
+                    intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, mSpeakItems.get(position).getId());
+                    intent.putExtra(Constants.KEY_COLLECTION_ID, mSpeakItems.get(position).getCollectionId());
+                    startActivity(intent);
+                });
             }
 
         }
@@ -172,12 +182,14 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
     public class StoryBoardItemViewHolder extends RecyclerView.ViewHolder{
 
         private View mRootView;
+        private CardView mCardView;
         private ImageView mThumbnailIv;
         private TextView mDescription;
         public StoryBoardItemViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
             mThumbnailIv = (ImageView)mRootView.findViewById(R.id.iv_thumb_id);
+            mCardView = (CardView) mRootView.findViewById(R.id.rootView);
             mDescription = (TextView)mRootView.findViewById(R.id.description_tv);
         }
     }
