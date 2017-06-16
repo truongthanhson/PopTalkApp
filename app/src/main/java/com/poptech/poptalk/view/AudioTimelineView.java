@@ -3,7 +3,9 @@ package com.poptech.poptalk.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +21,7 @@ import com.poptech.poptalk.utils.MetricUtils;
 public class AudioTimelineView extends View {
     private Paint paint;
     private Paint paint2;
+    private Paint paint3;
     private float progressLeft = 0;
     private float progressMiddle = 0.5f;
     private float progressRight = 1;
@@ -64,6 +67,10 @@ public class AudioTimelineView extends View {
         paint.setColor(0xffBDBDBD);
         paint2 = new Paint();
         paint2.setColor(0x3f000000);
+        paint3 = new Paint();
+        paint3.setColor(0x3f000000);
+        paint3.setTextSize(40);
+        paint3.setStyle(Paint.Style.FILL);
     }
 
     public void setBackground(Bitmap bitmap) {
@@ -210,13 +217,13 @@ public class AudioTimelineView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
+        int height = getMeasuredHeight() - MetricUtils.dpToPx(15);
         int startX = (int) (width * progressLeft);
         int midX = (int) (width * progressMiddle);
         int endX = (int) (width * progressRight);
 
         canvas.save();
-        canvas.clipRect(0, 0, width, height);
+        canvas.clipRect(0, 0, getMeasuredWidth(), getMeasuredWidth());
         canvas.drawRect(0, 0, startX, height, paint2);
         canvas.drawRect(endX, 0, width, height, paint2);
 
@@ -225,6 +232,16 @@ public class AudioTimelineView extends View {
         canvas.drawRect(endX - MetricUtils.dpToPx(2), 0, endX, height, paint);
         canvas.drawRect(startX + MetricUtils.dpToPx(1), 0, endX - MetricUtils.dpToPx(1), MetricUtils.dpToPx(0), paint);
         canvas.drawRect(startX + MetricUtils.dpToPx(1), height - MetricUtils.dpToPx(0), endX - MetricUtils.dpToPx(1), height, paint);
+
+        String startText = "A";
+        canvas.drawText(startText, startX - paint3.measureText(startText) / 2, getMeasuredHeight(), paint3);
+
+        String midText = "B";
+        canvas.drawText(midText, midX - paint3.measureText(midText) / 2, getMeasuredHeight(), paint3);
+
+        String endText = "C";
+        canvas.drawText(endText, endX - paint3.measureText(endText) / 2, getMeasuredHeight(), paint3);
+
         canvas.restore();
     }
 
