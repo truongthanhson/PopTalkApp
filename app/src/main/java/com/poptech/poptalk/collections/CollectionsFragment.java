@@ -179,7 +179,11 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
 
         @Override
         public void onBindViewHolder(CollectionViewHolder holder, final int position) {
-            holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
+            if(mCollections.get(position).getId() == -1){
+                holder.mDescriptionTv.setText("Unknown Collection");
+            }else{
+                holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
+            }
             holder.mLanguageTv.setText(mCollections.get(position).getLanguage());
 
             Glide.with(mContext)
