@@ -1,4 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -57,12 +58,22 @@
                 android:padding="10dp"
                 android:textSize="16sp" />
 
+            <com.jaredrummler.materialspinner.MaterialSpinner
+                android:id="@+id/language_spinner_id"
+                app:ms_dropdown_max_height="200dp"
+                app:ms_dropdown_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_below="@+id/user_email_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
             <Button
                 android:id="@+id/login_button_id"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/user_email_id"
+                android:layout_below="@+id/language_spinner_id"
                 android:layout_centerHorizontal="true"
                 android:paddingLeft="50dp"
                 android:paddingRight="50dp"

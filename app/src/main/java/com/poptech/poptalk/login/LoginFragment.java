@@ -22,6 +22,7 @@ import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Credentials;
 import com.poptech.poptalk.collections.CollectionsActivity;
@@ -31,6 +32,7 @@ import com.poptech.poptalk.utils.SaveData;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by sontt on 04/03/2017.
@@ -53,6 +55,8 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     private static final String TAG = "LoginActivity";
     private LoginContract.Presenter mPresenter;
 
+    private MaterialSpinner mLanguageSpinner;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +69,18 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
         mUserName = (TextView) mView.findViewById(R.id.user_name_id);
         mEmail = (EditText) mView.findViewById(R.id.user_email_id);
         mLoginButton = (Button) mView.findViewById(R.id.login_button_id);
+        mLanguageSpinner = (MaterialSpinner)mView.findViewById(R.id.language_spinner_id);
+//        mLanguageSpinner.setItems(ANDROID_VERSIONS);
+        mLanguageSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+            }
+        });
+        mLanguageSpinner.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
+
+            @Override public void onNothingSelected(MaterialSpinner spinner) {
+            }
+        });
         mLoginButton.setOnClickListener(this);
         mCallbackManager = CallbackManager.Factory.create();
         mFacebookLogin = (LoginButton) mView.findViewById(R.id.facebook_login_id);
@@ -77,6 +93,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Override
     public void onResume() {
         super.onResume();
+        mPresenter.start();
     }
 
     @Override
@@ -106,6 +123,13 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     }
 
     @Override
+    public void showErrorLanguage(String error) {
+        mLanguageSpinner.requestFocus();
+        mLanguageSpinner.setError(error);
+        AnimationUtils.shake(getActivity().getApplicationContext(), mLanguageSpinner);
+    }
+
+    @Override
     public void onLoginSuccessful() {
         Credentials credentials = new Credentials();
         credentials.setEmail(mEmail.getText().toString());
@@ -119,6 +143,12 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     }
 
     @Override
+    public void onLanguageLoaded(List<String> languages) {
+        languages.add(0,"");
+        mLanguageSpinner.setItems(languages);
+    }
+
+    @Override
     public void setPresenter(LoginContract.Presenter presenter) {
         mPresenter = presenter;
     }
@@ -127,7 +157,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.login_button_id:
-                mPresenter.login(mUserName.getText().toString(), mEmail.getText().toString());
+                mPresenter.login(mUserName.getText().toString(), mEmail.getText().toString(), mLanguageSpinner.getText().toString());
                 break;
             default:
                 break;
