@@ -1,12 +1,19 @@
 package com.poptech.poptalk.login;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Credentials;
 import com.poptech.poptalk.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -38,12 +45,14 @@ public class LoginPresenter implements LoginContract.Presenter {
     }
 
     @Override
-    public void login(String userName, String email) {
+    public void login(String userName, String email, String language) {
         if (userName.isEmpty()) {
             mView.showErrorUsername(mContext.getString(R.string.login_error_username));
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             mView.showErrorEmail(mContext.getString(R.string.login_error_email));
-        } else {
+        } else if (TextUtils.isEmpty(language)) {
+            mView.showErrorLanguage(mContext.getString(R.string.login_error_language));
+        }else {
             mView.onLoginSuccessful();
         }
     }
@@ -81,6 +90,24 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void start() {
+        Locale[] locales = Locale.getAvailableLocales();
+        List<String> languages = new ArrayList<>();
+        for (Locale l : locales) {
+            String language = l.getDisplayLanguage();
+            if (!StringUtils.isNullOrEmpty(language)) {
+                String[] regexChars = {"\\s+", "\\s*-\\s*", "\\s*'\\s*"};
+                String space = " ";
+                for (String regex : regexChars) {
+                    language = language.replaceAll(regex, space);
+                }
+                language = language.replaceAll("^\\s+", "");
+                language = language.replaceAll("\\s+$", "");
+                languages.add(language);
+            }
 
+        }
+        List<String> sortedLanguages = new ArrayList<>(new HashSet<>(languages));
+        Collections.sort(sortedLanguages, String.CASE_INSENSITIVE_ORDER);
+        mView.onLanguageLoaded(sortedLanguages);
     }
 }
