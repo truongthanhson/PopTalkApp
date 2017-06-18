@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,12 +14,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -56,7 +57,9 @@ import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.view.AudioTimelineView;
 import com.poptech.poptalk.view.SeekBarWaveformView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -81,7 +84,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private ImageView mPhotoView;
     private ImageButton mPhotoEdit;
-    private TextView mPhotoLanguage;
+    private Button mLanguage1;
+    private Button mLanguage2;
     private TextView mPhotoLocation;
     private TextView mPhotoDateTime;
     private EditText mPhotoDescription;
@@ -157,7 +161,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mPhotoEdit = (ImageButton) mView.findViewById(R.id.photo_edit_btn_id);
         mPhotoLocation = (TextView) mView.findViewById(R.id.photo_location_id);
         mPhotoDateTime = (TextView) mView.findViewById(R.id.photo_datetime_id);
-        mPhotoLanguage = (TextView) mView.findViewById(R.id.photo_language_id);
+        mLanguage1 = (Button) mView.findViewById(R.id.language1_button_id);
+        mLanguage2 = (Button) mView.findViewById(R.id.language2_button_id);
         mPhotoDescription = (EditText) mView.findViewById(R.id.description_et_id);
         mPhotoDescription.addTextChangedListener(this);
 
@@ -292,7 +297,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void onReloadPhotoAttribute() {
-        mPhotoLanguage.setText(mSpeakItem.getLanguage());
+        mLanguage1.setText(mSpeakItem.getLanguage());
+        mLanguage2.setText(Locale.getDefault().getDisplayLanguage());
         mPhotoDateTime.setText(mSpeakItem.getDateTime());
         mPhotoLocation.setText(mSpeakItem.getLocation());
         if (mSpeakItem.getLatitude() != 0 || mSpeakItem.getLongitude() != 0) {
@@ -306,10 +312,18 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 }
 
                 @Override
-                public void onSuccess(String address) {
-                    if (!StringUtils.isNullOrEmpty(address)) {
-                        mSpeakItem.setLocation(address);
-                        mPhotoLocation.setText(address);
+                public void onSuccess(Address address) {
+                    if (address != null) {
+                        String location = getLocation(address);
+                        if (!StringUtils.isNullOrEmpty(location)) {
+                            mSpeakItem.setLocation(location);
+                            mPhotoLocation.setText(location);
+                        }
+                        String language = getLanguage(address);
+                        if (!StringUtils.isNullOrEmpty(language)) {
+                            mSpeakItem.setLanguage(language);
+                            mLanguage1.setText(language);
+                        }
                     }
                 }
             });
@@ -317,6 +331,49 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         }
         mPhotoDescription.setText(mSpeakItem.getDescription());
     }
+
+    private String getLocation(Address address) {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> stringList = new ArrayList<>();
+
+        if (!StringUtils.isNullOrEmpty(address.getLocality())) {
+            stringList.add(address.getLocality());
+        } else if (!StringUtils.isNullOrEmpty(address.getAdminArea())) {
+            stringList.add(address.getAdminArea());
+        }
+        if (!StringUtils.isNullOrEmpty(address.getCountryName())) {
+            stringList.add(address.getCountryName());
+        }
+        for (int i = 0; i < stringList.size(); i++) {
+            stringBuilder.append(stringList.get(i));
+            if (i < stringList.size() - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+        // Return the text
+        return stringBuilder.toString();
+    }
+
+    private String getLanguage(Address address) {
+        Locale[] locales = Locale.getAvailableLocales();
+        for (Locale locale : locales) {
+            if (locale.getCountry().equalsIgnoreCase(address.getCountryCode())) {
+                String language = locale.getDisplayLanguage();
+                if (!StringUtils.isNullOrEmpty(language)) {
+                    String[] regexChars = {"\\s+", "\\s*-\\s*", "\\s*'\\s*"};
+                    String space = " ";
+                    for (String regex : regexChars) {
+                        language = language.replaceAll(regex, space);
+                    }
+                    language = language.replaceAll("^\\s+", "");
+                    language = language.replaceAll("\\s+$", "");
+                    return language;
+                }
+            }
+        }
+        return "";
+    }
+
 
     private void onReloadAudioWave() {
         // Reload marks
