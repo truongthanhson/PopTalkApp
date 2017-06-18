@@ -215,7 +215,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                         }
                     }
                     if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
-                        Collections.sort(speakItemSection, (o1, o2) -> o1.getDescription().compareTo(o2.getDescription()));
+                        Collections.sort(speakItemSection, (o1, o2) -> o1.getDescription1().compareTo(o2.getDescription1()));
                     } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {
                         Collections.sort(speakItemSection, (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
                     } else if (mSortType == GroupSpeakItemSortType.RECENT) {
@@ -291,7 +291,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
         @Override
         public void onBindViewHolder(SpeakItemViewHolder holder, final int position) {
-            holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription());
+            holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription1());
             holder.mLanguageTv.setText(mSpeakItems.get(position).getLanguage());
             Glide.with(mContext)
                     .load(mSpeakItems.get(position).getPhotoPath())
@@ -363,7 +363,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             } else {
                 holder.mRootView.findViewById(R.id.content).setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
-            holder.mDescriptionTv.setText(speakItems.get(i).getDescription());
+            holder.mDescriptionTv.setText(speakItems.get(i).getDescription1());
             holder.mLanguageTv.setText(speakItems.get(i).getLanguage());
             Glide.with(getActivity())
                     .load(speakItems.get(i).getPhotoPath())

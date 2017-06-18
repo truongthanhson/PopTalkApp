@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -52,6 +53,8 @@ import com.poptech.poptalk.maps.MapActivity;
 import com.poptech.poptalk.sound.AudioController;
 import com.poptech.poptalk.sound.NotificationCenter;
 import com.poptech.poptalk.utils.AndroidUtilities;
+import com.poptech.poptalk.utils.AnimationUtils;
+import com.poptech.poptalk.utils.SaveData;
 import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.view.AudioTimelineView;
@@ -81,6 +84,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private View mView;
     private ViewPager mViewPager;
     private ScrollView mScrollView;
+    private InputMethodManager mInputManager;
 
     private ImageView mPhotoView;
     private ImageButton mPhotoEdit;
@@ -115,6 +119,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private boolean mCurrentPlaying;
     private boolean mCurrentPausing;
     private boolean mRecording;
+    private boolean mLanguage1Enable;
+    private boolean mLanguage2Enable;
 
     private SpeakItemDetailFragmentCallback mCallback;
 
@@ -150,6 +156,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void initView() {
+        mInputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         mViewPager = (ViewPager) getActivity().findViewById(R.id.speak_item_pager_id);
         mScrollView = (ScrollView) mView.findViewById(R.id.speak_item_scroll_id);
 
@@ -162,13 +169,24 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mPhotoLocation = (TextView) mView.findViewById(R.id.photo_location_id);
         mPhotoDateTime = (TextView) mView.findViewById(R.id.photo_datetime_id);
         mLanguage1 = (Button) mView.findViewById(R.id.language1_button_id);
+        mLanguage1.setOnClickListener(this);
         mLanguage2 = (Button) mView.findViewById(R.id.language2_button_id);
+        mLanguage2.setOnClickListener(this);
         mPhotoDescription = (EditText) mView.findViewById(R.id.description_et_id);
         mPhotoDescription.addTextChangedListener(this);
+        mPhotoDescription.setFocusable(false);
+        mPhotoDescription.setOnClickListener(this);
+        mPhotoDescription.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                mInputManager.hideSoftInputFromWindow(mPhotoDescription.getWindowToken(), 0);
+            }
+        });
 
         // Record
         mRecordMenu = (RelativeLayout) mView.findViewById(R.id.record_menu_rl_id);
         mRecordButton = (ImageButton) mView.findViewById(R.id.record_ll_id);
+        mRecordButton.setOnTouchListener(this);
         mTimerText = (TextView) mView.findViewById(R.id.timer_tv_id);
         mSlideCancel = (LinearLayout) mView.findViewById(R.id.slide_cancel_ll_id);
 
@@ -176,20 +194,21 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mWaveformMenu = (FrameLayout) mView.findViewById(R.id.waveform_menu_id);
         mRecordWave = (SeekBarWaveformView) mView.findViewById(R.id.record_waveform_id);
         mRecordTimeline = (AudioTimelineView) mView.findViewById(R.id.record_timeline_id);
+        mRecordTimeline.setDelegate(this);
         mProgressBar = (ProgressBar) mView.findViewById(R.id.progress_bar_id);
 
         // Play
         mPlayMenu = (LinearLayout) mView.findViewById(R.id.play_menu_ll_id);
         mPlayCurrentButton = (ImageButton) mView.findViewById(R.id.play_current_button_id);
-        mPlayNextButton = (ImageButton) mView.findViewById(R.id.play_next_button_id);
-
-        mRecordButton.setOnTouchListener(this);
         mPlayCurrentButton.setOnClickListener(this);
+        mPlayNextButton = (ImageButton) mView.findViewById(R.id.play_next_button_id);
         mPlayNextButton.setOnClickListener(this);
-        mRecordTimeline.setDelegate(this);
+
     }
 
     private void initData() {
+        mLanguage1Enable = true;
+        mLanguage2Enable = false;
         mAudioCtrl = new AudioController(mSpeakItemId);
         mStartedDraggingX = -1;
         mDistCanMove = AndroidUtilities.dp(100);
@@ -297,8 +316,12 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void onReloadPhotoAttribute() {
-        mLanguage1.setText(mSpeakItem.getLanguage());
-        mLanguage2.setText(Locale.getDefault().getDisplayLanguage());
+        if(!StringUtils.isNullOrEmpty(mSpeakItem.getLanguage())) {
+            mLanguage1.setText(mSpeakItem.getLanguage());
+        }
+        if(!StringUtils.isNullOrEmpty(SaveData.getInstance(getActivity()).getLanguage())) {
+            mLanguage2.setText(SaveData.getInstance(getActivity()).getLanguage());
+        }
         mPhotoDateTime.setText(mSpeakItem.getDateTime());
         mPhotoLocation.setText(mSpeakItem.getLocation());
         if (mSpeakItem.getLatitude() != 0 || mSpeakItem.getLongitude() != 0) {
@@ -329,7 +352,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             });
             task.execute(location);
         }
-        mPhotoDescription.setText(mSpeakItem.getDescription());
+        mPhotoDescription.setText(mSpeakItem.getDescription1());
     }
 
     private String getLocation(Address address) {
@@ -416,6 +439,11 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.description_et_id:
+                mPhotoDescription.setFocusableInTouchMode(true);
+                mPhotoDescription.requestFocus();
+                mInputManager.showSoftInput(mPhotoDescription, InputMethodManager.SHOW_IMPLICIT);
+                break;
             case R.id.play_current_button_id:
                 playCurrent();
                 break;
@@ -424,6 +452,26 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 break;
             case R.id.photo_img_id:
                 showMap();
+                break;
+            case R.id.language1_button_id:
+                if(StringUtils.isNullOrEmpty(mSpeakItem.getLanguage())) {
+                    mPhotoDescription.setError(getString(R.string.description_error_language));
+                    AnimationUtils.shake(getActivity().getApplicationContext(), mPhotoDescription);
+                } else {
+                    mLanguage1Enable = true;
+                    mLanguage2Enable = false;
+                    mPhotoDescription.setText(mSpeakItem.getDescription1());
+                }
+                break;
+            case R.id.language2_button_id:
+                if(StringUtils.isNullOrEmpty(SaveData.getInstance(getActivity()).getLanguage())) {
+                    mPhotoDescription.setError(getString(R.string.description_error_language));
+                    AnimationUtils.shake(getActivity().getApplicationContext(), mPhotoDescription);
+                } else {
+                    mLanguage1Enable = false;
+                    mLanguage2Enable = true;
+                    mPhotoDescription.setText(mSpeakItem.getDescription2());
+                }
                 break;
             default:
                 break;
@@ -848,11 +896,21 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        mSpeakItem.setDescription(s.toString());
+        if (mLanguage1Enable) {
+            mSpeakItem.setDescription1(s.toString());
+        }
+        if (mLanguage2Enable) {
+            mSpeakItem.setDescription2(s.toString());
+        }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        mSpeakItem.setDescription(s.toString());
+        if (mLanguage1Enable) {
+            mSpeakItem.setDescription1(s.toString());
+        }
+        if (mLanguage2Enable) {
+            mSpeakItem.setDescription2(s.toString());
+        }
     }
 }

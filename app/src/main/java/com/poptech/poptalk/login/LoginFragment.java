@@ -69,16 +69,18 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
         mUserName = (TextView) mView.findViewById(R.id.user_name_id);
         mEmail = (EditText) mView.findViewById(R.id.user_email_id);
         mLoginButton = (Button) mView.findViewById(R.id.login_button_id);
-        mLanguageSpinner = (MaterialSpinner)mView.findViewById(R.id.language_spinner_id);
+        mLanguageSpinner = (MaterialSpinner) mView.findViewById(R.id.language_spinner_id);
 //        mLanguageSpinner.setItems(ANDROID_VERSIONS);
         mLanguageSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
             }
         });
         mLanguageSpinner.setOnNothingSelectedListener(new MaterialSpinner.OnNothingSelectedListener() {
 
-            @Override public void onNothingSelected(MaterialSpinner spinner) {
+            @Override
+            public void onNothingSelected(MaterialSpinner spinner) {
             }
         });
         mLoginButton.setOnClickListener(this);
@@ -135,6 +137,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
         credentials.setEmail(mEmail.getText().toString());
         credentials.setName(mUserName.getText().toString());
         mPresenter.updateCredentials(credentials);
+        SaveData.getInstance(getActivity()).setLanguage(mLanguageSpinner.getText().toString());
         onOpenCollectionActivity();
     }
 
@@ -144,7 +147,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     @Override
     public void onLanguageLoaded(List<String> languages) {
-        languages.add(0,"");
+        languages.add(0, "");
         mLanguageSpinner.setItems(languages);
     }
 

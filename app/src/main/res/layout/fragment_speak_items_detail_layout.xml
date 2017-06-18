@@ -10,224 +10,226 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="7">
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:id="@+id/photo_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center">
-
-                <ImageView
-                    android:id="@+id/photo_img_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <ImageButton
-                    android:id="@+id/photo_edit_btn_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|right"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_edit"
-                    android:visibility="gone" />
-            </FrameLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_margin="5dp"
-            android:layout_weight="2"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:weightSum="12">
+            android:weightSum="13">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2"
-                android:gravity="bottom">
+                android:layout_weight="6"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_location" />
-
-                <TextView
-                    android:id="@+id/photo_location_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:scrollHorizontally="true"
-                    android:text="None"
-                    android:textSize="14sp"
-                    android:textStyle="normal" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:gravity="bottom">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_date" />
-
-                <TextView
-                    android:id="@+id/photo_datetime_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:scrollHorizontally="true"
-                    android:text="None"
-                    android:textSize="14sp"
-                    android:textStyle="normal" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_weight="5"
-                android:background="@drawable/bg_photo_description">
-
-                <EditText
-                    android:id="@+id/description_et_id"
+                <FrameLayout
+                    android:id="@+id/photo_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="top"
-                    android:hint="Photo Description"
-                    android:imeOptions="actionDone"
-                    android:inputType="textMultiLine"
-                    android:padding="2dp"
-                    android:textSize="14sp" />
+                    android:layout_gravity="center">
+
+                    <ImageView
+                        android:id="@+id/photo_img_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <ImageButton
+                        android:id="@+id/photo_edit_btn_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_edit"
+                        android:visibility="gone" />
+                </FrameLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="3"
-                android:gravity="bottom"
-                android:weightSum="13">
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:layout_weight="3.5"
+                android:clickable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="vertical"
+                android:weightSum="12">
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2.25"
+                    android:gravity="center">
 
-                <Button
-                    android:id="@+id/language1_button_id"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4"
-                    android:text="Language 1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textSize="12sp" />
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_location" />
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
+                    <TextView
+                        android:id="@+id/photo_location_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:text="None"
+                        android:textSize="14sp"
+                        android:textStyle="normal" />
+                </LinearLayout>
 
-                <Button
-                    android:id="@+id/language2_button_id"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4"
-                    android:text="Language 2"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textSize="12sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2.25"
+                    android:gravity="center">
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_date" />
+
+                    <TextView
+                        android:id="@+id/photo_datetime_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:text="None"
+                        android:textSize="14sp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="4.5"
+                    android:background="@drawable/bg_photo_description">
+
+                    <EditText
+                        android:id="@+id/description_et_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:gravity="top"
+                        android:hint="Photo Description"
+                        android:imeOptions="actionDone"
+                        android:inputType="textMultiLine"
+                        android:padding="2dp"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:gravity="bottom"
+                    android:weightSum="13">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2" />
+
+                    <Button
+                        android:id="@+id/language1_button_id"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Language 1"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                    <Button
+                        android:id="@+id/language2_button_id"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Language 2"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2" />
+                </LinearLayout>
+
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="3.5"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <FrameLayout
+                    android:id="@+id/waveform_menu_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:visibility="visible">
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@color/colorAccent"
+                        android:indeterminateTintMode="src_atop"
+                        android:visibility="gone" />
+
+                    <com.poptech.poptalk.view.SeekBarWaveformView
+                        android:id="@+id/record_waveform_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="15dp" />
+
+                    <com.poptech.poptalk.view.AudioTimelineView
+                        android:id="@+id/record_timeline_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="bottom">
+
+                    <include
+                        android:id="@+id/record_menu_rl_id"
+                        layout="@layout/item_record_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="5dp"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:weightSum="5">
-
-            <FrameLayout
-                android:id="@+id/waveform_menu_id"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="3"
-                android:visibility="visible">
-
-                <ProgressBar
-                    android:id="@+id/progress_bar_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:indeterminateTint="@color/colorAccent"
-                    android:indeterminateTintMode="src_atop"
-                    android:visibility="gone" />
-
-                <com.poptech.poptalk.view.SeekBarWaveformView
-                    android:id="@+id/record_waveform_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="15dp" />
-
-                <com.poptech.poptalk.view.AudioTimelineView
-                    android:id="@+id/record_timeline_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:gravity="bottom">
-
-                <include
-                    android:id="@+id/record_menu_rl_id"
-                    layout="@layout/item_record_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
     </RelativeLayout>
 </ScrollView>

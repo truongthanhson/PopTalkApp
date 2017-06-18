@@ -4,6 +4,7 @@
     <string name="login_error_username">Please enter valid username</string>
     <string name="login_error_email">Please enter valid email</string>
     <string name="login_error_language">Please choose language</string>
+    <string name="description_error_language">Please choose language</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="photo_gallery">Gallery</string>
