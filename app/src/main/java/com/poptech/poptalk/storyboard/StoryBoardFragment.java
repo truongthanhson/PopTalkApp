@@ -26,7 +26,6 @@ import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.MetricUtils;
-import com.poptech.poptalk.view.ItemDecorationColumns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +154,7 @@ public class StoryBoardFragment extends Fragment implements StoryBoardContract.V
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(storyBoardItemViewHolder.mThumbnailIv);
 
-                storyBoardItemViewHolder.mDescription.setText(mSpeakItems.get(position).getDescription());
+                storyBoardItemViewHolder.mDescription.setText(mSpeakItems.get(position).getDescription1());
                 storyBoardItemViewHolder.mCardView.setOnClickListener(v -> {
                     Intent intent = new Intent(getContext(), SpeakItemDetailActivity.class);
                     intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, mSpeakItems.get(position).getId());

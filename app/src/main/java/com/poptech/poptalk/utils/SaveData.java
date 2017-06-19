@@ -3,6 +3,8 @@ package com.poptech.poptalk.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Locale;
+
 public class SaveData {
     private static SaveData saveData = null;
     private SharedPreferences sharePreference;
@@ -29,5 +31,14 @@ public class SaveData {
 
     public boolean isLoggedIn() {
         return sharePreference.getBoolean("isLogin", false);
+    }
+
+
+    public void setLanguage(String language) {
+        sharePreference.edit().putString("language", language).commit();
+    }
+
+    public String getLanguage() {
+        return sharePreference.getString("language", Locale.getDefault().getDisplayLanguage());
     }
 }

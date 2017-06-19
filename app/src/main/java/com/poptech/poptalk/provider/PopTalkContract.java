@@ -54,7 +54,8 @@ public class PopTalkContract {
         String SPEAK_ITEM_AUDIO_MARK = "audio_mark";
         String SPEAK_ITEM_AUDIO_DURATION = "audio_duration";
         String SPEAK_ITEM_PHOTO_PATH = "photo_path";
-        String SPEAK_ITEM_PHOTO_DESCRIPTION = "photo_description";
+        String SPEAK_ITEM_PHOTO_DESCRIPTION1 = "photo_description1";
+        String SPEAK_ITEM_PHOTO_DESCRIPTION2 = "photo_description2";
         String SPEAK_ITEM_PHOTO_LOCATION = "photo_location";
         String SPEAK_ITEM_PHOTO_LATITUDE = "photo_latitude";
         String SPEAK_ITEM_PHOTO_LONGITUDE = "photo_longitude";

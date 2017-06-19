@@ -21,12 +21,12 @@ import com.poptech.poptalk.utils.StringUtils;
  * doInBackground() Void - indicates that progress units are not used by this
  * subclass String - An address passed to onPostExecute()
  */
-public class LocationTask extends AsyncTask<Location, Void, String> {
+public class LocationTask extends AsyncTask<Location, Void, Address> {
 
     public interface onGetAddressTaskListener {
         public void onStart();
 
-        public void onSuccess(String address);
+        public void onSuccess(Address address);
     }
 
     private onGetAddressTaskListener mListener;
@@ -56,7 +56,7 @@ public class LocationTask extends AsyncTask<Location, Void, String> {
      * format the returned address, and return the address to the UI thread.
      */
     @Override
-    protected String doInBackground(Location... params) {
+    protected Address doInBackground(Location... params) {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
         Location location = params[0];
         List<Address> addresses = null;
@@ -67,11 +67,11 @@ public class LocationTask extends AsyncTask<Location, Void, String> {
             } catch (IOException exception1) {
                 Log.e(TAG, exception1.getMessage());
                 exception1.printStackTrace();
-                return "";
+                return null;
             } catch (IllegalArgumentException exception2) {
                 Log.e(TAG, exception2.getMessage());
                 exception2.printStackTrace();
-                return "";
+                return null;
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage());
                 ex.printStackTrace();
@@ -82,29 +82,30 @@ public class LocationTask extends AsyncTask<Location, Void, String> {
         if (addresses != null && addresses.size() > 0) {
             // Get the first address
             Address address = addresses.get(0);
-            StringBuilder stringBuilder = new StringBuilder();
-            List<String> stringList = new ArrayList<>();
-
-            if (!StringUtils.isNullOrEmpty(address.getLocality())) {
-                stringList.add(address.getLocality());
-            } else if (!StringUtils.isNullOrEmpty(address.getAdminArea())) {
-                stringList.add(address.getAdminArea());
-            }
-            if (!StringUtils.isNullOrEmpty(address.getCountryName())) {
-                stringList.add(address.getCountryName());
-            }
-            for (int i = 0; i < stringList.size(); i++) {
-                stringBuilder.append(stringList.get(i));
-                if (i < stringList.size() - 1) {
-                    stringBuilder.append(", ");
-                }
-            }
-            // Return the text
-            return stringBuilder.toString();
+            return address;
+//            StringBuilder stringBuilder = new StringBuilder();
+//            List<String> stringList = new ArrayList<>();
+//
+//            if (!StringUtils.isNullOrEmpty(address.getLocality())) {
+//                stringList.add(address.getLocality());
+//            } else if (!StringUtils.isNullOrEmpty(address.getAdminArea())) {
+//                stringList.add(address.getAdminArea());
+//            }
+//            if (!StringUtils.isNullOrEmpty(address.getCountryName())) {
+//                stringList.add(address.getCountryName());
+//            }
+//            for (int i = 0; i < stringList.size(); i++) {
+//                stringBuilder.append(stringList.get(i));
+//                if (i < stringList.size() - 1) {
+//                    stringBuilder.append(", ");
+//                }
+//            }
+//            // Return the text
+//            return stringBuilder.toString();
 
             // If there aren't any addresses, post a message
         } else {
-            return "";
+            return null;
         }
     }
 
@@ -114,7 +115,7 @@ public class LocationTask extends AsyncTask<Location, Void, String> {
      * thread.
      */
     @Override
-    protected void onPostExecute(String address) {
+    protected void onPostExecute(Address address) {
         mListener.onSuccess(address);
     }
 

@@ -1,10 +1,8 @@
 package com.poptech.poptalk.bean;
 
-import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.utils.StringUtils;
 
 /**
@@ -13,7 +11,8 @@ import com.poptech.poptalk.utils.StringUtils;
 
 public class SpeakItem implements Parcelable {
     private long id;
-    private String description;
+    private String description1;
+    private String description2;
     private String photoPath;
     private String datetime;
     private String location;
@@ -35,7 +34,8 @@ public class SpeakItem implements Parcelable {
 
     public SpeakItem() {
         id = -1;
-        description = "";
+        description1 = "";
+        description2 = "";
         photoPath = "";
         datetime = "";
         location = "";
@@ -49,16 +49,6 @@ public class SpeakItem implements Parcelable {
         setDefaultMark();
     }
 
-    public SpeakItem(long id, String location, String datetime, String description, String mark, String photoPath, long collectionId) {
-        this.id = id;
-        this.location = location;
-        this.datetime = datetime;
-        this.description = description;
-        this.photoPath = photoPath;
-        this.collectionId = collectionId;
-        setDefaultMark();
-    }
-
     public long getId() {
         return id;
     }
@@ -67,12 +57,20 @@ public class SpeakItem implements Parcelable {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescription1() {
+        return description1;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription1(String description1) {
+        this.description1 = description1;
+    }
+
+    public String getDescription2() {
+        return description2;
+    }
+
+    public void setDescription2(String description2) {
+        this.description2 = description2;
     }
 
     public String getPhotoPath() {
@@ -260,7 +258,8 @@ public class SpeakItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
-        dest.writeString(this.description);
+        dest.writeString(this.description1);
+        dest.writeString(this.description2);
         dest.writeString(this.photoPath);
         dest.writeString(this.datetime);
         dest.writeString(this.location);
@@ -282,7 +281,8 @@ public class SpeakItem implements Parcelable {
 
     protected SpeakItem(Parcel in) {
         this.id = in.readLong();
-        this.description = in.readString();
+        this.description1 = in.readString();
+        this.description2 = in.readString();
         this.photoPath = in.readString();
         this.datetime = in.readString();
         this.location = in.readString();

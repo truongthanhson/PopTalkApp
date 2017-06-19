@@ -75,9 +75,9 @@ public class SeekBarWaveform {
     }
 
     public void draw(Canvas canvas) {
-        int colWidth = 3;
+        int colWidth = 2;
         int colHeight = 90;
-        int colSpace = 4;
+        int colSpace = 3;
 
         int thumbLeftX = (int) Math.ceil(width * leftProgress);
         if (thumbLeftX < 0) {

@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -331,7 +330,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
         @Override
         public void onBindViewHolder(SpeakItemViewHolder holder, final int position) {
-            holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription());
+            holder.mDescriptionTv.setText(mSpeakItems.get(position).getDescription1());
             holder.mLanguageTv.setText(mSpeakItems.get(position).getLanguage());
             Glide.with(mContext)
                     .load(mSpeakItems.get(position).getPhotoPath())
