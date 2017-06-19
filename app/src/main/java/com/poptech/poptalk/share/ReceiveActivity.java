@@ -1,14 +1,17 @@
 package com.poptech.poptalk.share;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +36,12 @@ import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
+import com.poptech.poptalk.utils.IOUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +103,24 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         mSpeakItems = new ArrayList<>();
         mSpeakItemsAdapter = new SpeakItemsAdapter(mSpeakItems, this);
         mSpeakItemsView.setAdapter(mSpeakItemsAdapter);
+
+        //action open file from email
+        Intent intent = getIntent();
+        String action = intent.getAction();
+
+        if(action != null && action.compareTo(Intent.ACTION_VIEW) == 0){
+            try {
+                ContentResolver contentResolver = getContentResolver();
+                Uri uri = intent.getData();
+                InputStream inputStream = contentResolver.openInputStream(uri);
+                String filePath = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_PHOTO + "/" + System.currentTimeMillis() + "_s" + ".jpg";
+                File file = new File(filePath);
+                file.createNewFile();
+                IOUtils.copyFile(inputStream,new FileOutputStream(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
