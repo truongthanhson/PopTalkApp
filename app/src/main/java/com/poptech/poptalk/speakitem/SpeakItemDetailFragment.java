@@ -70,9 +70,11 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     public enum PlayState {
         NONE,
         CURRENT,
+        CURRENT_PAUSE,
         NEXT,
+        NEXT_PAUSE,
         REPEAT,
-        PAUSE
+        REPEAT_PAUSE
     }
 
     public interface SpeakItemDetailFragmentCallback {
@@ -496,7 +498,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private void playCurrent() {
         if (mPlayState != PlayState.CURRENT) {
-            if (mPlayState != PlayState.PAUSE) {
+            if (mPlayState != PlayState.CURRENT_PAUSE) {
                 mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
                 mAudioCtrl.seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
             }
@@ -505,14 +507,14 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             setPlayView();
         } else {
             mAudioCtrl.pauseAudio(mSpeakItem);
-            mPlayState = PlayState.PAUSE;
+            mPlayState = PlayState.CURRENT_PAUSE;
             setPlayView();
         }
     }
 
     private void playNext() {
         if (mPlayState != PlayState.NEXT) {
-            if (mPlayState != PlayState.PAUSE) {
+            if (mPlayState != PlayState.NEXT_PAUSE) {
                 mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
                 mAudioCtrl.seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
             }
@@ -521,7 +523,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             setPlayView();
         } else {
             mAudioCtrl.pauseAudio(mSpeakItem);
-            mPlayState = PlayState.PAUSE;
+            mPlayState = PlayState.NEXT_PAUSE;
             setPlayView();
         }
     }
@@ -529,7 +531,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     private void playRepeat() {
         if (mPlayState != PlayState.REPEAT) {
-            if (mPlayState != PlayState.PAUSE) {
+            if (mPlayState != PlayState.REPEAT_PAUSE) {
                 mSpeakItem.setAudioProgress(mSpeakItem.getAudioLeftMark());
                 mAudioCtrl.seekToProgress(mSpeakItem, mSpeakItem.getAudioLeftMark());
             }
@@ -538,7 +540,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             setPlayView();
         } else {
             mAudioCtrl.pauseAudio(mSpeakItem);
-            mPlayState = PlayState.PAUSE;
+            mPlayState = PlayState.REPEAT_PAUSE;
             setPlayView();
         }
     }

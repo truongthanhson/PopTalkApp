@@ -58,12 +58,8 @@ import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.share.ReceiveActivity;
-import com.poptech.poptalk.share.ShareActivity;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.storyboard.StoryBoardListActivity;
-import com.poptech.poptalk.storyboard.StoryBoardSelectFragment;
-import com.poptech.poptalk.storyboard.StoryboardActivity;
-import com.poptech.poptalk.storyboard.StoryboardSelecActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 import com.poptech.poptalk.utils.SaveData;
 import com.poptech.poptalk.utils.StringUtils;
@@ -73,7 +69,6 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -228,7 +223,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_add_speak_item:
-                CharSequence sources[] = new CharSequence[] {"from Camera", "from Gallery"};
+                CharSequence sources[] = new CharSequence[]{"from Camera", "from Gallery"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Create new speak item");
@@ -378,7 +373,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
                 Location location = intent.getExtras().getParcelable(Constants.KEY_GALLERY_LOCATION);
                 onAddSpeakItem(path, date, location);
             }
-        }else if (requestCode == Constants.REQUEST_AVATAR_CAPTURE) {
+        } else if (requestCode == Constants.REQUEST_AVATAR_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
                 if (mTracker != null) {
                     mLocation = mTracker.getLocation();
@@ -570,6 +565,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             mTracker.stopLocation();
         }
     }
+
     public void openSpeakItemDetailScreen(long speakItemId, long collectionId) {
         Intent intent = new Intent(this, SpeakItemDetailActivity.class);
         intent.putExtra(Constants.KEY_SPEAK_ITEM_ID, speakItemId);
@@ -580,7 +576,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     public void onAddSpeakItem(String path, String date, Location location) {
         long COLLECTION_ID = -1;
-        long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
+        long SPEAK_ITEM_ID = System.currentTimeMillis();
 
         // Update Collection
         if (mCollectionModel.isCollectionExisted(COLLECTION_ID)) {

@@ -29,6 +29,7 @@ import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
+import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.gallery.GalleryActivity;
@@ -153,13 +154,16 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
     }
 
     private void showChooseShareMethodDialog(SpeakItem speakItem) {
-        CharSequence choices[] = new CharSequence[] {"Share via Email", "Share via WiFi Direct"};
+        CharSequence choices[] = new CharSequence[]{"Share via Email", "Share via WiFi Direct"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose share method");
         builder.setItems(choices, (dialog, which) -> {
             if (which == 0) {
-                String speakItemZipPath = ShareActivity.zipSpeakItem(speakItem);
+                ShareItem shareItem = new ShareItem();
+                shareItem.setShareType(Constants.ShareType.SPEAK_ITEM);
+                shareItem.addSpeakItem(speakItem);
+                String speakItemZipPath = ShareActivity.zipSpeakItem(shareItem);
                 openSendEmail(speakItemZipPath);
             } else if (which == 1) {
                 goToShareSpeakItemScreen(speakItem);
@@ -178,7 +182,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
         emailIntent.putExtra(Intent.EXTRA_STREAM, path);
         // the mail subject
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-        startActivity(Intent.createChooser(emailIntent , "Send email..."));
+        startActivity(Intent.createChooser(emailIntent, "Send email..."));
     }
 
     private void goToShareSpeakItemScreen(SpeakItem speakItem) {

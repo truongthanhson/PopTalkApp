@@ -28,11 +28,11 @@ import java.util.Random;
  * Created by cuonghl on 5/23/2017.
  */
 
-public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
+public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
     public interface FileServerTaskListener {
         public void onStart();
 
-        public void onSuccess(SpeakItem speakItem);
+        public void onSuccess(String file);
     }
 
     private FileServerTaskListener mListener;
@@ -61,7 +61,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
 
     @Override
     protected void onCancelled() {
-        if(mServerSocket != null) {
+        if (mServerSocket != null) {
             try {
                 mServerSocket.close();
                 Log.d(ShareActivity.TAG, "Server: Socket close");
@@ -73,7 +73,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
     }
 
     @Override
-    protected SpeakItem doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         try {
             mServerSocket = new ServerSocket(8988);
             Log.d(ShareActivity.TAG, "Server: Socket opened");
@@ -95,7 +95,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
             InputStream inputstream = client.getInputStream();
             IOUtils.copyFile(inputstream, new FileOutputStream(f));
             mServerSocket.close();
-            return unZipSpeakItem(f.getAbsolutePath());
+            return f.getAbsolutePath();
         } catch (IOException e) {
             Log.e(ShareActivity.TAG, e.getMessage());
             e.printStackTrace();
@@ -108,89 +108,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, SpeakItem> {
      * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
      */
     @Override
-    protected void onPostExecute(SpeakItem result) {
+    protected void onPostExecute(String result) {
         mListener.onSuccess(result);
     }
-
-    private SpeakItem unZipSpeakItem(String zipFile) {
-        SpeakItem speakItem = new SpeakItem();
-        if (StringUtils.isNullOrEmpty(zipFile) || !new File(zipFile).exists()) {
-            return null;
-        }
-        long speakItemId = new Random().nextInt(Integer.MAX_VALUE);
-        String speakItemDir = Environment.getExternalStorageDirectory() +
-                Constants.PATH_APP + "/" +
-                Constants.PATH_SHARE + "/" +
-                Constants.PATH_RECEIVE + "/" +
-                speakItemId + "/";
-        File iSpeakItemDir = new File(speakItemDir);
-        try {
-            if (!iSpeakItemDir.exists()) {
-                Utils.forceMkdir(iSpeakItemDir);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        ZipManager zipManager = new ZipManager();
-        zipManager.unzip(zipFile, speakItemDir);
-
-        File[] jsonFiles = getFileWithExtension(new String[]{".json", ".JSON"}, speakItemDir);
-        if (jsonFiles != null) {
-            for (File json : jsonFiles) {
-                if (json != null && json.exists()) {
-                    Gson gson = new Gson();
-                    try {
-                        BufferedReader br = new BufferedReader(new FileReader(json));
-                        SpeakItem jsonSpeakItem = gson.fromJson(br, SpeakItem.class);
-                        if(jsonSpeakItem != null) {
-                            speakItem = jsonSpeakItem;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        File[] photoFiles = getFileWithExtension(new String[]{".jpg", ".jpeg", ".png"}, speakItemDir);
-        if (photoFiles != null) {
-            for (File photo : photoFiles) {
-                if (photo != null && photo.exists()) {
-                    speakItem.setPhotoPath(photo.getAbsolutePath());
-                }
-            }
-        }
-
-        File[] audioFiles = getFileWithExtension(new String[]{".ogg", ".mp3", ".3gp"}, speakItemDir);
-        if (audioFiles != null) {
-            for (File audio : audioFiles) {
-                if (audio != null && audio.exists()) {
-                    speakItem.setAudioPath(audio.getAbsolutePath());
-                }
-            }
-        }
-
-        speakItem.setId(speakItemId);
-        speakItem.setCollectionId(-1);
-
-        return speakItem;
-    }
-
-    private File[] getFileWithExtension(String[] extensions, String dir) {
-        File[] files = new File(dir).listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                boolean ret = false;
-                for (int i = 0; i < extensions.length; i++) {
-                    ret = (name.endsWith(extensions[i]));
-                    if (ret)
-                        break;
-                }
-                return ret;
-            }
-        });
-        return files;
-    }
-
 }

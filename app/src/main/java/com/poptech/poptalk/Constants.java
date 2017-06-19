@@ -23,6 +23,12 @@ import java.util.UUID;
  */
 
 public class Constants {
+    public enum ShareType {
+        NONE,
+        SPEAK_ITEM,
+        STORY_BOARD;
+    }
+
     public static final String TAG = "Constants";
 
     public static final String KEY_PHOTO_GALLERY = "key_photo_gallery";

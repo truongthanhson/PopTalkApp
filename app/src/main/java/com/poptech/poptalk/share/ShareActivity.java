@@ -33,6 +33,7 @@ import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
+import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.utils.ZipManager;
@@ -83,7 +84,6 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Key = getIntent().getIntExtra(Constants.KEY_PHOTO_GALLERY, 1);
         mSpeakItem = getIntent().getParcelableExtra(Constants.KEY_SPEAK_ITEM);
         setContentView(R.layout.activity_share_layout);
 
@@ -377,7 +377,10 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     private void startTransferFile(WifiP2pInfo info) {
         if (info != null) {
-            String speakItemZip = zipSpeakItem(mSpeakItem);
+            ShareItem shareItem = new ShareItem();
+            shareItem.setShareType(Constants.ShareType.SPEAK_ITEM);
+            shareItem.addSpeakItem(mSpeakItem);
+            String speakItemZip = zipSpeakItem(shareItem);
             Intent serviceIntent = new Intent(this, FileTransferService.class);
             serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
             serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, speakItemZip);
@@ -388,12 +391,13 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         }
     }
 
-    public static String zipSpeakItem(SpeakItem speakItem) {
+    public static String zipSpeakItem(ShareItem shareItem) {
+        long id = System.currentTimeMillis();
         String speakItemDir = Environment.getExternalStorageDirectory() +
                 Constants.PATH_APP + "/" +
                 Constants.PATH_SHARE + "/" +
                 Constants.PATH_SEND + "/" +
-                speakItem.getId();
+                id;
         File iSpeakItemDir = new File(speakItemDir);
         try {
             if (!iSpeakItemDir.exists()) {
@@ -403,10 +407,11 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             e.printStackTrace();
         }
 
-        String speakItemJson = speakItemDir + "/" + speakItem.getId() + ".json";
+
+        String speakItemJson = speakItemDir + "/" + id + ".json";
         Gson gson = new Gson();
         try {
-            String jsonString = gson.toJson(speakItem);
+            String jsonString = gson.toJson(shareItem);
             FileWriter fileWriter = new FileWriter(speakItemJson);
             fileWriter.write(jsonString);
             fileWriter.close();
@@ -418,14 +423,16 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         if (new File(speakItemJson).exists()) {
             zipFiles.add(speakItemJson);
         }
-        if (new File(speakItem.getAudioPath()).exists()) {
-            zipFiles.add(speakItem.getAudioPath());
-        }
-        if (new File(speakItem.getPhotoPath()).exists()) {
-            zipFiles.add(speakItem.getPhotoPath());
+        for (SpeakItem speakItem : shareItem.getSpeakItems()) {
+            if (new File(speakItem.getAudioPath()).exists()) {
+                zipFiles.add(speakItem.getAudioPath());
+            }
+            if (new File(speakItem.getPhotoPath()).exists()) {
+                zipFiles.add(speakItem.getPhotoPath());
+            }
         }
 
-        String speakItemZip = speakItemDir + "/" + speakItem.getId() + ".ptf";
+        String speakItemZip = speakItemDir + "/" + id + ".ptf";
         ZipManager zipManager = new ZipManager();
         zipManager.zip(zipFiles.toArray(new String[zipFiles.size()]), speakItemZip);
         return speakItemZip;

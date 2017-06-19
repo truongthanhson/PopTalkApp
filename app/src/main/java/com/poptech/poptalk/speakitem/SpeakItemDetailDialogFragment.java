@@ -56,6 +56,7 @@ import javax.inject.Inject;
 public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
     public interface SpeakItemDetailDialogFragmentCallback {
         void onClickSpeakItemDialogDismiss(SpeakItem speakItem);
+
         void onClickShare(SpeakItem speakItem);
     }
 
@@ -394,7 +395,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 }
             }
             if (!existed) {
-                collectionId = new Random().nextInt(Integer.MAX_VALUE);
+                collectionId = System.currentTimeMillis();
                 Collection collection = new Collection();
                 collection.setDescription(mDescriptionString);
                 collection.setId(collectionId);

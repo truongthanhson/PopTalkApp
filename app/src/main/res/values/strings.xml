@@ -8,8 +8,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="photo_gallery">Gallery</string>
-    <string name="receiver_title">Wifi Direct Receive</string>
-    <string name="sender_title">Wifi Direct Send</string>
+    <string name="receiver_title">Receive SpeakItems</string>
+    <string name="sender_title">Send SpeakItems</string>
 
     <string name="enable_p2p_button">P2P On/Off</string>
     <string name="discover_peers_button">Discover</string>

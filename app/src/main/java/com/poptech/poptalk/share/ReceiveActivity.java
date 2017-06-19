@@ -1,5 +1,6 @@
 package com.poptech.poptalk.share;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -26,26 +27,49 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.gson.Gson;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
+import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.IOUtils;
+import com.poptech.poptalk.utils.StringUtils;
+import com.poptech.poptalk.utils.Utils;
+import com.poptech.poptalk.utils.ZipManager;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener {
     public static final String TAG = "ReceiveActivity";
@@ -65,6 +89,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     private SpeakItemsAdapter mSpeakItemsAdapter;
     private List<SpeakItem> mSpeakItems;
     private FileServerAsyncTask mFileServerTask;
+    CompositeDisposable mDisposable = new CompositeDisposable();
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
@@ -107,18 +132,41 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         Intent intent = getIntent();
         String action = intent.getAction();
 
-        if(action != null && action.compareTo(Intent.ACTION_VIEW) == 0){
-            try {
-                ContentResolver contentResolver = getContentResolver();
-                Uri uri = intent.getData();
-                InputStream inputStream = contentResolver.openInputStream(uri);
-                String filePath = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_PHOTO + "/" + System.currentTimeMillis() + "_s" + ".jpg";
-                File file = new File(filePath);
-                file.createNewFile();
-                IOUtils.copyFile(inputStream,new FileOutputStream(file));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (action != null && action.compareTo(Intent.ACTION_VIEW) == 0) {
+            Dexter.withActivity(this)
+                    .withPermissions(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                    ).withListener(new MultiplePermissionsListener() {
+                @Override
+                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                    if (report.areAllPermissionsGranted()) {
+                        try {
+                            ContentResolver contentResolver = getContentResolver();
+                            Uri uri = intent.getData();
+                            InputStream inputStream = contentResolver.openInputStream(uri);
+                            String filePath = Environment.getExternalStorageDirectory() + Constants.PATH_APP + "/" + Constants.PATH_SHARE + "/" + Constants.PATH_RECEIVE + "/" + System.currentTimeMillis() + ".ptf";
+                            File file = new File(filePath);
+                            try {
+                                if (!file.getParentFile().exists()) {
+                                    Utils.forceMkdir(file.getParentFile());
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            file.createNewFile();
+                            IOUtils.copyFile(inputStream, new FileOutputStream(file));
+                            getReceivedSpeakItem(filePath);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                }
+            }).check();
         }
     }
 
@@ -147,8 +195,6 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
             @Override
             public void onSuccess() {
-//                Toast.makeText(ReceiveActivity.this, "Discovery initiated",
-//                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -167,6 +213,14 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         disconnect();
         unregisterReceiver(receiver);
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
     }
 
     @Override
@@ -199,44 +253,136 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         mFileServerTask.setListener(new FileServerAsyncTask.FileServerTaskListener() {
             @Override
             public void onStart() {
-//                Toast.makeText(PopTalkApplication.applicationContext,
-//                        "Start receiving speak item",
-//                        Toast.LENGTH_SHORT).show();
-//                findViewById(R.id.progress_bar_id).setVisibility(View.VISIBLE);
             }
 
             @Override
-            public void onSuccess(SpeakItem speakItem) {
+            public void onSuccess(String file) {
                 Toast.makeText(ReceiveActivity.this,
                         "Receive speak item successfully!",
                         Toast.LENGTH_SHORT).show();
-//                findViewById(R.id.progress_bar_id).setVisibility(View.GONE);
-                if (speakItem != null) {
-                    // Update Collection
-                    if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
-                        Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
-                        collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
-                        collection.setThumbPath(speakItem.getPhotoPath());
-                        mCollectionModel.updateCollection(collection);
-                    } else {
-                        Collection collection = new Collection();
-                        collection.setId(speakItem.getCollectionId());
-                        collection.setNumSpeakItem(1);
-                        collection.setThumbPath(speakItem.getPhotoPath());
-                        collection.setAddedTime(System.currentTimeMillis());
-                        mCollectionModel.addNewCollection(collection);
-                    }
-
-                    // Update Speak Item
-                    speakItem.setAddedTime(System.currentTimeMillis());
-                    mSpeakItemModel.addNewSpeakItem(speakItem);
-                    mSpeakItems.add(speakItem);
-                    mSpeakItemsAdapter.notifyDataSetChanged();
-                }
+                getReceivedSpeakItem(file);
                 startReceiveFileServer();
             }
         });
         mFileServerTask.executeOnExecutor(SERVER_EXECUTOR);
+    }
+
+    private void getReceivedSpeakItem(String file) {
+        Disposable subscription = Observable.create(new ObservableOnSubscribe<ShareItem>() {
+            @Override
+            public void subscribe(ObservableEmitter<ShareItem> e) throws Exception {
+                e.onNext(unZipSpeakItem(file));
+                e.onComplete();
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<ShareItem>() {
+                    @Override
+                    public void accept(ShareItem shareItem) throws Exception {
+                        if (shareItem != null) {
+                            // Update Collection
+                            for (SpeakItem speakItem : shareItem.getSpeakItems()) {
+                                if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
+                                    Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
+                                    collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
+                                    collection.setThumbPath(speakItem.getPhotoPath());
+                                    mCollectionModel.updateCollection(collection);
+                                } else {
+                                    Collection collection = new Collection();
+                                    collection.setId(speakItem.getCollectionId());
+                                    collection.setNumSpeakItem(1);
+                                    collection.setThumbPath(speakItem.getPhotoPath());
+                                    collection.setAddedTime(System.currentTimeMillis());
+                                    mCollectionModel.addNewCollection(collection);
+                                }
+
+                                // Update Speak Item
+                                speakItem.setAddedTime(System.currentTimeMillis());
+                                mSpeakItemModel.addNewSpeakItem(speakItem);
+                                mSpeakItems.add(speakItem);
+                                mSpeakItemsAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+                });
+        mDisposable.add(subscription);
+    }
+
+    private ShareItem unZipSpeakItem(String zipFile) {
+        ShareItem shareItem = new ShareItem();
+        if (StringUtils.isNullOrEmpty(zipFile) || !new File(zipFile).exists()) {
+            return null;
+        }
+        String speakItemDir = Environment.getExternalStorageDirectory() +
+                Constants.PATH_APP + "/" +
+                Constants.PATH_SHARE + "/" +
+                Constants.PATH_RECEIVE + "/" +
+                System.currentTimeMillis() + "/";
+        File iSpeakItemDir = new File(speakItemDir);
+        try {
+            if (!iSpeakItemDir.exists()) {
+                Utils.forceMkdir(iSpeakItemDir);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        ZipManager zipManager = new ZipManager();
+        zipManager.unzip(zipFile, speakItemDir);
+
+        File[] jsonFiles = getFileWithExtension(new String[]{".json", ".JSON"}, speakItemDir);
+        if (jsonFiles != null) {
+            for (File json : jsonFiles) {
+                if (json != null && json.exists()) {
+                    Gson gson = new Gson();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(json));
+                        ShareItem jsonShareItem = gson.fromJson(br, ShareItem.class);
+                        if (jsonShareItem != null) {
+                            shareItem = jsonShareItem;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < shareItem.getSpeakItems().size(); i++) {
+            String photoPath = shareItem.getSpeakItems().get(i).getPhotoPath();
+            if (!StringUtils.isNullOrEmpty(photoPath)) {
+                int lastIndex = photoPath.lastIndexOf("/");
+                if (lastIndex >= 0) {
+                    shareItem.getSpeakItems().get(i).setPhotoPath(speakItemDir + "/" + photoPath.substring(lastIndex + 1));
+                }
+            }
+            String audioPath = shareItem.getSpeakItems().get(i).getAudioPath();
+            if (!StringUtils.isNullOrEmpty(audioPath)) {
+                int lastIndex = audioPath.lastIndexOf("/");
+                if (lastIndex >= 0) {
+                    shareItem.getSpeakItems().get(i).setAudioPath(speakItemDir + "/" + audioPath.substring(lastIndex + 1));
+                }
+            }
+            shareItem.getSpeakItems().get(i).setId(System.currentTimeMillis());
+            shareItem.getSpeakItems().get(i).setCollectionId(-1);
+        }
+        return shareItem;
+    }
+
+    private File[] getFileWithExtension(String[] extensions, String dir) {
+        File[] files = new File(dir).listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                boolean ret = false;
+                for (int i = 0; i < extensions.length; i++) {
+                    ret = (name.endsWith(extensions[i]));
+                    if (ret)
+                        break;
+                }
+                return ret;
+            }
+        });
+        return files;
     }
 
     public void disconnect() {
@@ -244,12 +390,10 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
 
             @Override
             public void onFailure(int reasonCode) {
-//                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
             }
 
             @Override
             public void onSuccess() {
-//                Toast.makeText(ReceiveActivity.this, "disconnect", Toast.LENGTH_SHORT).show();
             }
 
         });
