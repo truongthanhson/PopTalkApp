@@ -2,12 +2,14 @@ package com.poptech.poptalk.speakitem;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
@@ -22,6 +24,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
@@ -29,10 +32,12 @@ import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.gallery.GalleryActivity;
+import com.poptech.poptalk.location.LocationTracker;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.share.ShareActivity;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -144,7 +149,36 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
 
     @Override
     public void onClickShare(SpeakItem speakItem) {
-        goToShareSpeakItemScreen(speakItem);
+        showChooseShareMethodDialog(speakItem);
+    }
+
+    private void showChooseShareMethodDialog(SpeakItem speakItem) {
+        CharSequence choices[] = new CharSequence[] {"Share via Email", "Share via WiFi Direct"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose share method");
+        builder.setItems(choices, (dialog, which) -> {
+            if (which == 0) {
+                String speakItemZipPath = ShareActivity.zipSpeakItem(speakItem);
+                openSendEmail(speakItemZipPath);
+            } else if (which == 1) {
+                goToShareSpeakItemScreen(speakItem);
+            }
+        });
+        builder.show();
+    }
+
+    private void openSendEmail(String speakItemZipPath) {
+        File filelocation = new File(speakItemZipPath);
+        Uri path = Uri.fromFile(filelocation);
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        // set the type to 'email'
+        emailIntent.setType("vnd.android.cursor.dir/email");
+        // the attachment
+        emailIntent.putExtra(Intent.EXTRA_STREAM, path);
+        // the mail subject
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+        startActivity(Intent.createChooser(emailIntent , "Send email..."));
     }
 
     private void goToShareSpeakItemScreen(SpeakItem speakItem) {

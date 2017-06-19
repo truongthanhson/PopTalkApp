@@ -228,11 +228,11 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_add_speak_item:
-                CharSequence colors[] = new CharSequence[] {"from Camera", "from Gallery"};
+                CharSequence sources[] = new CharSequence[] {"from Camera", "from Gallery"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Create new speak item");
-                builder.setItems(colors, (dialog, which) -> {
+                builder.setItems(sources, (dialog, which) -> {
                     if (which == 0) {
                         Dexter.withActivity(this)
                                 .withPermissions(

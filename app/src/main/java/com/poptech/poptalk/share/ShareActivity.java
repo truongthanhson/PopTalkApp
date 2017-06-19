@@ -377,7 +377,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     private void startTransferFile(WifiP2pInfo info) {
         if (info != null) {
-            String speakItemZip = zipSpeakItem();
+            String speakItemZip = zipSpeakItem(mSpeakItem);
             Intent serviceIntent = new Intent(this, FileTransferService.class);
             serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
             serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, speakItemZip);
@@ -388,12 +388,12 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         }
     }
 
-    private String zipSpeakItem() {
+    public static String zipSpeakItem(SpeakItem speakItem) {
         String speakItemDir = Environment.getExternalStorageDirectory() +
                 Constants.PATH_APP + "/" +
                 Constants.PATH_SHARE + "/" +
                 Constants.PATH_SEND + "/" +
-                mSpeakItem.getId();
+                speakItem.getId();
         File iSpeakItemDir = new File(speakItemDir);
         try {
             if (!iSpeakItemDir.exists()) {
@@ -403,10 +403,10 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             e.printStackTrace();
         }
 
-        String speakItemJson = speakItemDir + "/" + mSpeakItem.getId() + ".json";
+        String speakItemJson = speakItemDir + "/" + speakItem.getId() + ".json";
         Gson gson = new Gson();
         try {
-            String jsonString = gson.toJson(mSpeakItem);
+            String jsonString = gson.toJson(speakItem);
             FileWriter fileWriter = new FileWriter(speakItemJson);
             fileWriter.write(jsonString);
             fileWriter.close();
@@ -418,14 +418,14 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         if (new File(speakItemJson).exists()) {
             zipFiles.add(speakItemJson);
         }
-        if (new File(mSpeakItem.getAudioPath()).exists()) {
-            zipFiles.add(mSpeakItem.getAudioPath());
+        if (new File(speakItem.getAudioPath()).exists()) {
+            zipFiles.add(speakItem.getAudioPath());
         }
-        if (new File(mSpeakItem.getPhotoPath()).exists()) {
-            zipFiles.add(mSpeakItem.getPhotoPath());
+        if (new File(speakItem.getPhotoPath()).exists()) {
+            zipFiles.add(speakItem.getPhotoPath());
         }
 
-        String speakItemZip = speakItemDir + "/" + mSpeakItem.getId() + ".zip";
+        String speakItemZip = speakItemDir + "/" + speakItem.getId() + ".ptf";
         ZipManager zipManager = new ZipManager();
         zipManager.zip(zipFiles.toArray(new String[zipFiles.size()]), speakItemZip);
         return speakItemZip;
