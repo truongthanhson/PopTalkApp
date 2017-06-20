@@ -69,6 +69,7 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -576,7 +577,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
     public void onAddSpeakItem(String path, String date, Location location) {
         long COLLECTION_ID = -1;
-        long SPEAK_ITEM_ID = System.currentTimeMillis();
+        long SPEAK_ITEM_ID = new Random().nextInt(Integer.MAX_VALUE);
 
         // Update Collection
         if (mCollectionModel.isCollectionExisted(COLLECTION_ID)) {

@@ -274,7 +274,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         this.mPresenter = (SpeakItemPresenter) presenter;
     }
 
-    private class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder> {
+    public class SpeakItemsAdapter extends RecyclerView.Adapter<SpeakItemViewHolder> {
         private List<SpeakItem> mSpeakItems;
         private Context mContext;
 
@@ -317,7 +317,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         }
     }
 
-    private class SpeakItemViewHolder extends RecyclerView.ViewHolder {
+    public class SpeakItemViewHolder extends RecyclerView.ViewHolder {
 
         private View mRootView;
         private TextView mLanguageTv;
@@ -334,7 +334,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     }
 
     //section adapter for speak items
-    class SpeakItemSection extends StatelessSection {
+    public class SpeakItemSection extends StatelessSection {
 
         private List<SpeakItem> speakItems;
         private String header;
@@ -396,7 +396,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
         }
     }
 
-    class HeaderViewHolder extends RecyclerView.ViewHolder {
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView tvTitle;
 

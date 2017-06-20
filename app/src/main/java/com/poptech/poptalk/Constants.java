@@ -41,6 +41,8 @@ public class Constants {
 
     public static final String KEY_SPEAK_ITEM = "key_speak_item";
 
+    public static final String KEY_SHARE_ITEM = "key_share_item";
+
     public static final String KEY_SPEAK_ITEM_ID = "key_speak_item_id";
 
     public static final String KEY_COLLECTION = "key_collection";

@@ -66,7 +66,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
     private Dialog mWifiDialog = null;
-    private SpeakItem mSpeakItem;
+    private ShareItem mShareItem;
     private WifiP2pInfo mLastInfo;
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
@@ -84,7 +84,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSpeakItem = getIntent().getParcelableExtra(Constants.KEY_SPEAK_ITEM);
+        mShareItem = getIntent().getParcelableExtra(Constants.KEY_SHARE_ITEM);
         setContentView(R.layout.activity_share_layout);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -377,10 +377,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     private void startTransferFile(WifiP2pInfo info) {
         if (info != null) {
-            ShareItem shareItem = new ShareItem();
-            shareItem.setShareType(Constants.ShareType.SPEAK_ITEM);
-            shareItem.addSpeakItem(mSpeakItem);
-            String speakItemZip = zipSpeakItem(shareItem);
+            String speakItemZip = zipSpeakItem(mShareItem);
             Intent serviceIntent = new Intent(this, FileTransferService.class);
             serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
             serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, speakItemZip);
@@ -423,16 +420,26 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         if (new File(speakItemJson).exists()) {
             zipFiles.add(speakItemJson);
         }
-        for (SpeakItem speakItem : shareItem.getSpeakItems()) {
-            if (new File(speakItem.getAudioPath()).exists()) {
-                zipFiles.add(speakItem.getAudioPath());
+
+        if(shareItem.getShareType() == Constants.ShareType.SPEAK_ITEM) {
+            if (new File(shareItem.getSpeakItem().getAudioPath()).exists()) {
+                zipFiles.add(shareItem.getSpeakItem().getAudioPath());
             }
-            if (new File(speakItem.getPhotoPath()).exists()) {
-                zipFiles.add(speakItem.getPhotoPath());
+            if (new File(shareItem.getSpeakItem().getPhotoPath()).exists()) {
+                zipFiles.add(shareItem.getSpeakItem().getPhotoPath());
+            }
+        } else if(shareItem.getShareType() == Constants.ShareType.STORY_BOARD) {
+            for (SpeakItem speakItem : shareItem.getStoryboard().getSpeakItems()) {
+                if (new File(speakItem.getAudioPath()).exists()) {
+                    zipFiles.add(speakItem.getAudioPath());
+                }
+                if (new File(speakItem.getPhotoPath()).exists()) {
+                    zipFiles.add(speakItem.getPhotoPath());
+                }
             }
         }
 
-        String speakItemZip = speakItemDir + "/" + id + ".ptf";
+        String speakItemZip = speakItemDir + "/" + shareItem.getShareType().name() + "_" + id + ".ptf";
         ZipManager zipManager = new ZipManager();
         zipManager.zip(zipFiles.toArray(new String[zipFiles.size()]), speakItemZip);
         return speakItemZip;
@@ -441,7 +448,6 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
 
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
-        Log.e("sontt", peers.toString());
     }
 
 //

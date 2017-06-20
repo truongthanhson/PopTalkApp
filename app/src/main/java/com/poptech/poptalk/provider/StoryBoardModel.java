@@ -29,12 +29,13 @@ public class StoryBoardModel implements BaseModel {
     private interface StoryBoardQuery {
         String[] projections = new String[]{
                 PopTalkContract.StoryBoards._ID,
+                PopTalkContract.StoryBoards.STORYBOARD_ID,
                 PopTalkContract.StoryBoards.SPEAK_ITEM_IDS,
                 PopTalkContract.StoryBoards.CREATED_TIME
         };
-        int STORY_BOARD_ID = 0;
-        int SPEAK_ITEMS = 1;
-        int CREATED_TIME = 2;
+        int STORY_BOARD_ID = 1;
+        int SPEAK_ITEMS = 2;
+        int CREATED_TIME = 3;
     }
 
     public long addNewStoryBoard(StoryBoard storyBoard) {
@@ -43,7 +44,7 @@ public class StoryBoardModel implements BaseModel {
             SQLiteDatabase database = mDatabase.getWritableDatabase();
 
             ContentValues contentValues = new ContentValues();
-//            contentValues.put(PopTalkContract.StoryBoards._ID, storyBoard.getId());
+            contentValues.put(PopTalkContract.StoryBoards.STORYBOARD_ID, storyBoard.getId());
             contentValues.put(PopTalkContract.StoryBoards.SPEAK_ITEM_IDS, generateStringSpeakItems(storyBoard.getSpeakItems()));
             contentValues.put(PopTalkContract.StoryBoards.CREATED_TIME, storyBoard.getCreatedTime());
             ret = database.insert(PopTalkContract.Tables.STORY_BOARDS, null, contentValues);

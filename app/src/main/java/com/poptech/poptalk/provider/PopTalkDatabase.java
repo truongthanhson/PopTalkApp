@@ -73,6 +73,7 @@ public class PopTalkDatabase extends SQLiteOpenHelper {
 
     public static final String SQL_CREATE_STORY_BOARD = "CREATE TABLE " + Tables.STORY_BOARDS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + StoryBoardColumns.STORYBOARD_ID + " INTEGER,"
             + StoryBoardColumns.SPEAK_ITEM_IDS + " TEXT, "
             + StoryBoardColumns.CREATED_TIME + " INTEGER)";
 

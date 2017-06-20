@@ -8,6 +8,7 @@ import com.poptech.poptalk.provider.StoryBoardModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -46,6 +47,7 @@ public class StoryBoardSelectPresenter implements StoryBoardSelectContract.Prese
     @Override
     public void buildStoryBoard(List<SpeakItem> fromSpeakItems) {
         StoryBoard storyBoard = new StoryBoard();
+        storyBoard.setId(new Random().nextInt(Integer.MAX_VALUE));
         storyBoard.setSpeakItems(fromSpeakItems);
         storyBoard.setCreatedTime(System.currentTimeMillis());
         mStoryBoardModel.addNewStoryBoard(storyBoard);

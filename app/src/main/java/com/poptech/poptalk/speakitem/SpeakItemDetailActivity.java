@@ -154,27 +154,26 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
     }
 
     private void showChooseShareMethodDialog(SpeakItem speakItem) {
+        ShareItem shareItem = new ShareItem();
+        shareItem.setShareType(Constants.ShareType.SPEAK_ITEM);
+        shareItem.setSpeakItem(speakItem);
         CharSequence choices[] = new CharSequence[]{"Share via Email", "Share via WiFi Direct"};
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose share method");
         builder.setItems(choices, (dialog, which) -> {
             if (which == 0) {
-                ShareItem shareItem = new ShareItem();
-                shareItem.setShareType(Constants.ShareType.SPEAK_ITEM);
-                shareItem.addSpeakItem(speakItem);
                 String speakItemZipPath = ShareActivity.zipSpeakItem(shareItem);
                 openSendEmail(speakItemZipPath);
             } else if (which == 1) {
-                goToShareSpeakItemScreen(speakItem);
+                goToShareSpeakItemScreen(shareItem);
             }
         });
         builder.show();
     }
 
     private void openSendEmail(String speakItemZipPath) {
-        File filelocation = new File(speakItemZipPath);
-        Uri path = Uri.fromFile(filelocation);
+        File fileLocation = new File(speakItemZipPath);
+        Uri path = Uri.fromFile(fileLocation);
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         // set the type to 'email'
         emailIntent.setType("vnd.android.cursor.dir/email");
@@ -185,7 +184,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
         startActivity(Intent.createChooser(emailIntent, "Send email..."));
     }
 
-    private void goToShareSpeakItemScreen(SpeakItem speakItem) {
+    private void goToShareSpeakItemScreen(ShareItem shareItem) {
 
         Dexter.withActivity(this)
                 .withPermissions(Manifest.permission.ACCESS_WIFI_STATE,
@@ -201,7 +200,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
                 super.onPermissionsChecked(report);
                 if (report.areAllPermissionsGranted()) {
                     Intent intent = new Intent(SpeakItemDetailActivity.this, ShareActivity.class);
-                    intent.putExtra(Constants.KEY_SPEAK_ITEM, speakItem);
+                    intent.putExtra(Constants.KEY_SHARE_ITEM, shareItem);
                     startActivity(intent);
                 }
             }

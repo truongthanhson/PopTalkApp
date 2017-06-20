@@ -395,7 +395,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 }
             }
             if (!existed) {
-                collectionId = System.currentTimeMillis();
+                collectionId = new Random().nextInt(Integer.MAX_VALUE);
                 Collection collection = new Collection();
                 collection.setDescription(mDescriptionString);
                 collection.setId(collectionId);
