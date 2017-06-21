@@ -39,30 +39,31 @@ public class StoryBoardPresenter implements StoryBoardContract.Presenter {
             mView.onGenerateData(speakItems);
             return;
         }
-
+        List<SpeakItem> mutableSpeakItems = new ArrayList<>();
+        mutableSpeakItems.addAll(speakItems);
         List<SpeakItem> resultSpeakItems = new ArrayList<>();
         List<SpeakItem> tempList = new ArrayList<>();
-        int dataAdded = addData(speakItems.size(), column);
+        int dataAdded = addData(mutableSpeakItems.size(), column);
 
         if(dataAdded > 0){
             for(int i = 1; i <= dataAdded; i++){
                 SpeakItem paddingItem = new SpeakItem();
                 paddingItem.setId(-999);
-                speakItems.add(paddingItem);
+                mutableSpeakItems.add(paddingItem);
             }
         }
 
-        int numberOfLines = speakItems.size() / column;
-        if(speakItems.size() % column != 0){
+        int numberOfLines = mutableSpeakItems.size() / column;
+        if(mutableSpeakItems.size() % column != 0){
             numberOfLines ++;
         }
 
         for(int i=0; i < numberOfLines; i++){
             tempList.clear();
             for(int j = 0; j < column; j++){
-                if(i * column + j > speakItems.size() - 1)
+                if(i * column + j > mutableSpeakItems.size() - 1)
                     break;
-                tempList.add(speakItems.get(i * column + j));
+                tempList.add(mutableSpeakItems.get(i * column + j));
             }
 
             if(i % 2 == 1){
