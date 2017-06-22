@@ -45,10 +45,11 @@ public class StoryBoardSelectPresenter implements StoryBoardSelectContract.Prese
     }
 
     @Override
-    public void buildStoryBoard(List<SpeakItem> fromSpeakItems) {
+    public void buildStoryBoard(List<SpeakItem> fromSpeakItems, String storyboardName) {
         StoryBoard storyBoard = new StoryBoard();
         storyBoard.setId(new Random().nextInt(Integer.MAX_VALUE));
         storyBoard.setSpeakItems(fromSpeakItems);
+        storyBoard.setName(storyboardName);
         storyBoard.setCreatedTime(System.currentTimeMillis());
         mStoryBoardModel.addNewStoryBoard(storyBoard);
         mView.onStoryBoardBuilt(storyBoard);

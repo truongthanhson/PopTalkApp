@@ -13,10 +13,12 @@ public class StoryBoard implements Parcelable {
     private long id;
     private List<SpeakItem> speakItems;
     private long createdTime;
+    private String name;
 
-    public StoryBoard(long id, List<SpeakItem> speakItems, long createdTime) {
+    public StoryBoard(long id, List<SpeakItem> speakItems, String name, long createdTime) {
         this.id = id;
         this.speakItems = speakItems;
+        this.name = name;
         this.createdTime = createdTime;
     }
 
@@ -47,6 +49,13 @@ public class StoryBoard implements Parcelable {
         this.createdTime = createdTime;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @Override
     public int describeContents() {
@@ -56,12 +65,14 @@ public class StoryBoard implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
+        dest.writeString(this.name);
         dest.writeTypedList(this.speakItems);
         dest.writeLong(this.createdTime);
     }
 
     protected StoryBoard(Parcel in) {
         this.id = in.readLong();
+        this.name = in.readString();
         this.speakItems = in.createTypedArrayList(SpeakItem.CREATOR);
         this.createdTime = in.readLong();
     }

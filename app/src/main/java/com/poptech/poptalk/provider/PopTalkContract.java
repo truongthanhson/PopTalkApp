@@ -77,6 +77,7 @@ public class PopTalkContract {
 
     public interface StoryBoardColumns {
         String STORYBOARD_ID = "storyboard_id";
+        String STORYBOARD_NAME = "storyboard_name";
         String SPEAK_ITEM_IDS = "speak_items";
         String CREATED_TIME = "created_time";
     }

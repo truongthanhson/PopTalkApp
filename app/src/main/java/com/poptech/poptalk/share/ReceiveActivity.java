@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -602,8 +603,12 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                     .dontAnimate()
                     .into(holder.mThumbnailIv);
 
-            calendar.setTimeInMillis(mStoryBoards.get(position).getCreatedTime());
-            holder.mCreatedTimeTv.setText("Built " + dateFormat.format(calendar.getTime()));
+            if(TextUtils.isEmpty(mStoryBoards.get(position).getName())){
+                calendar.setTimeInMillis(mStoryBoards.get(position).getCreatedTime());
+                holder.mCreatedTimeTv.setText("Built " + dateFormat.format(calendar.getTime()));
+            }else{
+                holder.mCreatedTimeTv.setText(mStoryBoards.get(position).getName());
+            }
 
             holder.mRootView.setOnClickListener(new View.OnClickListener() {
                 @Override

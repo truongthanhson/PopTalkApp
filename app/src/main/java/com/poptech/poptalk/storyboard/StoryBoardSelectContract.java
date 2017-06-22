@@ -20,6 +20,6 @@ public interface StoryBoardSelectContract {
 
     interface Presenter extends BasePresenter{
         void loadAllSpeakItems();
-        void buildStoryBoard(List<SpeakItem> speakItems);
+        void buildStoryBoard(List<SpeakItem> speakItems, String storyboardName);
     }
 }

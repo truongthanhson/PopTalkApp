@@ -127,11 +127,11 @@ public class StoryBoardSelectFragment extends Fragment implements StoryBoardSele
         mStoryBoardSelectView.setAdapter(mAdapter);
     }
 
-    public void buildStoryBoard(){
+    public void buildStoryBoard(String storyboardName){
         if(getSelectedSpeakItems() == null || getSelectedSpeakItems().size() == 0){
             Toast.makeText(getActivity(), "You did not select any speak item to build storyboard", Toast.LENGTH_SHORT).show();
         }else{
-            mPresenter.buildStoryBoard(getSelectedSpeakItems());
+            mPresenter.buildStoryBoard(getSelectedSpeakItems(),storyboardName);
         }
     }
 

@@ -30,12 +30,14 @@ public class StoryBoardModel implements BaseModel {
         String[] projections = new String[]{
                 PopTalkContract.StoryBoards._ID,
                 PopTalkContract.StoryBoards.STORYBOARD_ID,
+                PopTalkContract.StoryBoards.STORYBOARD_NAME,
                 PopTalkContract.StoryBoards.SPEAK_ITEM_IDS,
                 PopTalkContract.StoryBoards.CREATED_TIME
         };
         int STORY_BOARD_ID = 1;
-        int SPEAK_ITEMS = 2;
-        int CREATED_TIME = 3;
+        int STORY_BOARD_NAME = 2;
+        int SPEAK_ITEMS = 3;
+        int CREATED_TIME = 4;
     }
 
     public long addNewStoryBoard(StoryBoard storyBoard) {
@@ -45,6 +47,7 @@ public class StoryBoardModel implements BaseModel {
 
             ContentValues contentValues = new ContentValues();
             contentValues.put(PopTalkContract.StoryBoards.STORYBOARD_ID, storyBoard.getId());
+            contentValues.put(PopTalkContract.StoryBoards.STORYBOARD_NAME, storyBoard.getName());
             contentValues.put(PopTalkContract.StoryBoards.SPEAK_ITEM_IDS, generateStringSpeakItems(storyBoard.getSpeakItems()));
             contentValues.put(PopTalkContract.StoryBoards.CREATED_TIME, storyBoard.getCreatedTime());
             ret = database.insert(PopTalkContract.Tables.STORY_BOARDS, null, contentValues);
@@ -66,6 +69,7 @@ public class StoryBoardModel implements BaseModel {
                     do {
                         StoryBoard storyBoard = new StoryBoard();
                         storyBoard.setId(cursor.getLong(StoryBoardQuery.STORY_BOARD_ID));
+                        storyBoard.setName(cursor.getString(StoryBoardQuery.STORY_BOARD_NAME));
                         storyBoard.setSpeakItems(parseSpeakItemsFromString(cursor.getString(StoryBoardQuery.SPEAK_ITEMS)));
                         storyBoard.setCreatedTime(cursor.getLong(StoryBoardQuery.CREATED_TIME));
                         storyBoards.add(storyBoard);
