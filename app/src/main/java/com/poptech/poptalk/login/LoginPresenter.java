@@ -89,7 +89,7 @@ public class LoginPresenter implements LoginContract.Presenter {
     }
 
     @Override
-    public void start() {
+    public void getLanguages() {
         Locale[] locales = Locale.getAvailableLocales();
         List<String> languages = new ArrayList<>();
         for (Locale l : locales) {
@@ -109,5 +109,10 @@ public class LoginPresenter implements LoginContract.Presenter {
         List<String> sortedLanguages = new ArrayList<>(new HashSet<>(languages));
         Collections.sort(sortedLanguages, String.CASE_INSENSITIVE_ORDER);
         mView.onLanguageLoaded(sortedLanguages);
+    }
+
+    @Override
+    public void start() {
+
     }
 }

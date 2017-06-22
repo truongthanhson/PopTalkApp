@@ -52,8 +52,6 @@
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
                 android:layout_weight="3.5"
-                android:clickable="true"
-                android:focusableInTouchMode="true"
                 android:orientation="vertical"
                 android:weightSum="12">
 
@@ -194,7 +192,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <ProgressBar
                         android:id="@+id/progress_bar_id"

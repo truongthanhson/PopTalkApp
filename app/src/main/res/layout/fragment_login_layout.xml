@@ -51,22 +51,39 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/user_name_id"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginBottom="20dp"
                     android:background="@color/white"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
                     android:padding="10dp"
                     android:textSize="16sp" />
 
-                <com.jaredrummler.materialspinner.MaterialSpinner
+                <RelativeLayout
                     android:id="@+id/language_spinner_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/user_email_id"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    app:ms_dropdown_height="wrap_content"
-                    app:ms_dropdown_max_height="200dp" />
+                    android:layout_marginBottom="40dp"
+                    android:background="@color/white"
+                    android:clickable="true">
+
+                    <TextView
+                        android:id="@+id/user_language_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Language"
+                        android:padding="10dp"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:text="▼"
+                        android:textSize="12sp" />
+                </RelativeLayout>
 
                 <Button
                     android:id="@+id/login_button_id"
@@ -75,6 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/language_spinner_id"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="10dp"
                     android:paddingLeft="50dp"
                     android:paddingRight="50dp"
                     android:text="Log In"

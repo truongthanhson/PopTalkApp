@@ -5,21 +5,21 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.multidex.MultiDex;
 import android.util.Base64;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.poptech.poptalk.di.AppComponent;
 import com.poptech.poptalk.di.AppModule;
 import com.poptech.poptalk.di.DaggerAppComponent;
-import com.poptech.poptalk.utils.Utils;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by sontt on 25/04/2017.
@@ -39,6 +39,7 @@ public class PopTalkApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         applicationContext = this;
         applicationHandler = new Handler(applicationContext.getMainLooper());
         mAppComponent = DaggerAppComponent.builder().appModule(new AppModule(applicationContext)).build();

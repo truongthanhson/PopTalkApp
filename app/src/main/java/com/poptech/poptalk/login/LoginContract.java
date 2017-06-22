@@ -29,6 +29,8 @@ public class LoginContract {
     interface Presenter extends BasePresenter {
         void login(String userName, String email, String language);
 
+        void getLanguages();
+
         void updateCredentials(Credentials credentials);
     }
 }

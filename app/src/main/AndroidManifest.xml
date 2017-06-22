@@ -9,9 +9,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:windowSoftInputMode="adjustResize"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:windowSoftInputMode="adjustResize">
 
         <activity
             android:name=".LauncherActivity"
@@ -32,7 +32,8 @@
         <activity android:name=".storyboard.StoryboardSelecActivity" />
         <activity android:name=".storyboard.StoryBoardListActivity" />
         <activity android:name=".share.ShareActivity" />
-        <activity android:name=".share.ReceiveActivity"
+        <activity
+            android:name=".share.ReceiveActivity"
 
             android:parentActivityName=".collections.CollectionsActivity">
             <intent-filter>
@@ -73,8 +74,14 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="c51bfd23a831b96f96b84571dd4a929ccf790f6b" />
+
         <!-- Used for transferring files  after a successful connection -->
-        <service android:enabled="true" android:name=".share.FileTransferService" />
+        <service
+            android:name=".share.FileTransferService"
+            android:enabled="true" />
     </application>
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
