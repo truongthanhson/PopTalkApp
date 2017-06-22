@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,6 +42,7 @@ import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.bean.StoryBoard;
+import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
@@ -453,6 +455,16 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+//        NavUtils.navigateUpFromSameTask(this);
+        if(isTaskRoot()) {
+            Intent parentIntent = new Intent(this, CollectionsActivity.class);
+            startActivity(parentIntent);
+            finish();
+        }
     }
 
     private class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
