@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -153,6 +154,49 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mSpeakItemId = getArguments().getLong(Constants.KEY_SPEAK_ITEM_ID);
     }
 
+    /**
+     * Adds a listener to the layout {@link ViewTreeObserver} to wait for the view measurements
+     * and then calls {@link #consolideHeights(LinearLayout)}.
+     */
+    private static void scheduleConsolideHeights(final LinearLayout layout) {
+
+        final ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
+
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    consolideHeights(layout);
+                }
+            });
+        }
+    }
+
+    /**
+     * Note: you might want to use {@link #scheduleConsolideHeights(android.widget.LinearLayout)}.
+     *
+     * Takes a {@link android.widget.LinearLayout} and, for each of its child views, sets the height
+     * of the child's LayoutParams to the current height of the child.
+     *
+     * Useful when a {@link android.widget.LinearLayout} that has relative heights (with weights)
+     * may display the keyboard. With absolute heights, the layout maintains its aspect when the soft
+     * keyboard appears.
+     *
+     * See: http://stackoverflow.com/q/22534107/1121497
+     */
+    private static void consolideHeights(LinearLayout layout) {
+
+        for (int i = 0; i < layout.getChildCount(); i++)
+        {
+            final View child = layout.getChildAt(i);
+            final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) child.getLayoutParams();
+            params.height = child.getHeight();
+            params.weight = 0;
+            child.setLayoutParams(params);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -160,6 +204,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mView = inflater.inflate(R.layout.fragment_speak_items_detail_layout, container, false);
         initView();
         initData();
+        scheduleConsolideHeights((LinearLayout) mView.findViewById(R.id.root));
         return mView;
     }
 
