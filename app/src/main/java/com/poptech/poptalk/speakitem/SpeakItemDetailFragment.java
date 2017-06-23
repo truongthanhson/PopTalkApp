@@ -309,6 +309,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onPause() {
+        mPresenter.updateSpeakItem(mSpeakItem);
         super.onPause();
     }
 
@@ -316,7 +317,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     public void onStop() {
         stopPlay();
         clearNotification();
-        mPresenter.updateSpeakItem(mSpeakItem);
         super.onStop();
     }
 
