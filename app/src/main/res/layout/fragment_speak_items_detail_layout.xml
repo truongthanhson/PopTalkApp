@@ -124,8 +124,8 @@
                         android:hint="Photo Description"
                         android:imeOptions="actionDone"
                         android:inputType="textMultiLine"
-                        android:padding="2dp"
-                        android:textSize="14sp" />
+                        android:padding="5dp"
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
