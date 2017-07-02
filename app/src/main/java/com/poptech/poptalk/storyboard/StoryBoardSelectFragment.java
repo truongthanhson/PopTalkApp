@@ -1,16 +1,11 @@
 package com.poptech.poptalk.storyboard;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +19,6 @@ import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.bean.StoryBoard;
-import com.poptech.poptalk.collections.SpeakItemsFragment;
-import com.poptech.poptalk.utils.MetricUtils;
 import com.poptech.poptalk.view.ItemDecorationColumns;
 
 import java.util.ArrayList;
@@ -111,7 +104,7 @@ public class StoryBoardSelectFragment extends Fragment implements StoryBoardSele
     }
 
     private void initView() {
-        mStoryBoardSelectView = (RecyclerView)mRootView.findViewById(R.id.speak_item_list);
+        mStoryBoardSelectView = (RecyclerView)mRootView.findViewById(R.id.share_item_list);
         mStoryBoardSelectView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         mStoryBoardSelectView.addItemDecoration(new ItemDecorationColumns(3, getResources().getDimensionPixelSize(R.dimen.grid_divider), true));
     }

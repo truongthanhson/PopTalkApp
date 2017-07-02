@@ -32,10 +32,13 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
     }
 
     @Override
-    public void loadAllSpeakItems() {
-        List<SpeakItem> speakItems = mSpeakItemModel.getSpeakItems();
+    public void loadCollections() {
         List<Collection> collections = mCollectionModel.getCollections();
-        mView.onAllSpeakItemsLoaded(speakItems, collections);
+        for (int i = 0; i < collections.size(); i++) {
+            long collectionId = collections.get(i).getId();
+            collections.get(i).addAllSpeakItems(mSpeakItemModel.getSpeakItems(collectionId));
+        }
+        mView.onCollectionsLoaded(collections);
     }
 
     @Override
@@ -47,7 +50,9 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
 
     @Override
     public void loadCollection(long collectionId) {
-        mView.onCollectionLoaded(mCollectionModel.getCollection(collectionId));
+        Collection collection = mCollectionModel.getCollection(collectionId);
+        collection.addAllSpeakItems(mSpeakItemModel.getSpeakItems(collectionId));
+        mView.onCollectionLoaded(collection);
     }
 
     @Override

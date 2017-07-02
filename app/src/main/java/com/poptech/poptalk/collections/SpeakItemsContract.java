@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface SpeakItemsContract {
     interface View extends BaseView<Presenter> {
-        void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections);
+        void onCollectionsLoaded(List<Collection> collections);
 
         void onSpeakItemsLoaded(List<SpeakItem> speakItems);
 
@@ -21,7 +21,7 @@ public interface SpeakItemsContract {
     }
 
     interface Presenter extends BasePresenter {
-        void loadAllSpeakItems();
+        void loadCollections();
 
         void loadSpeakItems(long collectionId);
 

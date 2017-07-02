@@ -3,6 +3,9 @@ package com.poptech.poptalk.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by sontt on 28/04/2017.
  */
@@ -15,6 +18,7 @@ public class Collection implements Parcelable {
     private int numSpeakItem;
     private long addedTime;
     private int numAccess;
+    private List<SpeakItem> speakItems;
 
     public Collection() {
         description = "";
@@ -23,6 +27,7 @@ public class Collection implements Parcelable {
         numSpeakItem = 0;
         addedTime = 0;
         numAccess = 0;
+        speakItems = new ArrayList<>();
     }
 
     public Collection(int id, String description, String language, String thumbPath) {
@@ -88,6 +93,18 @@ public class Collection implements Parcelable {
         return this.numAccess;
     }
 
+    public List<SpeakItem> getSpeakItems() {
+        return speakItems;
+    }
+
+    public void addAllSpeakItems(List<SpeakItem> speakItems) {
+        this.speakItems.addAll(speakItems);
+    }
+
+    public void addSpeakItems(SpeakItem speakItem) {
+        this.speakItems.add(speakItem);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -103,6 +120,7 @@ public class Collection implements Parcelable {
         dest.writeInt(this.numSpeakItem);
         dest.writeLong(this.addedTime);
         dest.writeInt(this.numAccess);
+        dest.writeTypedList(this.speakItems);
     }
 
     protected Collection(Parcel in) {
@@ -113,6 +131,7 @@ public class Collection implements Parcelable {
         this.numSpeakItem = in.readInt();
         this.addedTime = in.readLong();
         this.numAccess = in.readInt();
+        this.speakItems = in.createTypedArrayList(SpeakItem.CREATOR);
     }
 
     public static final Parcelable.Creator<Collection> CREATOR = new Parcelable.Creator<Collection>() {

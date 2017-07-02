@@ -4,30 +4,27 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.poptech.poptalk.Constants;
-import com.poptech.poptalk.utils.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by sontt on 30/04/2017.
  */
 
 public class ShareItem implements Parcelable {
-    private Constants.ShareType shareType;
+    private Constants.ShareType type;
     SpeakItem speakItem;
     StoryBoard storyBoard;
+    Collection collection;
 
     public ShareItem() {
-        shareType = Constants.ShareType.NONE;
+        type = Constants.ShareType.NONE;
     }
 
-    public Constants.ShareType getShareType() {
-        return shareType;
+    public Constants.ShareType getType() {
+        return type;
     }
 
-    public void setShareType(Constants.ShareType shareType) {
-        this.shareType = shareType;
+    public void setType(Constants.ShareType type) {
+        this.type = type;
     }
 
     public SpeakItem getSpeakItem() {
@@ -46,6 +43,15 @@ public class ShareItem implements Parcelable {
         this.storyBoard = storyBoard;
     }
 
+
+    public Collection getCollection() {
+        return collection;
+    }
+
+    public void setCollection(Collection collection) {
+        this.collection = collection;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -55,11 +61,13 @@ public class ShareItem implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.speakItem, flags);
         dest.writeParcelable(this.storyBoard, flags);
+        dest.writeParcelable(this.collection, flags);
     }
 
     protected ShareItem(Parcel in) {
         this.speakItem = in.readParcelable(SpeakItem.class.getClassLoader());
         this.storyBoard = in.readParcelable(StoryBoard.class.getClassLoader());
+        this.collection = in.readParcelable(Collection.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<ShareItem> CREATOR = new Parcelable.Creator<ShareItem>() {

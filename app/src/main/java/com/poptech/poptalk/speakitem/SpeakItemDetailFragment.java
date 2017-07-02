@@ -21,12 +21,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -62,6 +65,8 @@ import com.poptech.poptalk.view.AudioTimelineView;
 import com.poptech.poptalk.view.SeekBarWaveformView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -175,20 +180,19 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     /**
      * Note: you might want to use {@link #scheduleConsolideHeights(android.widget.LinearLayout)}.
-     *
+     * <p>
      * Takes a {@link android.widget.LinearLayout} and, for each of its child views, sets the height
      * of the child's LayoutParams to the current height of the child.
-     *
+     * <p>
      * Useful when a {@link android.widget.LinearLayout} that has relative heights (with weights)
      * may display the keyboard. With absolute heights, the layout maintains its aspect when the soft
      * keyboard appears.
-     *
+     * <p>
      * See: http://stackoverflow.com/q/22534107/1121497
      */
     private static void consolideHeights(LinearLayout layout) {
 
-        for (int i = 0; i < layout.getChildCount(); i++)
-        {
+        for (int i = 0; i < layout.getChildCount(); i++) {
             final View child = layout.getChildAt(i);
             final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) child.getLayoutParams();
             params.height = child.getHeight();
@@ -223,8 +227,10 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mPhotoDateTime = (TextView) mView.findViewById(R.id.photo_datetime_id);
         mLanguage1 = (Button) mView.findViewById(R.id.language1_button_id);
         mLanguage1.setOnClickListener(this);
+        mLanguage1.setOnLongClickListener(this);
         mLanguage2 = (Button) mView.findViewById(R.id.language2_button_id);
         mLanguage2.setOnClickListener(this);
+        mLanguage2.setOnLongClickListener(this);
         mPhotoDescription = (EditText) mView.findViewById(R.id.description_et_id);
         mPhotoDescription.addTextChangedListener(this);
         mPhotoDescription.setFocusable(false);
@@ -853,7 +859,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
     @Override
     public void onLeftProgressChanged(float progress) {
-        if(mAudioCtrl != null) {
+        if (mAudioCtrl != null) {
             mAudioCtrl.stopAudio();
         }
         mPlayState = PlayState.NONE;
@@ -893,6 +899,10 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             case R.id.photo_img_id:
                 showChoosePhotoDialog();
                 break;
+            case R.id.language1_button_id:
+            case R.id.language2_button_id:
+                selectLanguage(v);
+                break;
             default:
                 break;
         }
@@ -931,6 +941,79 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             }
         });
         builder.show();
+    }
+
+    private void selectLanguage(View v) {
+        Locale[] locales = Locale.getAvailableLocales();
+        List<String> languages = new ArrayList<>();
+        for (Locale l : locales) {
+            String language = l.getDisplayLanguage();
+            if (!StringUtils.isNullOrEmpty(language)) {
+                String[] regexChars = {"\\s+", "\\s*-\\s*", "\\s*'\\s*"};
+                String space = " ";
+                for (String regex : regexChars) {
+                    language = language.replaceAll(regex, space);
+                }
+                language = language.replaceAll("^\\s+", "");
+                language = language.replaceAll("\\s+$", "");
+                languages.add(language);
+            }
+
+        }
+        List<String> sortedLanguages = new ArrayList<>(new HashSet<>(languages));
+        Collections.sort(sortedLanguages, String.CASE_INSENSITIVE_ORDER);
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
+        alertDialog.setView(convertView);
+        alertDialog.setTitle("Select Language");
+        alertDialog.setIcon(R.drawable.ic_language);
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.setCancelable(false);
+        final AlertDialog dialog = alertDialog.create();
+
+        ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
+        EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, sortedLanguages);
+        searchText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                adapter.getFilter().filter(cs);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+            }
+        });
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String language = (String) parent.getItemAtPosition(position);
+                ((Button) v).setText(language);
+                if (v.getId() == R.id.language1_button_id) {
+                    mSpeakItem.setLanguage(language);
+                } else if (v.getId() == R.id.language2_button_id) {
+                    SaveData.getInstance(getActivity()).setLanguage(language);
+                }
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        dialog.show();
     }
 
     @Override

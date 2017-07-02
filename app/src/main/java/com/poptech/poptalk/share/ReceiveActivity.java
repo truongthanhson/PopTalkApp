@@ -13,11 +13,10 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -43,18 +42,19 @@ import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.bean.StoryBoard;
+import com.poptech.poptalk.collections.CollectionDetailActivity;
 import com.poptech.poptalk.collections.CollectionsActivity;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.provider.StoryBoardModel;
 import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
-import com.poptech.poptalk.storyboard.StoryBoardListFragment;
 import com.poptech.poptalk.storyboard.StoryboardActivity;
 import com.poptech.poptalk.utils.IOUtils;
 import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.utils.ZipManager;
+import com.poptech.poptalk.view.ItemDecorationColumns;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -96,11 +96,13 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     private SpeakItemModel mSpeakItemModel;
     private CollectionsModel mCollectionModel;
     private StoryBoardModel mStoryBoardModel;
-    private RecyclerView mSpeakItemsView;
+    private RecyclerView mShareItemsView;
     private SpeakItemsAdapter mSpeakItemsAdapter;
     private StoryBoardListAdapter mStoryBoardsAdapter;
+    private CollectionsAdapter mCollectionsAdapter;
     private List<SpeakItem> mSpeakItems;
     private List<StoryBoard> mStoryBoard;
+    private List<Collection> mCollection;
     private FileServerAsyncTask mFileServerTask;
     CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -137,12 +139,14 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
         deletePersistentGroups();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
 
-        mSpeakItemsView = (RecyclerView) findViewById(R.id.speak_item_list);
-        mSpeakItemsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mShareItemsView = (RecyclerView) findViewById(R.id.share_item_list);
+        mShareItemsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mSpeakItems = new ArrayList<>();
         mStoryBoard = new ArrayList<>();
+        mCollection = new ArrayList<>();
         mSpeakItemsAdapter = new SpeakItemsAdapter(mSpeakItems, this);
         mStoryBoardsAdapter = new StoryBoardListAdapter(mStoryBoard, this);
+        mCollectionsAdapter = new CollectionsAdapter(mCollection, this);
 
         //action open file from email
         Intent intent = getIntent();
@@ -298,19 +302,30 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                         if (shareItem != null) {
                             // Update Collection
                             List<SpeakItem> speakItems = new ArrayList<>();
-                            if (shareItem.getShareType() == Constants.ShareType.SPEAK_ITEM) {
+                            if (shareItem.getType() == Constants.ShareType.SPEAK_ITEM) {
                                 // Add Collections
                                 speakItems.add(shareItem.getSpeakItem());
                                 // Set Adapter
                                 mSpeakItems.add(shareItem.getSpeakItem());
-                                mSpeakItemsView.setAdapter(mSpeakItemsAdapter);
+                                mShareItemsView.setAdapter(mSpeakItemsAdapter);
                                 mSpeakItemsAdapter.notifyDataSetChanged();
-                            } else if (shareItem.getShareType() == Constants.ShareType.STORY_BOARD) {
-                                speakItems.addAll(shareItem.getStoryboard().getSpeakItems());
+                            } else if (shareItem.getType() == Constants.ShareType.STORY_BOARD) {
+                                speakItems.addAll((shareItem.getStoryboard()).getSpeakItems());
                                 mStoryBoard.add(shareItem.getStoryboard());
-                                mSpeakItemsView.setAdapter(mStoryBoardsAdapter);
+                                mShareItemsView.setAdapter(mStoryBoardsAdapter);
                                 mStoryBoardsAdapter.notifyDataSetChanged();
                                 mStoryBoardModel.addNewStoryBoard(shareItem.getStoryboard());
+                            } else if (shareItem.getType() == Constants.ShareType.COLLECTION) {
+                                speakItems.addAll((shareItem.getCollection()).getSpeakItems());
+                                mCollection.add(shareItem.getCollection());
+                                RecyclerView.LayoutManager layoutManager = new GridLayoutManager(ReceiveActivity.this, 2);
+                                ItemDecorationColumns itemDecoration = new ItemDecorationColumns(2, getResources().getDimensionPixelSize(R.dimen.grid_divider), true);
+                                mShareItemsView.setHasFixedSize(true);
+                                mShareItemsView.setLayoutManager(layoutManager);
+                                mShareItemsView.addItemDecoration(itemDecoration);
+                                mShareItemsView.setAdapter(mCollectionsAdapter);
+                                mCollectionsAdapter.notifyDataSetChanged();
+                                mCollectionModel.addNewCollection(shareItem.getCollection());
                             }
 
                             // Update Collection
@@ -379,42 +394,72 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             }
         }
 
-        if (shareItem.getShareType() == Constants.ShareType.SPEAK_ITEM) {
-            String photoPath = shareItem.getSpeakItem().getPhotoPath();
+        if (shareItem.getType() == Constants.ShareType.SPEAK_ITEM) {
+            SpeakItem speakItem = shareItem.getSpeakItem();
+            String photoPath = speakItem.getPhotoPath();
             if (!StringUtils.isNullOrEmpty(photoPath)) {
                 int lastIndex = photoPath.lastIndexOf("/");
                 if (lastIndex >= 0) {
-                    shareItem.getSpeakItem().setPhotoPath(speakItemDir + "/" + photoPath.substring(lastIndex + 1));
+                    speakItem.setPhotoPath(speakItemDir + "/" + photoPath.substring(lastIndex + 1));
                 }
             }
-            String audioPath = shareItem.getSpeakItem().getAudioPath();
+            String audioPath = speakItem.getAudioPath();
             if (!StringUtils.isNullOrEmpty(audioPath)) {
                 int lastIndex = audioPath.lastIndexOf("/");
                 if (lastIndex >= 0) {
-                    shareItem.getSpeakItem().setAudioPath(speakItemDir + "/" + audioPath.substring(lastIndex + 1));
+                    speakItem.setAudioPath(speakItemDir + "/" + audioPath.substring(lastIndex + 1));
                 }
             }
-            shareItem.getSpeakItem().setId(new Random().nextInt(Integer.MAX_VALUE));
-            shareItem.getSpeakItem().setCollectionId(-1);
-        } else if (shareItem.getShareType() == Constants.ShareType.STORY_BOARD) {
-            for (int i = 0; i < shareItem.getStoryboard().getSpeakItems().size(); i++) {
-                String photoPath = shareItem.getStoryboard().getSpeakItems().get(i).getPhotoPath();
+            speakItem.setId(new Random().nextInt(Integer.MAX_VALUE));
+            speakItem.setCollectionId(-1);
+        } else if (shareItem.getType() == Constants.ShareType.STORY_BOARD) {
+            StoryBoard storyBoard = shareItem.getStoryboard();
+            for (int i = 0; i < storyBoard.getSpeakItems().size(); i++) {
+                String photoPath = storyBoard.getSpeakItems().get(i).getPhotoPath();
                 if (!StringUtils.isNullOrEmpty(photoPath)) {
                     int lastIndex = photoPath.lastIndexOf("/");
                     if (lastIndex >= 0) {
-                        shareItem.getStoryboard().getSpeakItems().get(i).setPhotoPath(speakItemDir + "/" + photoPath.substring(lastIndex + 1));
+                        storyBoard.getSpeakItems().get(i).setPhotoPath(speakItemDir + "/" + photoPath.substring(lastIndex + 1));
                     }
                 }
-                String audioPath = shareItem.getStoryboard().getSpeakItems().get(i).getAudioPath();
+                String audioPath = storyBoard.getSpeakItems().get(i).getAudioPath();
                 if (!StringUtils.isNullOrEmpty(audioPath)) {
                     int lastIndex = audioPath.lastIndexOf("/");
                     if (lastIndex >= 0) {
-                        shareItem.getStoryboard().getSpeakItems().get(i).setAudioPath(speakItemDir + "/" + audioPath.substring(lastIndex + 1));
+                        storyBoard.getSpeakItems().get(i).setAudioPath(speakItemDir + "/" + audioPath.substring(lastIndex + 1));
                     }
                 }
-                shareItem.getStoryboard().getSpeakItems().get(i).setId(new Random().nextInt(Integer.MAX_VALUE));
-                shareItem.getStoryboard().getSpeakItems().get(i).setCollectionId(-1);
-                shareItem.getStoryboard().setId(new Random().nextInt(Integer.MAX_VALUE));
+                storyBoard.getSpeakItems().get(i).setId(new Random().nextInt(Integer.MAX_VALUE));
+                storyBoard.getSpeakItems().get(i).setCollectionId(-1);
+                storyBoard.setId(new Random().nextInt(Integer.MAX_VALUE));
+            }
+        } else if (shareItem.getType() == Constants.ShareType.COLLECTION) {
+            Collection collection = shareItem.getCollection();
+            collection.setId(new Random().nextInt(Integer.MAX_VALUE));
+            collection.setAddedTime(System.currentTimeMillis());
+            if (!StringUtils.isNullOrEmpty(collection.getThumbPath())) {
+                int lastIndex = collection.getThumbPath().lastIndexOf("/");
+                if (lastIndex >= 0) {
+                    collection.setThumbPath(speakItemDir + "/" + collection.getThumbPath().substring(lastIndex + 1));
+                }
+            }
+            for (int i = 0; i < collection.getSpeakItems().size(); i++) {
+                String photoPath = collection.getSpeakItems().get(i).getPhotoPath();
+                if (!StringUtils.isNullOrEmpty(photoPath)) {
+                    int lastIndex = photoPath.lastIndexOf("/");
+                    if (lastIndex >= 0) {
+                        collection.getSpeakItems().get(i).setPhotoPath(speakItemDir + "/" + photoPath.substring(lastIndex + 1));
+                    }
+                }
+                String audioPath = collection.getSpeakItems().get(i).getAudioPath();
+                if (!StringUtils.isNullOrEmpty(audioPath)) {
+                    int lastIndex = audioPath.lastIndexOf("/");
+                    if (lastIndex >= 0) {
+                        collection.getSpeakItems().get(i).setAudioPath(speakItemDir + "/" + audioPath.substring(lastIndex + 1));
+                    }
+                }
+                collection.getSpeakItems().get(i).setId(new Random().nextInt(Integer.MAX_VALUE));
+                collection.getSpeakItems().get(i).setCollectionId(collection.getId());
             }
         }
         return shareItem;
@@ -461,7 +506,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
     @Override
     public void onBackPressed() {
 //        NavUtils.navigateUpFromSameTask(this);
-        if(isTaskRoot()) {
+        if (isTaskRoot()) {
             Intent parentIntent = new Intent(this, CollectionsActivity.class);
             startActivity(parentIntent);
             finish();
@@ -603,10 +648,10 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                     .dontAnimate()
                     .into(holder.mThumbnailIv);
 
-            if(TextUtils.isEmpty(mStoryBoards.get(position).getName())){
+            if (TextUtils.isEmpty(mStoryBoards.get(position).getName())) {
                 calendar.setTimeInMillis(mStoryBoards.get(position).getCreatedTime());
                 holder.mCreatedTimeTv.setText("Built " + dateFormat.format(calendar.getTime()));
-            }else{
+            } else {
                 holder.mCreatedTimeTv.setText(mStoryBoards.get(position).getName());
             }
 
@@ -639,6 +684,70 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             mRootView = itemView;
             mThumbnailIv = (ImageView) mRootView.findViewById(R.id.iv_thumb_id);
             mCreatedTimeTv = (TextView) mRootView.findViewById(R.id.tv_created_time);
+        }
+    }
+
+    public class CollectionsAdapter extends RecyclerView.Adapter<CollectionViewHolder> {
+        private List<Collection> mCollections;
+        private Context mContext;
+
+        public CollectionsAdapter(List<Collection> collections, Context context) {
+            this.mCollections = collections;
+            this.mContext = context;
+        }
+
+        @Override
+        public CollectionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_collection_layout, parent, false);
+            return new CollectionViewHolder(rootView);
+        }
+
+        @Override
+        public void onBindViewHolder(CollectionViewHolder holder, final int position) {
+            if (mCollections.get(position).getId() == -1) {
+                holder.mDescriptionTv.setText("Unknown Collection");
+            } else {
+                holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
+            }
+            holder.mLanguageTv.setText(mCollections.get(position).getLanguage());
+
+            Glide.with(mContext)
+                    .load(mCollections.get(position).getThumbPath())
+                    .centerCrop()
+                    .thumbnail(0.5f)
+                    .placeholder(R.color.colorAccent)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.mThumbnailIv);
+
+            holder.mRootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, CollectionDetailActivity.class);
+                    intent.putExtra(Constants.KEY_COLLECTION_ID, mCollections.get(position));
+                    startActivity(intent);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mCollections.size();
+        }
+    }
+
+    public class CollectionViewHolder extends RecyclerView.ViewHolder {
+
+        private View mRootView;
+        private TextView mLanguageTv;
+        private ImageView mThumbnailIv;
+        private TextView mDescriptionTv;
+
+        public CollectionViewHolder(View itemView) {
+            super(itemView);
+            mRootView = itemView;
+            mDescriptionTv = (TextView) mRootView.findViewById(R.id.tv_description_id);
+            mLanguageTv = (TextView) mRootView.findViewById(R.id.tv_lang_id);
+            mThumbnailIv = (ImageView) mRootView.findViewById(R.id.iv_thumb_id);
         }
     }
 }

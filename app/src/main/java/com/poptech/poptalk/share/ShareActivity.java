@@ -2,7 +2,6 @@ package com.poptech.poptalk.share;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,35 +19,26 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.poptech.poptalk.Constants;
-import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
+import com.poptech.poptalk.bean.StoryBoard;
 import com.poptech.poptalk.utils.Utils;
 import com.poptech.poptalk.utils.ZipManager;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by sontt on 17/05/2017.
@@ -421,15 +411,27 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             zipFiles.add(speakItemJson);
         }
 
-        if(shareItem.getShareType() == Constants.ShareType.SPEAK_ITEM) {
-            if (new File(shareItem.getSpeakItem().getAudioPath()).exists()) {
-                zipFiles.add(shareItem.getSpeakItem().getAudioPath());
+        if (shareItem.getType() == Constants.ShareType.SPEAK_ITEM) {
+            SpeakItem speakItem = shareItem.getSpeakItem();
+            if (new File(speakItem.getAudioPath()).exists()) {
+                zipFiles.add(speakItem.getAudioPath());
             }
-            if (new File(shareItem.getSpeakItem().getPhotoPath()).exists()) {
-                zipFiles.add(shareItem.getSpeakItem().getPhotoPath());
+            if (new File(speakItem.getPhotoPath()).exists()) {
+                zipFiles.add(speakItem.getPhotoPath());
             }
-        } else if(shareItem.getShareType() == Constants.ShareType.STORY_BOARD) {
-            for (SpeakItem speakItem : shareItem.getStoryboard().getSpeakItems()) {
+        } else if (shareItem.getType() == Constants.ShareType.STORY_BOARD) {
+            StoryBoard storyBoard = shareItem.getStoryboard();
+            for (SpeakItem speakItem : storyBoard.getSpeakItems()) {
+                if (new File(speakItem.getAudioPath()).exists()) {
+                    zipFiles.add(speakItem.getAudioPath());
+                }
+                if (new File(speakItem.getPhotoPath()).exists()) {
+                    zipFiles.add(speakItem.getPhotoPath());
+                }
+            }
+        } else if (shareItem.getType() == Constants.ShareType.COLLECTION) {
+            Collection collection = shareItem.getCollection();
+            for (SpeakItem speakItem : collection.getSpeakItems()) {
                 if (new File(speakItem.getAudioPath()).exists()) {
                     zipFiles.add(speakItem.getAudioPath());
                 }
@@ -439,7 +441,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
             }
         }
 
-        String speakItemZip = speakItemDir + "/" + shareItem.getShareType().name() + "_" + id + ".ptf";
+        String speakItemZip = speakItemDir + "/" + shareItem.getType().name() + "_" + id + ".ptf";
         ZipManager zipManager = new ZipManager();
         zipManager.zip(zipFiles.toArray(new String[zipFiles.size()]), speakItemZip);
         return speakItemZip;

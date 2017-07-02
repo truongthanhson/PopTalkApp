@@ -26,6 +26,7 @@ public class Constants {
     public enum ShareType {
         NONE,
         SPEAK_ITEM,
+        COLLECTION,
         STORY_BOARD;
     }
 

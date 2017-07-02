@@ -10,17 +10,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 
 import com.poptech.poptalk.R;
-import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.bean.StoryBoard;
 import com.poptech.poptalk.utils.ActivityUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.poptech.poptalk.utils.AndroidUtilities;
 
 /**
  * Created by sontt on 09/05/2017.
@@ -53,7 +52,7 @@ public class StoryboardSelecActivity extends AppCompatActivity implements StoryB
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_story_board_select, menu);
+        getMenuInflater().inflate(R.menu.menu_build, menu);
         return true;
     }
 
@@ -82,27 +81,25 @@ public class StoryboardSelecActivity extends AppCompatActivity implements StoryB
     private void showInputStoryBoardName() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Set storyboard name");
-
-        // Set up the input
-        final EditText input = new EditText(this);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-        // Set up the buttons
+        builder.setIcon(R.drawable.ic_add_circle);
+        LayoutInflater inflater = getLayoutInflater();
+        View convertView = inflater.inflate(R.layout.item_edittext_dialog, null);
+        final EditText editText = (EditText) convertView.findViewById(R.id.edit_text_id);
+        builder.setView(convertView);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mStoryBoardName = input.getText().toString();
+                mStoryBoardName = editText.getText().toString();
                 buildStoryBoard();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
+        builder.setCancelable(false);
 
         builder.show();
     }

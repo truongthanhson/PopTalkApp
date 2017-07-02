@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -53,6 +54,8 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     public interface SpeakItemsFragmentCallback {
         void onClickSpeakItem(long speakItemId, long collectionId);
+
+        void onClickShareItem(Collection collection);
     }
 
     public enum GroupSpeakItemSortType {
@@ -74,6 +77,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     private View mView;
     private RecyclerView mSpeakItemsView;
     private long mCollectionId;
+    private Collection mCollection;
     GroupSpeakItemSortType mSortType;
     GroupSpeakItemViewType mViewType;
     private SectionedRecyclerViewAdapter mSectionedSpeakItemAdapter;
@@ -111,13 +115,14 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         mView = inflater.inflate(R.layout.fragment_speak_items_layout, container, false);
         initView();
         return mView;
     }
 
     private void initView() {
-        mSpeakItemsView = (RecyclerView) mView.findViewById(R.id.speak_item_list);
+        mSpeakItemsView = (RecyclerView) mView.findViewById(R.id.share_item_list);
     }
 
     @Override
@@ -142,7 +147,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                 if (mSortType == GroupSpeakItemSortType.NONE) {
                     mPresenter.loadSpeakItems(mCollectionId);
                 } else {
-                    mPresenter.loadAllSpeakItems();
+                    mPresenter.loadCollections();
                 }
             }
 
@@ -178,9 +183,13 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
     }
 
     @Override
-    public void onAllSpeakItemsLoaded(List<SpeakItem> speakItems, List<Collection> collections) {
+    public void onCollectionsLoaded(List<Collection> collections) {
         mSectionedSpeakItemAdapter = new SectionedRecyclerViewAdapter();
         if (mSortType == GroupSpeakItemSortType.LOCATION) {
+            List<SpeakItem> speakItems = new ArrayList<>();
+            for (Collection collection : collections) {
+                speakItems.addAll(collection.getSpeakItems());
+            }
             List<String> locations = new ArrayList<>();
             for (SpeakItem speakItem : speakItems) {
                 locations.add(speakItem.getLocation().trim());
@@ -208,20 +217,14 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             }
             for (Collection collection : collections) {
                 if (collection.getNumSpeakItem() > 0) {
-                    List<SpeakItem> speakItemSection = new ArrayList<>();
-                    for (SpeakItem speakItem : speakItems) {
-                        if (speakItem.getCollectionId() == collection.getId()) {
-                            speakItemSection.add(speakItem);
-                        }
-                    }
                     if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
-                        Collections.sort(speakItemSection, (o1, o2) -> o1.getDescription1().compareTo(o2.getDescription1()));
+                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getDescription1().compareTo(o2.getDescription1()));
                     } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {
-                        Collections.sort(speakItemSection, (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
+                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
                     } else if (mSortType == GroupSpeakItemSortType.RECENT) {
-                        Collections.sort(speakItemSection, (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
+                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
                     }
-                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(speakItemSection, collection.getDescription(), R.layout.item_speak_item_layout));
+                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(collection.getSpeakItems(), collection.getDescription(), R.layout.item_speak_item_layout));
                 }
             }
         }
@@ -241,9 +244,19 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
 
     @Override
     public void onCollectionLoaded(Collection collection) {
+        mCollection = collection;
         if (!StringUtils.isNullOrEmpty(collection.getDescription())) {
             ((CollectionDetailActivity) getActivity()).getSupportActionBar().setTitle(collection.getDescription());
         }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            mCallback.onClickShareItem(mCollection);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 

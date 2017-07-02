@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +23,6 @@ import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.bean.StoryBoard;
 import com.poptech.poptalk.share.ShareActivity;
-import com.poptech.poptalk.speakitem.SpeakItemDetailActivity;
 import com.poptech.poptalk.utils.ActivityUtils;
 
 import java.io.File;
@@ -39,6 +37,7 @@ public class StoryboardActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolBar;
     private StoryBoard mStoryBoard;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,13 +50,13 @@ public class StoryboardActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Story Board");
 
-        if(getIntent() != null){
+        if (getIntent() != null) {
             mStoryBoard = getIntent().getParcelableExtra("storyboard");
         }
         showStoryBoard((ArrayList<SpeakItem>) mStoryBoard.getSpeakItems());
     }
 
-    private void showStoryBoard(ArrayList<SpeakItem> speakItems){
+    private void showStoryBoard(ArrayList<SpeakItem> speakItems) {
         StoryBoardFragment storyBoardFragment = StoryBoardFragment.newInstance();
         Bundle args = new Bundle();
         args.putParcelableArrayList("selected_speak_items", speakItems);
@@ -68,7 +67,7 @@ public class StoryboardActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_story_board_share, menu);
+        getMenuInflater().inflate(R.menu.menu_share, menu);
         return true;
     }
 
@@ -77,7 +76,7 @@ public class StoryboardActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
-        }else if (item.getItemId() == R.id.action_share) {
+        } else if (item.getItemId() == R.id.action_share) {
             showChooseShareMethodDialog();
         }
         return super.onOptionsItemSelected(item);
@@ -85,7 +84,7 @@ public class StoryboardActivity extends AppCompatActivity {
 
     private void showChooseShareMethodDialog() {
         ShareItem shareItem = new ShareItem();
-        shareItem.setShareType(Constants.ShareType.STORY_BOARD);
+        shareItem.setType(Constants.ShareType.STORY_BOARD);
         shareItem.setStoryBoard(mStoryBoard);
         CharSequence choices[] = new CharSequence[]{"Share via Email", "Share via WiFi Direct"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

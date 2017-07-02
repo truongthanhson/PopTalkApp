@@ -24,16 +24,12 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.BaseMultiplePermissionsListener;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.poptech.poptalk.Constants;
 import com.poptech.poptalk.PopTalkApplication;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.bean.ShareItem;
 import com.poptech.poptalk.bean.SpeakItem;
-import com.poptech.poptalk.collections.CollectionsActivity;
-import com.poptech.poptalk.gallery.GalleryActivity;
-import com.poptech.poptalk.location.LocationTracker;
 import com.poptech.poptalk.provider.PopTalkDatabase;
 import com.poptech.poptalk.provider.SpeakItemModel;
 import com.poptech.poptalk.share.ShareActivity;
@@ -155,7 +151,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
 
     private void showChooseShareMethodDialog(SpeakItem speakItem) {
         ShareItem shareItem = new ShareItem();
-        shareItem.setShareType(Constants.ShareType.SPEAK_ITEM);
+        shareItem.setType(Constants.ShareType.SPEAK_ITEM);
         shareItem.setSpeakItem(speakItem);
         CharSequence choices[] = new CharSequence[]{"Share via Email", "Share via WiFi Direct"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

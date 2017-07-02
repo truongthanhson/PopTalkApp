@@ -560,6 +560,11 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
+    public void onClickShareItem(Collection collection) {
+
+    }
+
+    @Override
     public void onLocationChanged(Location location) {
         mLocation = location;
         if (mTracker != null) {

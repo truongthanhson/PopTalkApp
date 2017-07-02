@@ -37,7 +37,9 @@ public class SpeakItemDetailPresenter implements SpeakItemDetailContract.Present
 
     @Override
     public void loadCollection(long collectionId) {
-        mView.onCollectionLoaded(mCollectionModel.getCollection(collectionId));
+        Collection collection = mCollectionModel.getCollection(collectionId);
+        collection.addAllSpeakItems(mSpeakItemModel.getSpeakItems(collectionId));
+        mView.onCollectionLoaded(collection);
     }
 
     @Override
