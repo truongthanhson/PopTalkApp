@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">#FF9800</color>
-    <color name="colorPrimaryDark">#F57C00</color>
-    <color name="colorPrimaryLight">#FFE0B2</color>
-    <color name="colorAccent">#4CAF50</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#757575</color>
-    <color name="icons">#212121</color>
-    <color name="divider">#BDBDBD</color>
+    <color name="transparent">#00000000</color>
+    <color name="background">#000000</color>
 
-    <color name="textColorPrimary">#757575</color>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimaryLight">#484848</color>
+    <color name="colorAccent">#9E9E9E</color>
+    <color name="primary_text">#ffffff</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="dark_icon">#99000000</color>
+
+    <color name="textColorPrimary">@color/primary_text</color>
+    <color name="textColorSecondary">@color/secondary_text</color>
     <color name="navigationBarColor">#000000</color>
     <color name="half_black">#808080</color>
     <color name="black">#ff000000</color>
     <color name="white">#ffffffff</color>
     <color name="gray">#ffa5a5a5</color>
-    <color name="transparent">#00FFFFFF</color>
 
     <color name="level_0">#1abc9c</color>
     <color name="level_1">#3498db</color>

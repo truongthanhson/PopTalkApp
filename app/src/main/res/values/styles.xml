@@ -24,6 +24,30 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
+    </style>
+
+    <style name="CollectionsItem.Title" parent="">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="CollectionsItem.Description" parent="">
+        <item name="android:textColor">@color/textColorSecondary</item>
+    </style>
+
+    <style name="SpeakItem.Description" parent="">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="SpeakItem.Language1" parent="">
+        <item name="android:textColor">@color/textColorSecondary</item>
+    </style>
+
+    <style name="NavigationDrawer.Background" parent="">
+        <item name="android:background">@color/white</item>
     </style>
 
     <!-- ToolBar -->
