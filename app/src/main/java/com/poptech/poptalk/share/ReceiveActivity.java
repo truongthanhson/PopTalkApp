@@ -325,21 +325,19 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                                 mShareItemsView.addItemDecoration(itemDecoration);
                                 mShareItemsView.setAdapter(mCollectionsAdapter);
                                 mCollectionsAdapter.notifyDataSetChanged();
-                                mCollectionModel.addNewCollection(shareItem.getCollection());
+                                if (!mCollectionModel.isCollectionExisted(shareItem.getCollection().getId())) {
+                                    mCollectionModel.addNewCollection(shareItem.getCollection());
+                                }
                             }
 
                             // Update Collection
                             for (SpeakItem speakItem : speakItems) {
                                 if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
                                     Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
-                                    collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
-                                    collection.setThumbPath(speakItem.getPhotoPath());
                                     mCollectionModel.updateCollection(collection);
                                 } else {
                                     Collection collection = new Collection();
                                     collection.setId(speakItem.getCollectionId());
-                                    collection.setNumSpeakItem(1);
-                                    collection.setThumbPath(speakItem.getPhotoPath());
                                     collection.setAddedTime(System.currentTimeMillis());
                                     mCollectionModel.addNewCollection(collection);
                                 }
@@ -435,14 +433,9 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             }
         } else if (shareItem.getType() == Constants.ShareType.COLLECTION) {
             Collection collection = shareItem.getCollection();
-            collection.setId(new Random().nextInt(Integer.MAX_VALUE));
+            collection.setId(-2);
+            collection.setDescription("Received Collection");
             collection.setAddedTime(System.currentTimeMillis());
-            if (!StringUtils.isNullOrEmpty(collection.getThumbPath())) {
-                int lastIndex = collection.getThumbPath().lastIndexOf("/");
-                if (lastIndex >= 0) {
-                    collection.setThumbPath(speakItemDir + "/" + collection.getThumbPath().substring(lastIndex + 1));
-                }
-            }
             for (int i = 0; i < collection.getSpeakItems().size(); i++) {
                 String photoPath = collection.getSpeakItems().get(i).getPhotoPath();
                 if (!StringUtils.isNullOrEmpty(photoPath)) {
@@ -709,15 +702,17 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             } else {
                 holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
             }
-            holder.mLanguageTv.setText(mCollections.get(position).getLanguage());
+            if(mCollections.get(position).getSpeakItems().size() > 0) {
+                holder.mLanguageTv.setText(mCollections.get(position).getSpeakItems().get(0).getLanguage());
 
-            Glide.with(mContext)
-                    .load(mCollections.get(position).getThumbPath())
-                    .centerCrop()
-                    .thumbnail(0.5f)
-                    .placeholder(R.color.colorAccent)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.mThumbnailIv);
+                Glide.with(mContext)
+                        .load(mCollections.get(position).getSpeakItems().get(0).getPhotoPath())
+                        .centerCrop()
+                        .thumbnail(0.5f)
+                        .placeholder(R.color.colorAccent)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(holder.mThumbnailIv);
+            }
 
             holder.mRootView.setOnClickListener(new View.OnClickListener() {
                 @Override

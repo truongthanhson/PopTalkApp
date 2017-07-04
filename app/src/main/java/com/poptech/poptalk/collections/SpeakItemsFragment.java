@@ -216,7 +216,7 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
                 Collections.sort(collections, (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
             }
             for (Collection collection : collections) {
-                if (collection.getNumSpeakItem() > 0) {
+                if (collection.getSpeakItems().size() > 0) {
                     if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
                         Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getDescription1().compareTo(o2.getDescription1()));
                     } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {

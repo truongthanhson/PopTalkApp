@@ -2,6 +2,7 @@ package com.poptech.poptalk.collections;
 
 import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.provider.CollectionsModel;
+import com.poptech.poptalk.provider.SpeakItemModel;
 
 import java.util.List;
 
@@ -13,12 +14,14 @@ import javax.inject.Inject;
 
 public class CollectionsPresenter implements CollectionsContract.Presenter {
     private CollectionsContract.View mView;
-    private CollectionsModel mModel;
+    private SpeakItemModel mSpeakItemModel;
+    private CollectionsModel mCollectionModel;
     private List<Collection> allCollections;
 
     @Inject
-    public CollectionsPresenter(CollectionsModel model, CollectionsContract.View view) {
-        this.mModel = model;
+    public CollectionsPresenter(SpeakItemModel speakItemModel, CollectionsModel collectionsModel, CollectionsContract.View view) {
+        this.mSpeakItemModel = speakItemModel;
+        this.mCollectionModel = collectionsModel;
         this.mView = view;
     }
 
@@ -36,7 +39,11 @@ public class CollectionsPresenter implements CollectionsContract.Presenter {
     @Override
     public void loadCollections() {
         //mModel.generateTestData();
-        List<Collection> collections = mModel.getCollections();
+        List<Collection> collections = mCollectionModel.getCollections();
+        for (int i = 0; i < collections.size(); i++) {
+            long collectionId = collections.get(i).getId();
+            collections.get(i).addAllSpeakItems(mSpeakItemModel.getSpeakItems(collectionId));
+        }
         mView.onCollectionsLoaded(collections);
 
     }

@@ -13,18 +13,12 @@ import java.util.List;
 public class Collection implements Parcelable {
     private long id;
     private String description;
-    private String language;
-    private String thumbPath;
-    private int numSpeakItem;
     private long addedTime;
     private int numAccess;
     private List<SpeakItem> speakItems;
 
     public Collection() {
         description = "";
-        language = "";
-        thumbPath = "";
-        numSpeakItem = 0;
         addedTime = 0;
         numAccess = 0;
         speakItems = new ArrayList<>();
@@ -33,8 +27,6 @@ public class Collection implements Parcelable {
     public Collection(int id, String description, String language, String thumbPath) {
         this.id = id;
         this.description = description;
-        this.language = language;
-        this.thumbPath = thumbPath;
     }
 
     public long getId() {
@@ -51,30 +43,6 @@ public class Collection implements Parcelable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public String getThumbPath() {
-        return thumbPath;
-    }
-
-    public void setThumbPath(String thumbPath) {
-        this.thumbPath = thumbPath;
-    }
-
-    public void setNumSpeakItem(int numSpeakItem) {
-        this.numSpeakItem = numSpeakItem;
-    }
-
-    public int getNumSpeakItem() {
-        return numSpeakItem;
     }
 
     public void setAddedTime(long addedTime) {
@@ -115,9 +83,6 @@ public class Collection implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
         dest.writeString(this.description);
-        dest.writeString(this.language);
-        dest.writeString(this.thumbPath);
-        dest.writeInt(this.numSpeakItem);
         dest.writeLong(this.addedTime);
         dest.writeInt(this.numAccess);
         dest.writeTypedList(this.speakItems);
@@ -126,9 +91,6 @@ public class Collection implements Parcelable {
     protected Collection(Parcel in) {
         this.id = in.readLong();
         this.description = in.readString();
-        this.language = in.readString();
-        this.thumbPath = in.readString();
-        this.numSpeakItem = in.readInt();
         this.addedTime = in.readLong();
         this.numAccess = in.readInt();
         this.speakItems = in.createTypedArrayList(SpeakItem.CREATOR);

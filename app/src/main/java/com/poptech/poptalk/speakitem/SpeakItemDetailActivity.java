@@ -82,6 +82,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
                 mSpeakItemPagerAdapter = new SpeakItemsPagerAdapter(getSupportFragmentManager(), speakItems);
                 mSpeakItemPager.setAdapter(mSpeakItemPagerAdapter);
                 mSpeakItemPager.setCurrentItem(getCurrentItem(speakItems));
+                mSpeakItemPagerAdapter.notifyDataSetChanged();
             }
 
             @Override

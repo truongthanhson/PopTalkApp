@@ -587,14 +587,10 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
         // Update Collection
         if (mCollectionModel.isCollectionExisted(COLLECTION_ID)) {
             Collection collection = mCollectionModel.getCollection(COLLECTION_ID);
-            collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
-            collection.setThumbPath(path);
             mCollectionModel.updateCollection(collection);
         } else {
             Collection collection = new Collection();
             collection.setId(COLLECTION_ID);
-            collection.setNumSpeakItem(1);
-            collection.setThumbPath(path);
             collection.setAddedTime(System.currentTimeMillis());
             mCollectionModel.addNewCollection(collection);
         }

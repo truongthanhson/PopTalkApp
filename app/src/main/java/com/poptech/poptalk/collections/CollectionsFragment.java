@@ -154,7 +154,7 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
     public void onCollectionsLoaded(List<Collection> collections) {
         List<Collection> newCollections = new ArrayList<>();
         for (Collection collection : collections) {
-            if (collection.getNumSpeakItem() > 0) {
+            if (collection.getSpeakItems().size() > 0) {
                 newCollections.add(collection);
             }
         }
@@ -184,15 +184,18 @@ public class CollectionsFragment extends Fragment implements CollectionsContract
             }else{
                 holder.mDescriptionTv.setText(mCollections.get(position).getDescription());
             }
-            holder.mLanguageTv.setText(mCollections.get(position).getLanguage());
+            if(mCollections.get(position).getSpeakItems().size() > 0) {
+                holder.mLanguageTv.setText(mCollections.get(position).getSpeakItems().get(0).getLanguage());
 
-            Glide.with(mContext)
-                    .load(mCollections.get(position).getThumbPath())
-                    .centerCrop()
-                    .thumbnail(0.5f)
-                    .placeholder(R.color.colorAccent)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.mThumbnailIv);
+                Glide.with(mContext)
+                        .load(mCollections.get(position).getSpeakItems().get(0).getPhotoPath())
+                        .centerCrop()
+                        .thumbnail(0.5f)
+                        .placeholder(R.color.colorAccent)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(holder.mThumbnailIv);
+            }
+
 
             holder.mRootView.setOnClickListener(new View.OnClickListener() {
                 @Override

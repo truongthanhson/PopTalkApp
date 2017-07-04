@@ -11,9 +11,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,7 +25,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.gson.Gson;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -41,7 +38,6 @@ import com.poptech.poptalk.bean.Collection;
 import com.poptech.poptalk.bean.SpeakItem;
 import com.poptech.poptalk.provider.CollectionsModel;
 import com.poptech.poptalk.provider.SpeakItemModel;
-import com.poptech.poptalk.utils.AndroidUtilities;
 import com.poptech.poptalk.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -70,16 +66,16 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
     private List<Collection> mCollections;
 
     private ImageView mSpeakItemPhoto;
-    private TextView mSpeakItemLanguage;
-    private TextView mSpeakItemCollection;
+    //    private TextView mSpeakItemLanguage;
+//    private TextView mSpeakItemCollection;
     private Button mSpeakItemShareButton;
-    private Button mSpeakItemLanguageButton;
+    //    private Button mSpeakItemLanguageButton;
     private AutoCompleteTextView mAddCollectionEdit;
     private Button mAddCollectionButton;
     private Button mSaveButton;
     private SpeakItemDetailDialogFragmentCallback mCallBack;
 
-    private String mLanguageString;
+    //    private String mLanguageString;
     private String mDescriptionString;
 
 
@@ -131,12 +127,12 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
         dialog.setContentView(contentView);
 
         mSpeakItemPhoto = (ImageView) contentView.findViewById(R.id.speak_item_photo_id);
-        mSpeakItemCollection = (TextView) contentView.findViewById(R.id.speak_item_collection_id);
-        mSpeakItemLanguage = (TextView) contentView.findViewById(R.id.speak_item_language_id);
+//        mSpeakItemCollection = (TextView) contentView.findViewById(R.id.speak_item_collection_id);
+//        mSpeakItemLanguage = (TextView) contentView.findViewById(R.id.speak_item_language_id);
         mSpeakItemShareButton = (Button) contentView.findViewById(R.id.share_button_id);
         mSpeakItemShareButton.setOnClickListener(this);
-        mSpeakItemLanguageButton = (Button) contentView.findViewById(R.id.language_button_id);
-        mSpeakItemLanguageButton.setOnClickListener(this);
+//        mSpeakItemLanguageButton = (Button) contentView.findViewById(R.id.language_button_id);
+//        mSpeakItemLanguageButton.setOnClickListener(this);
 
         mAddCollectionEdit = (AutoCompleteTextView) contentView.findViewById(R.id.add_collection_edit_id);
         mAddCollectionEdit.setOnClickListener(this);
@@ -179,14 +175,14 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 .into(mSpeakItemPhoto);
         for (Collection collection : mCollections) {
             if (collection.getId() == mSpeakItem.getCollectionId()) {
-                mLanguageString = collection.getLanguage();
+
                 mDescriptionString = collection.getDescription();
-                mSpeakItemCollection.setText(collection.getDescription());
+//                mSpeakItemCollection.setText(collection.getDescription());
                 break;
             }
         }
-        mSpeakItemLanguage.setText(mSpeakItem.getLanguage());
-
+//        mLanguageString = mSpeakItem.getLanguage();
+//        mSpeakItemLanguage.setText(mLanguageString);
     }
 
     @Override
@@ -199,15 +195,15 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 addNewCollection();
                 break;
             case R.id.share_button_id:
-                updateCollection();
+                updateSpeakItem();
                 dismiss();
                 mCallBack.onClickShare(mSpeakItem);
                 break;
-            case R.id.language_button_id:
-                selectLanguage();
-                break;
+//            case R.id.language_button_id:
+//                selectLanguage();
+//                break;
             case R.id.save_button_id:
-                updateCollection();
+                updateSpeakItem();
                 dismiss();
                 break;
             default:
@@ -215,74 +211,74 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
         }
     }
 
-    private void selectLanguage() {
-        Locale[] locales = Locale.getAvailableLocales();
-        List<String> languages = new ArrayList<>();
-        for (Locale l : locales) {
-            String language = l.getDisplayLanguage();
-            if (!StringUtils.isNullOrEmpty(language)) {
-                String[] regexChars = {"\\s+", "\\s*-\\s*", "\\s*'\\s*"};
-                String space = " ";
-                for (String regex : regexChars) {
-                    language = language.replaceAll(regex, space);
-                }
-                language = language.replaceAll("^\\s+", "");
-                language = language.replaceAll("\\s+$", "");
-                languages.add(language);
-            }
-
-        }
-        List<String> sortedLanguages = new ArrayList<>(new HashSet<>(languages));
-        Collections.sort(sortedLanguages, String.CASE_INSENSITIVE_ORDER);
-
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
-        alertDialog.setView(convertView);
-        alertDialog.setTitle("Select Language");
-        alertDialog.setIcon(R.drawable.ic_language);
-        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialog.setCancelable(false);
-        final AlertDialog dialog = alertDialog.create();
-
-        ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
-        EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, sortedLanguages);
-        searchText.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                adapter.getFilter().filter(cs);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable arg0) {
-            }
-        });
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String language = (String) parent.getItemAtPosition(position);
-                mLanguageString = language;
-                mSpeakItemLanguage.setText(language);
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        dialog.show();
-    }
+//    private void selectLanguage() {
+//        Locale[] locales = Locale.getAvailableLocales();
+//        List<String> languages = new ArrayList<>();
+//        for (Locale l : locales) {
+//            String language = l.getDisplayLanguage();
+//            if (!StringUtils.isNullOrEmpty(language)) {
+//                String[] regexChars = {"\\s+", "\\s*-\\s*", "\\s*'\\s*"};
+//                String space = " ";
+//                for (String regex : regexChars) {
+//                    language = language.replaceAll(regex, space);
+//                }
+//                language = language.replaceAll("^\\s+", "");
+//                language = language.replaceAll("\\s+$", "");
+//                languages.add(language);
+//            }
+//
+//        }
+//        List<String> sortedLanguages = new ArrayList<>(new HashSet<>(languages));
+//        Collections.sort(sortedLanguages, String.CASE_INSENSITIVE_ORDER);
+//
+//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+//        LayoutInflater inflater = getActivity().getLayoutInflater();
+//        View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
+//        alertDialog.setView(convertView);
+//        alertDialog.setTitle("Select Language");
+//        alertDialog.setIcon(R.drawable.ic_language);
+//        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//        alertDialog.setCancelable(false);
+//        final AlertDialog dialog = alertDialog.create();
+//
+//        ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
+//        EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
+//        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, sortedLanguages);
+//        searchText.addTextChangedListener(new TextWatcher() {
+//
+//            @Override
+//            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+//                adapter.getFilter().filter(cs);
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable arg0) {
+//            }
+//        });
+//        listView.setAdapter(adapter);
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                String language = (String) parent.getItemAtPosition(position);
+//                mLanguageString = language;
+//                mSpeakItemLanguage.setText(language);
+//                if (dialog != null) {
+//                    dialog.dismiss();
+//                }
+//            }
+//        });
+//
+//        dialog.show();
+//    }
 
     private void selectCollection() {
         int index = 0;
@@ -292,6 +288,9 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 descriptions.add(collection.getDescription());
             }
         }
+        List<String> sortedDescription = new ArrayList<>(new HashSet<>(descriptions));
+        Collections.sort(sortedDescription, String.CASE_INSENSITIVE_ORDER);
+
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
@@ -309,7 +308,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
         EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, descriptions);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, sortedDescription);
         searchText.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -331,7 +330,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String description = (String) parent.getItemAtPosition(position);
                 mDescriptionString = description;
-                mSpeakItemCollection.setText(description);
+//                mSpeakItemCollection.setText(description);
                 mAddCollectionEdit.setText(description);
                 if (dialog != null) {
                     dialog.dismiss();
@@ -356,7 +355,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
             public void onClick(DialogInterface dialog, int which) {
                 String description = editText.getText().toString();
                 mDescriptionString = description;
-                mSpeakItemCollection.setText(description);
+//                mSpeakItemCollection.setText(description);
                 mAddCollectionEdit.setText(description);
             }
         });
@@ -371,25 +370,17 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
         builder.show();
     }
 
-    private void updateCollection() {
+    private void updateSpeakItem() {
         boolean existed = false;
         long collectionId = -1;
-        if (!StringUtils.isNullOrEmpty(mLanguageString)) {
-            mSpeakItem.setLanguage(mLanguageString);
-        }
+//        if (!StringUtils.isNullOrEmpty(mLanguageString)) {
+//            mSpeakItem.setLanguage(mLanguageString);
+//        }
 
         if (!StringUtils.isNullOrEmpty(mDescriptionString)) {
-            // Update current collection
-            updateCollectionItem(mSpeakItem.getCollectionId());
-
-            // Update new collection
             for (Collection collection : mCollections) {
                 if (collection.getDescription().equals(mDescriptionString)) {
                     collectionId = collection.getId();
-                    collection.setThumbPath(mSpeakItem.getPhotoPath());
-                    collection.setLanguage(mSpeakItem.getLanguage());
-                    collection.setNumSpeakItem(collection.getNumSpeakItem() + 1);
-                    mCollectionModel.updateCollection(collection);
                     existed = true;
                     break;
                 }
@@ -399,38 +390,12 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
                 Collection collection = new Collection();
                 collection.setDescription(mDescriptionString);
                 collection.setId(collectionId);
-                collection.setThumbPath(mSpeakItem.getPhotoPath());
-                collection.setLanguage(mSpeakItem.getLanguage());
-                collection.setNumSpeakItem(1);
                 collection.setAddedTime(System.currentTimeMillis());
                 mCollectionModel.addNewCollection(collection);
                 mCollections.add(collection);
             }
             mSpeakItem.setCollectionId(collectionId);
+            mSpeakItemModel.updateSpeakItem(mSpeakItem);
         }
-
-    }
-
-    private void updateCollectionItem(long collectionId) {
-        List<SpeakItem> speakItems = mSpeakItemModel.getSpeakItems(collectionId);
-        for (int i = 0; i < mCollections.size(); i++) {
-            if (mCollections.get(i).getId() == collectionId) {
-                for (int j = 0; j < speakItems.size(); j++) {
-                    if (speakItems.get(j).getId() == mSpeakItem.getId()) {
-                        speakItems.remove(j);
-                    }
-                }
-                mCollections.get(i).setNumSpeakItem(speakItems.size());
-                if (speakItems.size() > 0) {
-                    mCollections.get(i).setThumbPath(speakItems.get(speakItems.size() - 1).getPhotoPath());
-                    mCollections.get(i).setLanguage(speakItems.get(speakItems.size() - 1).getLanguage());
-                } else {
-                    mCollections.get(i).setThumbPath("");
-                    mCollections.get(i).setLanguage("");
-                }
-                mCollectionModel.updateCollection(mCollections.get(i));
-            }
-        }
-
     }
 }

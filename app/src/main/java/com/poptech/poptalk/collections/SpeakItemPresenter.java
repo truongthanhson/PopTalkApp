@@ -20,9 +20,9 @@ public class SpeakItemPresenter implements SpeakItemsContract.Presenter {
     private SpeakItemsContract.View mView;
 
     @Inject
-    public SpeakItemPresenter(SpeakItemModel mSpeakItemModel, CollectionsModel mCollectionModel, SpeakItemsContract.View mView) {
-        this.mSpeakItemModel = mSpeakItemModel;
-        this.mCollectionModel = mCollectionModel;
+    public SpeakItemPresenter(SpeakItemModel speakItemModel, CollectionsModel collectionModel, SpeakItemsContract.View mView) {
+        this.mSpeakItemModel = speakItemModel;
+        this.mCollectionModel = collectionModel;
         this.mView = mView;
     }
 

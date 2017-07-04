@@ -292,6 +292,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             public void onPermissionGranted(PermissionGrantedResponse response) {
                 super.onPermissionGranted(response);
                 mPresenter.loadSpeakItem(mSpeakItemId);
+                mPresenter.loadCollection(mSpeakItem.getCollectionId());
             }
 
             @Override
