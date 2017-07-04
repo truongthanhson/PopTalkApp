@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -34,9 +35,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -124,6 +129,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private ImageButton mPlayCurrentButton;
     private ImageButton mPlayNextButton;
     private ImageButton mPlayRepeatButton;
+    private ImageButton mAudioCutButton;
 
     private AudioController mAudioCtrl;
     private SpeakItem mSpeakItem;
@@ -264,6 +270,9 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mPlayNextButton.setOnClickListener(this);
         mPlayRepeatButton = (ImageButton) mView.findViewById(R.id.play_repeat_button_id);
         mPlayRepeatButton.setOnClickListener(this);
+        mAudioCutButton = (ImageButton) mView.findViewById(R.id.audio_cut_button_id);
+        mAudioCutButton.setOnClickListener(this);
+
 
     }
 
@@ -510,6 +519,9 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 break;
             case R.id.play_repeat_button_id:
                 playRepeat();
+                break;
+            case R.id.audio_cut_button_id:
+                showAudioCuttingDialog();
                 break;
             case R.id.photo_img_id:
                 showMap();
@@ -901,7 +913,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 break;
             case R.id.language1_button_id:
             case R.id.language2_button_id:
-                selectLanguage(v);
+                showChooseLanguageDialog(v);
                 break;
             default:
                 break;
@@ -943,7 +955,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         builder.show();
     }
 
-    private void selectLanguage(View v) {
+    private void showChooseLanguageDialog(View v) {
         Locale[] locales = Locale.getAvailableLocales();
         List<String> languages = new ArrayList<>();
         for (Locale l : locales) {
@@ -1014,6 +1026,91 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         });
 
         dialog.show();
+    }
+
+    private void showAudioCuttingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Audio Cutting");
+        builder.setMessage("Do you want to cut audio from A to C position?");
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Dexter.withActivity(getActivity())
+                        .withPermissions(
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .withListener(new BaseMultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                super.onPermissionsChecked(report);
+                                if (report.areAllPermissionsGranted()) {
+                                    FFmpeg ffmpeg = FFmpeg.getInstance(getActivity());
+                                    try {
+                                        long leftTime = (long) (mSpeakItem.getAudioDuration() * mSpeakItem.getAudioLeftMark());
+                                        long rightTime = (long) (mSpeakItem.getAudioDuration() * mSpeakItem.getAudioRightMark());
+                                        float durationTime = ((float)rightTime - (float)leftTime) / 1000;
+                                        String startTime = String.format("%02d:%02d:%02d.%02d", (leftTime / 1000) / 3600, (leftTime / 1000) / 60, (leftTime / 1000) % 60, (int) (leftTime % 1000L) / 10);
+
+                                        String audioIn = mSpeakItem.getAudioPath();
+                                        String audioOut = Environment.getExternalStorageDirectory() +
+                                                Constants.PATH_APP + "/" +
+                                                Constants.PATH_AUDIO + "/" +
+                                                mSpeakItemId + "_" + System.currentTimeMillis() + "_record.ogg";
+                                        String run = "-i " + audioIn + " -ss " + startTime + " -t " + durationTime + " -acodec copy " + audioOut;
+                                        String cmd[] = run.split(" ");
+                                        ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
+
+                                            @Override
+                                            public void onStart() {
+                                                mProgressBar.setVisibility(View.VISIBLE);
+                                            }
+
+                                            @Override
+                                            public void onProgress(String message) {
+                                                mProgressBar.setVisibility(View.VISIBLE);
+                                            }
+
+                                            @Override
+                                            public void onFailure(String message) {
+                                                mProgressBar.setVisibility(View.GONE);
+                                                Toast.makeText(getActivity(), "Failure: " + message, Toast.LENGTH_LONG);
+                                            }
+
+                                            @Override
+                                            public void onSuccess(String message) {
+                                                mProgressBar.setVisibility(View.GONE);
+                                                mSpeakItem.setAudioPath(audioOut);
+                                                mSpeakItem.setAudioDuration(rightTime - leftTime);
+                                                onReloadAudioWave();
+                                            }
+
+                                            @Override
+                                            public void onFinish() {
+                                                mProgressBar.setVisibility(View.GONE);
+                                            }
+                                        });
+                                    } catch (FFmpegCommandAlreadyRunningException e) {
+                                        mProgressBar.setVisibility(View.GONE);
+                                        Toast.makeText(getActivity(), "Exception: " + e.toString(), Toast.LENGTH_LONG);
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                super.onPermissionRationaleShouldBeShown(permissions, token);
+                            }
+                        }).check();
+            }
+        });
+        builder.show();
     }
 
     @Override

@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/colorPrimaryLight" />
+            <solid android:color="@color/colorAccent" />
             <stroke
                 android:width="0.5dp"
                 android:color="@color/transparent" />
@@ -10,7 +10,7 @@
     </item>
     <item
         android:bottom="10dp"
-        android:drawable="@drawable/ic_pause"
+        android:drawable="@drawable/ic_cut"
         android:left="10dp"
         android:right="10dp"
         android:top="10dp" />

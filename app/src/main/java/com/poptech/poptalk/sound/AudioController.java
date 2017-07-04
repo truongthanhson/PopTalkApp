@@ -338,7 +338,7 @@ public class AudioController {
                             audioToSend.setAudioWaveform(getWaveform(recordingAudioFileToSend.getAbsolutePath()));
                             audioToSend.setAudioPath(recordingAudioFileToSend.getAbsolutePath());
                             long duration = mRecordTimeCount;
-                            audioToSend.setAudioDuration((int) (mRecordTimeCount / 1000));
+                            audioToSend.setAudioDuration(duration);
                             if (duration > 700) {
                                 NotificationCenter.getInstance().postNotificationName(NotificationCenter.audioDidSent, mAudioId, audioToSend);
                             } else {

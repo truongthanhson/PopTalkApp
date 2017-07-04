@@ -20,7 +20,7 @@ public class SpeakItem implements Parcelable {
     private double longitude;
     private long collectionId;
     private String audioPath;
-    private int audioDuration;
+    private long audioDuration; // in ms
     private float audioProgress;
     private int audioProgressSec;
     private byte[] audioWaveform;
@@ -145,11 +145,11 @@ public class SpeakItem implements Parcelable {
         return audioPath;
     }
 
-    public void setAudioDuration(int audioDuration) {
+    public void setAudioDuration(long audioDuration) {
         this.audioDuration = audioDuration;
     }
 
-    public int getAudioDuration() {
+    public long getAudioDuration() {
         return audioDuration;
     }
 
@@ -267,7 +267,7 @@ public class SpeakItem implements Parcelable {
         dest.writeDouble(this.longitude);
         dest.writeLong(this.collectionId);
         dest.writeString(this.audioPath);
-        dest.writeInt(this.audioDuration);
+        dest.writeLong(this.audioDuration);
         dest.writeFloat(this.audioProgress);
         dest.writeInt(this.audioProgressSec);
         dest.writeByteArray(this.audioWaveform);

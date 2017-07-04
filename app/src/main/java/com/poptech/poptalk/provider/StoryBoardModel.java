@@ -110,7 +110,7 @@ public class StoryBoardModel implements BaseModel {
                     speakItem.setId(cursor.getLong(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_ID));
                     speakItem.setAudioPath(cursor.getString(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_AUDIO_PATH));
                     speakItem.setAudioMark(cursor.getString(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_AUDIO_MARK));
-                    speakItem.setAudioDuration(cursor.getInt(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_AUDIO_DURATION));
+                    speakItem.setAudioDuration(cursor.getLong(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_AUDIO_DURATION));
                     speakItem.setPhotoPath(cursor.getString(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_PHOTO_PATH));
                     speakItem.setDescription1(cursor.getString(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION1));
                     speakItem.setDescription2(cursor.getString(SpeakItemModel.SpeakItemQuery.SPEAK_ITEM_PHOTO_DESCRIPTION2));

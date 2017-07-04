@@ -12,9 +12,13 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.poptech.poptalk.di.AppComponent;
 import com.poptech.poptalk.di.AppModule;
 import com.poptech.poptalk.di.DaggerAppComponent;
+import com.poptech.poptalk.utils.SaveData;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,6 +49,28 @@ public class PopTalkApplication extends Application {
         mAppComponent = DaggerAppComponent.builder().appModule(new AppModule(applicationContext)).build();
         FacebookSdk.sdkInitialize(getApplicationContext());
         NativeLoader.initNativeLibs(applicationContext);
+        FFmpeg ffmpeg = FFmpeg.getInstance(applicationContext);
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {
+                }
+
+                @Override
+                public void onFailure() {
+                }
+
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onFinish() {
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+        }
 
         try {
             PackageInfo info = getPackageManager().getPackageInfo("com.poptech.poptalk", PackageManager.GET_SIGNATURES);

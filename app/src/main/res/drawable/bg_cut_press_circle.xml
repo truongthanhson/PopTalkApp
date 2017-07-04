@@ -10,7 +10,7 @@
     </item>
     <item
         android:bottom="10dp"
-        android:drawable="@drawable/ic_pause"
+        android:drawable="@drawable/ic_cut"
         android:left="10dp"
         android:right="10dp"
         android:top="10dp" />
