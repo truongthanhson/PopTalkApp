@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <View
@@ -13,12 +14,16 @@
     <EditText
         android:id="@+id/edit_text_id"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/white"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
         android:hint="Enter Here ..."
-        android:inputType="text"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:inputType="textNoSuggestions"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:selectAllOnFocus="true"
+        android:textColor="@color/text_secondary_dark"
+        android:textColorHighlight="#b303a9f4"
         android:textSize="16sp" />
 
     <View
