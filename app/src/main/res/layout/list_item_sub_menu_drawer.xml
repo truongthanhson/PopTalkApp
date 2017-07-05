@@ -5,6 +5,7 @@
   android:layout_height="@dimen/list_item_height">
 
   <TextView
+    style="@style/NavigationDrawer.Item.TextApperance"
     android:id="@+id/list_item_artist_name"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

@@ -14,6 +14,7 @@
     android:layout_marginLeft="@dimen/horizontal_margin" />
 
   <TextView
+    style="@style/NavigationDrawer.Item.TextApperance"
     android:id="@+id/list_item_genre_name"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

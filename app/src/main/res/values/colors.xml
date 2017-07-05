@@ -2,7 +2,7 @@
 <resources>
 
     <color name="transparent">#00000000</color>
-    <color name="background">#000000</color>
+    <color name="background">@color/colorPrimary</color>
     <!-- common colours -->
     <color name="text_primary_dark">#de000000</color> <!-- 87% -->
     <color name="text_secondary_dark">#8a000000</color> <!-- 54% -->
@@ -12,8 +12,8 @@
     <color name="text_disabled_light">#4dffffff</color> <!-- 30% -->
     <color name="colorPrimary">#212121</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorPrimaryLight">#484848</color>
-    <color name="colorAccent">#9E9E9E</color>
+    <color name="colorPrimaryLight">#303030</color>
+    <color name="colorAccent">#424242</color>
     <color name="primary_text">#ffffff</color>
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
