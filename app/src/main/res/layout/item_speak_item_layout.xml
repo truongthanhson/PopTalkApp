@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="@color/transparent"
+    card_view:cardBackgroundColor="@color/colorAccent"
     card_view:cardCornerRadius="3dp"
     card_view:cardElevation="4dp"
     card_view:cardPreventCornerOverlap="true"
@@ -44,12 +44,14 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:maxLines="1"
                 android:ellipsize="end"
                 style="@style/SpeakItem.Description"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tv_lang_id"
+                android:maxLines="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"

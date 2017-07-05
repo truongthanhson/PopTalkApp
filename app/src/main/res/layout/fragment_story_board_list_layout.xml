@@ -4,12 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f1f5f7">
+    android:background="@color/background">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/story_board_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#f1f5f7"
         android:scrollbars="none" />
 </android.support.design.widget.CoordinatorLayout>

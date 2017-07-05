@@ -54,6 +54,18 @@
         <item name="android:textColor">@color/textColorPrimary</item>
     </style>
 
+    <style name="TextAppearance.SpeakItemDetail.Location" parent="">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.SpeakItemDetail.Time" parent="">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.RecordPanel.Button.Title" parent="">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
     <style name="NavigationDrawer.Background" parent="">
         <item name="android:background">@color/colorPrimary</item>
     </style>

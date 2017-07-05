@@ -65,6 +65,7 @@
                     android:src="@drawable/ic_location" />
 
                 <TextView
+                    style="@style/TextAppearance.SpeakItemDetail.Location"
                     android:id="@+id/photo_location_id"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -91,6 +92,7 @@
                     android:src="@drawable/ic_date" />
 
                 <TextView
+                    style="@style/TextAppearance.SpeakItemDetail.Time"
                     android:id="@+id/photo_datetime_id"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
