@@ -3,7 +3,13 @@
 
     <color name="transparent">#00000000</color>
     <color name="background">#000000</color>
-
+    <!-- common colours -->
+    <color name="text_primary_dark">#de000000</color> <!-- 87% -->
+    <color name="text_secondary_dark">#8a000000</color> <!-- 54% -->
+    <color name="text_tertiary_dark">#61000000</color> <!-- 38% -->
+    <color name="text_primary_light">#ffffffff</color>
+    <color name="text_secondary_light">#b3ffffff</color> <!-- 70% -->
+    <color name="text_disabled_light">#4dffffff</color> <!-- 30% -->
     <color name="colorPrimary">#212121</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorPrimaryLight">#484848</color>
@@ -13,6 +19,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
     <color name="dark_icon">#99000000</color>
+    <color name="background_light">#fafafa</color> <!-- grey 50 -->
 
     <color name="textColorPrimary">@color/primary_text</color>
     <color name="textColorSecondary">@color/secondary_text</color>

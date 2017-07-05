@@ -171,7 +171,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
         EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, languages);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_language_layout, R.id.language_name, languages);
         searchText.addTextChangedListener(new TextWatcher() {
 
             @Override

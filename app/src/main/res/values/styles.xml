@@ -60,11 +60,12 @@
 
     <style name="PopTalk.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <!-- Used for the buttons -->
-        <item name="colorAccent">#4CAF50</item>
+        <item name="colorPrimary">#03a9f4</item>
+        <item name="colorAccent">#03a9f4</item>
         <!-- Used for the title and text -->
-        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
         <!-- Used for the background -->
-        <item name="android:background">#424242</item>
+        <item name="android:background">@drawable/dialog_background</item>
     </style>
 
     <!-- ToolBar -->

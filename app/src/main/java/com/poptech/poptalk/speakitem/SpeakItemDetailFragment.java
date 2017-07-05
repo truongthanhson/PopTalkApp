@@ -993,7 +993,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
         EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, sortedLanguages);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_language_layout, R.id.language_name, sortedLanguages);
         searchText.addTextChangedListener(new TextWatcher() {
 
             @Override

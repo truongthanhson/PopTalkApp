@@ -42,4 +42,6 @@
     <dimen name="recycler_item_inset">2dp</dimen>
     <dimen name="recycler_height">200dp</dimen>
 
+    <dimen name="dialog_corners">2dp</dimen>
+
 </resources>
