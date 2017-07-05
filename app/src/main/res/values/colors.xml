@@ -30,7 +30,7 @@
     <color name="level_5">#2ecc71</color>
     <color name="level_default">#000000</color>
 
-    <color name="login_background">#f1f5f7</color>
+    <color name="login_background">#424242</color>
     <color name="login_base_background">#f8f9f9</color>
     <color name="login_footer_background">#ffda1b</color>
     <color name="login_footer_text">#c62828</color>

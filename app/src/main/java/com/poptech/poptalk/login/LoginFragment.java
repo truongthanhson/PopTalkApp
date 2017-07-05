@@ -18,6 +18,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -55,9 +56,9 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     private InputMethodManager mInputManager;
 
-    private TextView mUserName;
+    private AutoCompleteTextView mUserName;
 
-    private EditText mEmail;
+    private AutoCompleteTextView mEmail;
 
     private Button mLoginButton;
 
@@ -83,15 +84,8 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_login_layout, container, false);
         mInputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        mUserName = (TextView) mView.findViewById(R.id.user_name_id);
-        mUserName.setOnClickListener(this);
-        mUserName.setFocusable(false);
-        mUserName.setOnFocusChangeListener(this);
-        mUserName.setOnEditorActionListener(this);
-        mEmail = (EditText) mView.findViewById(R.id.user_email_id);
-        mEmail.setOnClickListener(this);
-        mEmail.setFocusable(false);
-        mEmail.setOnEditorActionListener(this);
+        mUserName = (AutoCompleteTextView) mView.findViewById(R.id.username);
+        mEmail = (AutoCompleteTextView) mView.findViewById(R.id.useremail);
         mLoginButton = (Button) mView.findViewById(R.id.login_button_id);
         mLanguageSpinner = (RelativeLayout) mView.findViewById(R.id.language_spinner_id);
         mLanguageSpinner.setOnClickListener(this);
@@ -221,16 +215,6 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
                 break;
             case R.id.language_spinner_id:
                 mPresenter.getLanguages();
-                break;
-            case R.id.user_name_id:
-                mUserName.setFocusableInTouchMode(true);
-                mUserName.requestFocus();
-                mInputManager.showSoftInput(mUserName, InputMethodManager.SHOW_IMPLICIT);
-                break;
-            case R.id.user_email_id:
-                mEmail.setFocusableInTouchMode(true);
-                mEmail.requestFocus();
-                mInputManager.showSoftInput(mEmail, InputMethodManager.SHOW_IMPLICIT);
                 break;
             default:
                 break;
