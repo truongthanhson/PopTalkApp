@@ -15,11 +15,7 @@
   -->
 <resources>
 
-    <!-- Base application theme. --><style name="AppTheme" parent="Base.AppTheme" />
-
-    <style name="AppTheme.OverlapSystemBar" parent="Base.AppTheme" />
-
-    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="PopTalk" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -46,8 +42,29 @@
         <item name="android:textColor">@color/textColorSecondary</item>
     </style>
 
+    <style name="TextAppearance.SpeakItemList.Caption" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.SpeakItemDetail.RecordedTime" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
     <style name="NavigationDrawer.Background" parent="">
         <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="PopTalk.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">#4CAF50</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <!-- Used for the background -->
+        <item name="android:background">#424242</item>
     </style>
 
     <!-- ToolBar -->

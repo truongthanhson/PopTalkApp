@@ -190,7 +190,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
     }
 
     public void showWifiSettings() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         alertDialog.setTitle("Wifi Setting");
         alertDialog.setMessage("Wifi is not enabled. Do you want to enable wifi?");
         alertDialog.setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
@@ -231,7 +231,7 @@ public class ShareActivity extends AppCompatActivity implements WifiP2pManager.C
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
         } else {
-            builder = new AlertDialog.Builder(this);
+            builder = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         }
         if (device.status == WifiP2pDevice.AVAILABLE) {
             builder.setTitle("Connect")

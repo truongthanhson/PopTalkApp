@@ -79,7 +79,7 @@ public class StoryboardSelecActivity extends AppCompatActivity implements StoryB
     }
 
     private void showInputStoryBoardName() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         builder.setTitle("Set storyboard name");
         builder.setIcon(R.drawable.ic_add_circle);
         LayoutInflater inflater = getLayoutInflater();

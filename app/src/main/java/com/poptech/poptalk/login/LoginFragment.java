@@ -160,7 +160,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
     @Override
     public void onLanguageLoaded(List<String> languages) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity(), R.style.PopTalk_AlertDialog);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
         alertDialog.setView(convertView);

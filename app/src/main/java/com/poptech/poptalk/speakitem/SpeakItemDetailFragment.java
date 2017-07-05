@@ -925,7 +925,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private void showChoosePhotoDialog() {
         CharSequence options[] = new CharSequence[]{"Gallery", "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PopTalk_AlertDialog);
         builder.setTitle("Pickup Photo");
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
@@ -976,7 +976,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         List<String> sortedLanguages = new ArrayList<>(new HashSet<>(languages));
         Collections.sort(sortedLanguages, String.CASE_INSENSITIVE_ORDER);
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity(), R.style.PopTalk_AlertDialog);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
         alertDialog.setView(convertView);
@@ -1030,7 +1030,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void showAudioCuttingDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PopTalk_AlertDialog);
         builder.setTitle("Audio Cutting");
         builder.setMessage("Do you want to cut audio from A to C position?");
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

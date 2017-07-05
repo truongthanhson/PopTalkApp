@@ -299,7 +299,7 @@ public class GalleryActivity extends AppCompatActivity implements LocationListen
 
 
     public void showSettingsAlert() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         alertDialog.setTitle("Location Setting");
         alertDialog.setMessage("Location is not enabled. Do you want to enable location?");
         alertDialog.setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {

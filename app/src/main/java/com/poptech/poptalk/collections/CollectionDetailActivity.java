@@ -85,7 +85,7 @@ public class CollectionDetailActivity extends AppCompatActivity implements Speak
         shareItem.setType(Constants.ShareType.COLLECTION);
         shareItem.setCollection(collection);
         CharSequence choices[] = new CharSequence[]{"Share via Email", "Share via WiFi Direct"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         builder.setTitle("Choose share method");
         builder.setItems(choices, (dialog, which) -> {
             if (which == 0) {

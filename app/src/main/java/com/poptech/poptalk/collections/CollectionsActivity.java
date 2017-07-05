@@ -226,7 +226,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
             case R.id.fab_add_speak_item:
                 CharSequence sources[] = new CharSequence[]{"from Camera", "from Gallery"};
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
                 builder.setTitle("Create new speak item");
                 builder.setItems(sources, (dialog, which) -> {
                     if (which == 0) {
@@ -278,7 +278,7 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void showSettingsAlert() {
-        android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         alertDialog.setTitle("Location Setting");
         alertDialog.setMessage("Location is not enabled. Do you want to enable location?");
         alertDialog.setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {

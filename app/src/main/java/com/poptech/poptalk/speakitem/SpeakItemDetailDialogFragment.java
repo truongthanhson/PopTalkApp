@@ -291,7 +291,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
         List<String> sortedDescription = new ArrayList<>(new HashSet<>(descriptions));
         Collections.sort(sortedDescription, String.CASE_INSENSITIVE_ORDER);
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity(), R.style.PopTalk_AlertDialog);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View convertView = inflater.inflate(R.layout.item_listview_dialog, null);
         alertDialog.setView(convertView);
@@ -343,7 +343,7 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
 
 
     private void addNewCollection() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PopTalk_AlertDialog);
         builder.setTitle("Add Collection");
         builder.setIcon(R.drawable.ic_add_circle);
         LayoutInflater inflater = getActivity().getLayoutInflater();

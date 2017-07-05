@@ -155,7 +155,7 @@ public class SpeakItemDetailActivity extends AppCompatActivity implements SpeakI
         shareItem.setType(Constants.ShareType.SPEAK_ITEM);
         shareItem.setSpeakItem(speakItem);
         CharSequence choices[] = new CharSequence[]{"Share via Email", "Share via WiFi Direct"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.PopTalk_AlertDialog);
         builder.setTitle("Choose share method");
         builder.setItems(choices, (dialog, which) -> {
             if (which == 0) {

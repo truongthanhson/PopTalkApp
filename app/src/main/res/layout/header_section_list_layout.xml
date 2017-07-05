@@ -7,15 +7,13 @@
     android:paddingTop="5dp">
 
     <TextView
+        style="@style/TextAppearance.SpeakItemList.Caption"
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:textColor="@color/colorPrimary"
-        android:textSize="16sp"
-        android:textStyle="bold"
         tools:text="Title test text" />
 
     <View
