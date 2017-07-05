@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <View
@@ -9,25 +11,21 @@
         android:layout_height="0.5dp"
         android:background="@color/colorAccent" />
 
-    <LinearLayout
+    <AutoCompleteTextView
+        android:id="@+id/search_id"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:paddingLeft="10dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_search" />
-
-        <EditText
-            android:id="@+id/search_id"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="Search ..."
-            android:inputType="text"
-            android:textSize="16sp" />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:drawableLeft="@drawable/ic_search"
+        android:hint="Search ..."
+        android:inputType="textNoSuggestions"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:selectAllOnFocus="true"
+        android:textColor="@color/text_secondary_dark"
+        android:textColorHighlight="#b303a9f4"
+        android:textSize="16sp" />
 
     <View
         android:layout_width="match_parent"

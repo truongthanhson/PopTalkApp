@@ -1,7 +1,6 @@
 package com.poptech.poptalk.login;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,13 +8,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -45,16 +40,13 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by sontt on 04/03/2017.
  */
 
-public class LoginFragment extends Fragment implements LoginContract.View, View.OnClickListener, FacebookCallback<LoginResult>, View.OnFocusChangeListener, TextView.OnEditorActionListener {
+public class LoginFragment extends Fragment implements LoginContract.View, View.OnClickListener, FacebookCallback<LoginResult> {
     private static final String TAG = "LoginActivity";
-
-    private InputMethodManager mInputManager;
 
     private AutoCompleteTextView mUserName;
 
@@ -83,7 +75,6 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_login_layout, container, false);
-        mInputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         mUserName = (AutoCompleteTextView) mView.findViewById(R.id.username);
         mEmail = (AutoCompleteTextView) mView.findViewById(R.id.useremail);
         mLoginButton = (Button) mView.findViewById(R.id.login_button_id);
@@ -170,7 +161,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
         final AlertDialog dialog = alertDialog.create();
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
-        EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
+        AutoCompleteTextView searchText = (AutoCompleteTextView) convertView.findViewById(R.id.search_id);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_language_layout, R.id.language_name, languages);
         searchText.addTextChangedListener(new TextWatcher() {
 
@@ -258,39 +249,5 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
     @Override
     public void onError(FacebookException error) {
         Toast.makeText(getActivity(), "Facebook login error " + error.toString(), Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()) {
-            case R.id.user_name_id:
-                mInputManager.hideSoftInputFromWindow(mUserName.getWindowToken(), 0);
-                break;
-            case R.id.user_email_id:
-                mInputManager.hideSoftInputFromWindow(mEmail.getWindowToken(), 0);
-                break;
-            default:
-                break;
-        }
-
-    }
-
-    @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-            switch (v.getId()) {
-                case R.id.user_name_id:
-                    mUserName.setFocusable(false);
-                    mInputManager.hideSoftInputFromWindow(mUserName.getWindowToken(), 0);
-                    break;
-                case R.id.user_email_id:
-                    mEmail.setFocusable(false);
-                    mInputManager.hideSoftInputFromWindow(mEmail.getWindowToken(), 0);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return false;
     }
 }

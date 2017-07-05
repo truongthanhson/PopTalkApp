@@ -31,6 +31,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="40dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:src="@mipmap/ic_launcher" />
 
                 <android.support.design.widget.TextInputLayout
@@ -47,8 +49,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/username"
                         android:inputType="textEmailAddress"
-                        android:textColorHighlight="#b303a9f4"
-                        android:selectAllOnFocus="true" />
+                        android:selectAllOnFocus="true"
+                        android:textColorHighlight="#b303a9f4" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -58,6 +60,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/user_name_id"
                     android:layout_marginBottom="20dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:textColorHint="@color/colorAccent">
 
                     <AutoCompleteTextView
@@ -66,23 +70,23 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/email"
                         android:inputType="textEmailAddress"
-                        android:textColorHighlight="#b303a9f4"
-                        android:selectAllOnFocus="true" />
+                        android:selectAllOnFocus="true"
+                        android:textColorHighlight="#b303a9f4" />
 
                 </android.support.design.widget.TextInputLayout>
 
 
-           <!--     <EditText
-                    android:id="@+id/user_email_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/user_name_id"
-                    android:layout_marginBottom="20dp"
-                    android:background="@color/white"
-                    android:hint="Email"
-                    android:inputType="textEmailAddress"
-                    android:padding="10dp"
-                    android:textSize="16sp" />-->
+                <!--     <EditText
+                         android:id="@+id/user_email_id"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_below="@+id/user_name_id"
+                         android:layout_marginBottom="20dp"
+                         android:background="@color/white"
+                         android:hint="Email"
+                         android:inputType="textEmailAddress"
+                         android:padding="10dp"
+                         android:textSize="16sp" />-->
 
                 <RelativeLayout
                     android:id="@+id/language_spinner_id"
