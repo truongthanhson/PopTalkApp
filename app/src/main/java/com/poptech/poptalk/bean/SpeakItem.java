@@ -46,6 +46,7 @@ public class SpeakItem implements Parcelable {
         language = "";
         addedTime = 0;
         numAccess = 0;
+        audioWaveform = new byte[0];
         setDefaultMark();
     }
 
@@ -270,6 +271,7 @@ public class SpeakItem implements Parcelable {
         dest.writeLong(this.audioDuration);
         dest.writeFloat(this.audioProgress);
         dest.writeInt(this.audioProgressSec);
+        dest.writeInt(this.audioWaveform.length);
         dest.writeByteArray(this.audioWaveform);
         dest.writeFloat(this.audioLeftMark);
         dest.writeFloat(this.audioRightMark);
@@ -290,10 +292,11 @@ public class SpeakItem implements Parcelable {
         this.longitude = in.readDouble();
         this.collectionId = in.readLong();
         this.audioPath = in.readString();
-        this.audioDuration = in.readInt();
+        this.audioDuration = in.readLong();
         this.audioProgress = in.readFloat();
         this.audioProgressSec = in.readInt();
-        this.audioWaveform = in.createByteArray();
+        this.audioWaveform = new byte[in.readInt()];
+        in.readByteArray(this.audioWaveform);
         this.audioLeftMark = in.readFloat();
         this.audioRightMark = in.readFloat();
         this.audioMiddleMark = in.readFloat();
