@@ -827,6 +827,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mRecordWave.setWaveform(mSpeakItem.getAudioWaveform());
         mRecordWave.setVisibility(View.VISIBLE);
         mRecordTimeline.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     private void onRecordStarted() {
