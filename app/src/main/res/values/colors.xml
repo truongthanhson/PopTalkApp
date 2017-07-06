@@ -20,6 +20,7 @@
     <color name="divider">#BDBDBD</color>
     <color name="dark_icon">#99000000</color>
     <color name="background_light">#fafafa</color> <!-- grey 50 -->
+    <color name="progress_indeterminate_tint">#f1c40f</color>
 
     <color name="textColorPrimary">@color/primary_text</color>
     <color name="textColorSecondary">@color/secondary_text</color>
