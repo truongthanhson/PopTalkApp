@@ -68,7 +68,7 @@ public class AudioTimelineView extends View {
         paint2 = new Paint();
         paint2.setColor(0x3f000000);
         paint3 = new Paint();
-        paint3.setColor(0x3f000000);
+        paint3.setColor(0xffffffff);
         paint3.setTextSize(40);
         paint3.setStyle(Paint.Style.FILL);
     }

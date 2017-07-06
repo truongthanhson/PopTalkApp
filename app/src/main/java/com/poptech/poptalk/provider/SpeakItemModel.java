@@ -8,6 +8,7 @@ import com.poptech.poptalk.BaseModel;
 import com.poptech.poptalk.bean.SpeakItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -219,6 +220,9 @@ public class SpeakItemModel implements BaseModel {
                     cursor.close();
                 }
             }
+            Collections.sort(speakItems, (o1, o2) -> (
+                    o1.getAddedTime() < o2.getAddedTime()) ? 1 :
+                    ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : -1));
             return speakItems;
         }
     }

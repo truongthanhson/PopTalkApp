@@ -433,8 +433,9 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             }
         } else if (shareItem.getType() == Constants.ShareType.COLLECTION) {
             Collection collection = shareItem.getCollection();
-            collection.setId(-2);
-            collection.setDescription("Received Collection");
+//            collection.setId(-2);
+//            collection.setDescription("Received Collection");
+            collection.setId(new Random().nextInt(Integer.MAX_VALUE));
             collection.setAddedTime(System.currentTimeMillis());
             for (int i = 0; i < collection.getSpeakItems().size(); i++) {
                 String photoPath = collection.getSpeakItems().get(i).getPhotoPath();

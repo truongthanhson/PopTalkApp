@@ -14,14 +14,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -105,7 +103,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     private View mView;
     private ViewPager mViewPager;
     private ScrollView mScrollView;
-    private InputMethodManager mInputManager;
 
     private ImageView mPhotoView;
     private ImageButton mPhotoEdit;
@@ -219,7 +216,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     }
 
     private void initView() {
-        mInputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         mViewPager = (ViewPager) getActivity().findViewById(R.id.speak_item_pager_id);
         mScrollView = (ScrollView) mView.findViewById(R.id.speak_item_scroll_id);
 
@@ -239,14 +235,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mLanguage2.setOnLongClickListener(this);
         mPhotoDescription = (EditText) mView.findViewById(R.id.description_et_id);
         mPhotoDescription.addTextChangedListener(this);
-        mPhotoDescription.setFocusable(false);
-        mPhotoDescription.setOnClickListener(this);
-        mPhotoDescription.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                mInputManager.hideSoftInputFromWindow(mPhotoDescription.getWindowToken(), 0);
-            }
-        });
 
         // Record
         mRecordMenu = (RelativeLayout) mView.findViewById(R.id.record_menu_rl_id);
@@ -507,11 +495,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.description_et_id:
-                mPhotoDescription.setFocusableInTouchMode(true);
-                mPhotoDescription.requestFocus();
-                mInputManager.showSoftInput(mPhotoDescription, InputMethodManager.SHOW_IMPLICIT);
-                break;
             case R.id.play_current_button_id:
                 playCurrent();
                 break;
@@ -993,7 +976,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
         EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_language_layout, R.id.language_name, sortedLanguages);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_listview_dialog_layout, R.id.row_id, sortedLanguages);
         searchText.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -1055,7 +1038,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                                     try {
                                         long leftTime = (long) (mSpeakItem.getAudioDuration() * mSpeakItem.getAudioLeftMark());
                                         long rightTime = (long) (mSpeakItem.getAudioDuration() * mSpeakItem.getAudioRightMark());
-                                        float durationTime = ((float)rightTime - (float)leftTime) / 1000;
+                                        float durationTime = ((float) rightTime - (float) leftTime) / 1000;
                                         String startTime = String.format("%02d:%02d:%02d.%02d", (leftTime / 1000) / 3600, (leftTime / 1000) / 60, (leftTime / 1000) % 60, (int) (leftTime % 1000L) / 10);
 
                                         String audioIn = mSpeakItem.getAudioPath();
@@ -1127,6 +1110,7 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                 mSpeakItem.setLatitude(location.getLatitude());
                 mSpeakItem.setLongitude(location.getLongitude());
                 mSpeakItem.setLocation("");
+                mPresenter.updateSpeakItem(mSpeakItem);
                 onReloadPhotoView();
                 onReloadPhotoAttribute();
             }

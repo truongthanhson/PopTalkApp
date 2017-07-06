@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -44,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -307,8 +305,8 @@ public class SpeakItemDetailDialogFragment extends BottomSheetDialogFragment imp
         final AlertDialog dialog = alertDialog.create();
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
-        EditText searchText = (EditText) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, sortedDescription);
+        AutoCompleteTextView searchText = (AutoCompleteTextView) convertView.findViewById(R.id.search_id);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_listview_dialog_layout, R.id.row_id, sortedDescription);
         searchText.addTextChangedListener(new TextWatcher() {
 
             @Override

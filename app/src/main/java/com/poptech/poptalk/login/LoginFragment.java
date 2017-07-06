@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -162,7 +161,7 @@ public class LoginFragment extends Fragment implements LoginContract.View, View.
 
         ListView listView = (ListView) convertView.findViewById(R.id.list_view_id);
         AutoCompleteTextView searchText = (AutoCompleteTextView) convertView.findViewById(R.id.search_id);
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_language_layout, R.id.language_name, languages);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.row_listview_dialog_layout, R.id.row_id, languages);
         searchText.addTextChangedListener(new TextWatcher() {
 
             @Override
