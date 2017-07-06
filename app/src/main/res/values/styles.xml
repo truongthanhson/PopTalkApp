@@ -67,7 +67,7 @@
     </style>
 
     <style name="NavigationDrawer.Background" parent="">
-        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:background">@color/half_black</item>
     </style>
 
     <style name="NavigationDrawer.Header.Background" parent="">

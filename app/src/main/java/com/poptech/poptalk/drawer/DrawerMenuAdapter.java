@@ -6,15 +6,21 @@ import android.view.ViewGroup;
 
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.collections.AppMenuOpen;
+import com.thoughtbot.expandablecheckrecyclerview.CheckableChildRecyclerViewAdapter;
+import com.thoughtbot.expandablecheckrecyclerview.models.CheckedExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMenuViewHolder, SubMenuDrawerViewHolder> {
+public class DrawerMenuAdapter extends CheckableChildRecyclerViewAdapter<TopLevelMenuViewHolder, SubMenuDrawerViewHolder> {
     AppMenuOpen delegate;
+    private final Set<Integer> mSelectedPos = Collections.synchronizedSet(new TreeSet<Integer>());
 
-    public DrawerMenuAdapter(List<? extends ExpandableGroup> groups, AppMenuOpen delegate) {
+    public DrawerMenuAdapter(List<? extends CheckedExpandableGroup> groups, AppMenuOpen delegate) {
         super(groups);
         this.delegate = delegate;
     }
@@ -27,50 +33,16 @@ public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMen
     }
 
     @Override
-    public SubMenuDrawerViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_sub_menu_drawer, parent, false);
+    public SubMenuDrawerViewHolder onCreateCheckChildViewHolder(ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.list_item_sub_menu_drawer, viewGroup, false);
         return new SubMenuDrawerViewHolder(view);
     }
 
     @Override
-    public void onBindChildViewHolder(SubMenuDrawerViewHolder holder, int flatPosition,
-                                      final ExpandableGroup group, int childIndex) {
-
-        final SubMenuDrawer subMenu = ((TopLevelMenuDrawer) group).getItems().get(childIndex);
-        holder.setSubMenuName(subMenu.getName());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (group.getTitle().equalsIgnoreCase("view")) {
-                    if (subMenu.getName().equalsIgnoreCase("collection")) {
-                        delegate.onNavigateToViewCollection();
-                    } else if (subMenu.getName().equalsIgnoreCase("list")) {
-                        delegate.onNavigateToViewList();
-                    } else if (subMenu.getName().equalsIgnoreCase("location")) {
-                        delegate.onNavigateToViewLocation();
-                    }
-                } else if (group.getTitle().equalsIgnoreCase("sort by")) {
-                    if (subMenu.getName().equalsIgnoreCase("description")) {
-                        delegate.onNavigateToSortByDescription();
-                    } else if (subMenu.getName().equalsIgnoreCase("language")) {
-                        delegate.onNavigateToSortByLanguage();
-                    } else if (subMenu.getName().equalsIgnoreCase("recent")) {
-                        delegate.onNavigateToSortByRecent();
-                    }
-                } else if (group.getTitle().equalsIgnoreCase("story board")) {
-                    if (subMenu.getName().equalsIgnoreCase("map & datetime")) {
-                        delegate.onNavigateStoryboardMap();
-                    } else if (subMenu.getName().equalsIgnoreCase("frequency")) {
-                        delegate.onNavigateStoryboardFrequency();
-                    }
-                } else if (group.getTitle().equalsIgnoreCase("receive item")) {
-                    if (subMenu.getName().equalsIgnoreCase("wifi direct")) {
-                        delegate.onNavigateToReceiveScreen();
-                    }
-                }
-            }
-        });
+    public void onBindCheckChildViewHolder(SubMenuDrawerViewHolder subMenuDrawerViewHolder, int i, CheckedExpandableGroup checkedExpandableGroup, int childIndex) {
+        final SubMenuDrawer subMenu = (SubMenuDrawer) checkedExpandableGroup.getItems().get(childIndex);
+        subMenuDrawerViewHolder.setSubMenuName(subMenu.getName());
     }
 
     @Override
@@ -78,5 +50,10 @@ public class DrawerMenuAdapter extends ExpandableRecyclerViewAdapter<TopLevelMen
                                       ExpandableGroup group) {
 
         holder.setTopLevelMenu(group);
+    }
+
+    @Override
+    public void onChildCheckChanged(View view, boolean checked, int flatPos) {
+        super.onChildCheckChanged(view, checked, flatPos);
     }
 }
