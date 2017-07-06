@@ -464,6 +464,9 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         if (mAudioCtrl.generateWaveform(mSpeakItem)) {
             mPlayMenu.setVisibility(View.VISIBLE);
             mWaveformMenu.setVisibility(View.VISIBLE);
+            mTimerText.setVisibility(View.VISIBLE);
+            Long time = mSpeakItem.getAudioDuration() / 1000;
+            mTimerText.setText(String.format("%02d:%02d", time / 60, time % 60));
         }
     }
 
@@ -720,7 +723,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
             params.leftMargin = AndroidUtilities.dp(100);
             mSlideCancel.setLayoutParams(params);
             mSlideCancel.setVisibility(View.GONE);
-            mTimerText.setVisibility(View.GONE);
             mRecordButton.setTranslationX(0);
             Utils.scaleView(mRecordButton, 1.0f, 1.0f);
         }
@@ -742,8 +744,6 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         } else {
             mPlayRepeatButton.setSelected(false);
         }
-        mTimerText.setText("00:00");
-        mTimerText.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -828,6 +828,8 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
         mRecordWave.setVisibility(View.VISIBLE);
         mRecordTimeline.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
+        Long time = mSpeakItem.getAudioDuration() / 1000;
+        mTimerText.setText(String.format("%02d:%02d", time / 60, time % 60));
     }
 
     private void onRecordStarted() {
