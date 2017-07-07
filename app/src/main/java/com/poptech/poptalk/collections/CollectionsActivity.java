@@ -65,6 +65,8 @@ import com.poptech.poptalk.utils.SaveData;
 import com.poptech.poptalk.utils.StringUtils;
 import com.poptech.poptalk.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.thoughtbot.expandablecheckrecyclerview.listeners.OnCheckChildClickListener;
+import com.thoughtbot.expandablecheckrecyclerview.models.CheckedExpandableGroup;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -208,6 +210,38 @@ public class CollectionsActivity extends AppCompatActivity implements View.OnCli
 
         mDrawerMenu.setLayoutManager(new LinearLayoutManager(this));
         mDrawerMenuAdapter = new DrawerMenuAdapter(DrawerMenuDataFactory.makeDrawerMenu(), this);
+        mDrawerMenuAdapter.setChildClickListener(new OnCheckChildClickListener() {
+            @Override
+            public void onCheckChildCLick(View v, boolean checked, CheckedExpandableGroup checkedExpandableGroup, int childIndex) {
+            if (checkedExpandableGroup.getTitle().equalsIgnoreCase("view")) {
+                if (childIndex == 0) {
+                    onNavigateToViewCollection();
+                } else if (childIndex == 1) {
+                    onNavigateToViewList();
+                } else if (childIndex == 2) {
+                    onNavigateToViewLocation();
+                }
+            } else if (checkedExpandableGroup.getTitle().equalsIgnoreCase("sort by")) {
+                if (childIndex == 0) {
+                    onNavigateToSortByDescription();
+                } else if (childIndex == 1) {
+                    onNavigateToSortByLanguage();
+                } else if (childIndex == 2) {
+                    onNavigateToSortByRecent();
+                }
+            } else if (checkedExpandableGroup.getTitle().equalsIgnoreCase("story board")) {
+                if (childIndex == 0) {
+                    onNavigateStoryboardMap();
+                } else if (childIndex == 1) {
+                    onNavigateStoryboardFrequency();
+                }
+            } else if (checkedExpandableGroup.getTitle().equalsIgnoreCase("receive item")) {
+                if (childIndex == 0) {
+                    onNavigateToReceiveScreen();
+                }
+            }
+            }
+        });
         mDrawerMenu.setAdapter(mDrawerMenuAdapter);
     }
 

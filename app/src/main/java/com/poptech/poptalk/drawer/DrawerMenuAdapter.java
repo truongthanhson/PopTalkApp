@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.poptech.poptalk.R;
 import com.poptech.poptalk.collections.AppMenuOpen;
 import com.thoughtbot.expandablecheckrecyclerview.CheckableChildRecyclerViewAdapter;
+import com.thoughtbot.expandablecheckrecyclerview.listeners.OnChildCheckChangedListener;
 import com.thoughtbot.expandablecheckrecyclerview.models.CheckedExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
@@ -48,12 +49,7 @@ public class DrawerMenuAdapter extends CheckableChildRecyclerViewAdapter<TopLeve
     @Override
     public void onBindGroupViewHolder(TopLevelMenuViewHolder holder, int flatPosition,
                                       ExpandableGroup group) {
-
         holder.setTopLevelMenu(group);
     }
 
-    @Override
-    public void onChildCheckChanged(View view, boolean checked, int flatPos) {
-        super.onChildCheckChanged(view, checked, flatPos);
-    }
 }
