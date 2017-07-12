@@ -651,6 +651,19 @@ public class SpeakItemDetailFragment extends Fragment implements NotificationCen
                     }).check();
 
                     if (mRecordPermission) {
+                        // Pause Audio
+                        switch (mPlayState) {
+                            case CURRENT:
+                                mPlayState = PlayState.CURRENT_PAUSE;
+                                break;
+                            case NEXT:
+                                mPlayState = PlayState.NEXT_PAUSE;
+                                break;
+                            case REPEAT:
+                                mPlayState = PlayState.REPEAT_PAUSE;
+                                break;
+                        }
+                        setPlayView();
                         mStartedDraggingX = -1;
                         mRecording = true;
                         setRecordView();
