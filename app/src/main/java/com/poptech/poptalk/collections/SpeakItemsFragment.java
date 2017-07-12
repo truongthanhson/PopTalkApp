@@ -208,23 +208,23 @@ public class SpeakItemsFragment extends Fragment implements SpeakItemsContract.V
             }
         } else {
             if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
-                Collections.sort(collections, (o1, o2) -> o1.getDescription().compareTo(o2.getDescription()));
+                Collections.sort(collections, (o1, o2) -> o1.getDescription().compareToIgnoreCase(o2.getDescription()));
             } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {
-                //Collections.sort(collections, (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
-                Collections.sort(collections, (o1, o2) -> o1.getDescription().compareTo(o2.getDescription()));
+                //Collections.sort(collections, (o1, o2) -> o1.getLanguage().compareToIgnoreCase(o2.getLanguage()));
+                Collections.sort(collections, (o1, o2) -> o1.getDescription().compareToIgnoreCase(o2.getDescription()));
             } else if (mSortType == GroupSpeakItemSortType.RECENT) {
                 Collections.sort(collections, (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
             }
             for (Collection collection : collections) {
                 if (collection.getSpeakItems().size() > 0) {
                     if (mSortType == GroupSpeakItemSortType.DESCRIPTION) {
-                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getDescription1().compareTo(o2.getDescription1()));
+                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getDescription1().compareToIgnoreCase(o2.getDescription1()));
                     } else if (mSortType == GroupSpeakItemSortType.LANGUAGE) {
-                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getLanguage().compareTo(o2.getLanguage()));
+                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> o1.getLanguage().compareToIgnoreCase(o2.getLanguage()));
                     } else if (mSortType == GroupSpeakItemSortType.RECENT) {
-                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? -1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : 1));
+                        Collections.sort(collection.getSpeakItems(), (o1, o2) -> (o1.getAddedTime() < o2.getAddedTime()) ? 1 : ((o1.getAddedTime() == o2.getAddedTime()) ? 0 : -1));
                     }
-                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(collection.getSpeakItems(), collection.getDescription(), R.layout.item_speak_item_layout));
+                    mSectionedSpeakItemAdapter.addSection(new SpeakItemSection(collection.getSpeakItems(), collection.getId() == -1 ? "Unknown Collection" : collection.getDescription(), R.layout.item_speak_item_layout));
                 }
             }
         }
