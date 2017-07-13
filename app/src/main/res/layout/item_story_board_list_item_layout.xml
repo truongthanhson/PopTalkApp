@@ -8,10 +8,9 @@
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardBackgroundColor="@color/text_tertiary_dark"
-    card_view:cardCornerRadius="3dp"
-    card_view:cardElevation="4dp"
-    card_view:cardPreventCornerOverlap="true"
-    card_view:cardUseCompatPadding="true">
+    card_view:cardPreventCornerOverlap="false"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardMaxElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
