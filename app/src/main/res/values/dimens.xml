@@ -43,6 +43,6 @@
     <dimen name="recycler_height">200dp</dimen>
 
     <dimen name="dialog_corners">2dp</dimen>
-    <dimen name="card_margin_horizontal">-3dp</dimen>
+    <dimen name="card_margin_horizontal">3dp</dimen>
     <dimen name="card_margin_vertical">3dp</dimen>
 </resources>
