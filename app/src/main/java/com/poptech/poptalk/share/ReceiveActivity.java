@@ -67,6 +67,7 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executor;
@@ -331,6 +332,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                             }
 
                             // Update Collection
+                            Collections.reverse(speakItems);
                             for (SpeakItem speakItem : speakItems) {
                                 if (mCollectionModel.isCollectionExisted(speakItem.getCollectionId())) {
                                     Collection collection = mCollectionModel.getCollection(speakItem.getCollectionId());
@@ -433,8 +435,9 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
             }
         } else if (shareItem.getType() == Constants.ShareType.COLLECTION) {
             Collection collection = shareItem.getCollection();
-//            collection.setId(-2);
-//            collection.setDescription("Received Collection");
+            if(StringUtils.isNullOrEmpty(collection.getDescription())) {
+                collection.setDescription("Received Collection");
+            }
             collection.setId(new Random().nextInt(Integer.MAX_VALUE));
             collection.setAddedTime(System.currentTimeMillis());
             for (int i = 0; i < collection.getSpeakItems().size(); i++) {
@@ -719,7 +722,7 @@ public class ReceiveActivity extends AppCompatActivity implements WifiP2pManager
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, CollectionDetailActivity.class);
-                    intent.putExtra(Constants.KEY_COLLECTION_ID, mCollections.get(position));
+                    intent.putExtra(Constants.KEY_COLLECTION_ID, mCollections.get(position).getId());
                     startActivity(intent);
                 }
             });
